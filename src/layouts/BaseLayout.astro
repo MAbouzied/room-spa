@@ -1,0 +1,81 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+import '../styles/icons.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+import SeoHead from '../components/SeoHead.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  path?: string;
+  navVariant?: 'home' | 'gift';
+  image?: string;
+  schemas?: Record<string, unknown>[];
+  keywords?: string[];
+}
+
+const {
+  title,
+  description = site.seoDescription,
+  path = '/',
+  navVariant = 'home',
+  image,
+  schemas = [],
+  keywords,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <SeoHead
+      title={title}
+      description={description}
+      path={path}
+      image={image}
+      schemas={schemas}
+      keywords={keywords}
+    />
+    <meta name="generator" content={Astro.generator} />
+    <ClientRouter />
+  </head>
+  <body>
+    <Header variant={navVariant} transition:animate="fade" />
+    <main id="main-content" transition:animate="fade">
+      <slot />
+    </main>
+    <Footer transition:animate="fade" />
+    <WhatsAppFloat transition:persist="whatsapp-float" />
+    <script>
+      const initReveals = () => {
+        const reveals = document.querySelectorAll('.reveal:not(.is-visible)');
+        if (!reveals.length) return;
+
+        if (!('IntersectionObserver' in window)) {
+          reveals.forEach((el) => el.classList.add('is-visible'));
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+        );
+
+        reveals.forEach((el) => observer.observe(el));
+      };
+
+      document.addEventListener('astro:page-load', initReveals);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+---
+import { Icon } from 'astro-icon/components';
+import Button from './Button.astro';
+---
+
+<section class="section gift-banner">
+  <div class="container gift-banner__inner reveal">
+    <div>
+      <p class="gift-banner__eyebrow">
+        <Icon name="mdi:gift-outline" class="icon icon--md" aria-hidden="true" />
+        أهديه ما يستحقه
+      </p>
+      <h3>اهتمامكِ هدية نادرة</h3>
+      <p>
+        أهدِ زوجكِ، أبيكِ، أخيكِ، أو ابنكِ تجربة سبا فاخرة يستحقها — لحظة راحة حقيقية تُعبّر عن
+        اهتمامكِ بطريقة لا تُنسى.
+      </p>
+    </div>
+    <Button href="/gift" variant="accent" shape="xl">
+      <Icon name="mdi:gift" class="icon icon--md" aria-hidden="true" />
+      أهدِ الآن
+    </Button>
+  </div>
+</section>
+
+<style>
+  .gift-banner__inner {
+    display: grid;
+    gap: 1.5rem;
+    align-items: center;
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(192, 166, 140, 0.35);
+    background:
+      radial-gradient(circle at 10% 20%, rgba(192, 166, 140, 0.18), transparent 40%),
+      linear-gradient(135deg, rgba(38, 55, 38, 0.95), rgba(24, 35, 24, 0.98));
+  }
+
+  .gift-banner__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-accent-soft);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .gift-banner h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: 0.65rem;
+  }
+
+  .gift-banner p:last-of-type {
+    color: var(--color-text-muted);
+    max-width: 40rem;
+  }
+
+  @media (min-width: 800px) {
+    .gift-banner__inner {
+      grid-template-columns: 1fr auto;
+    }
+  }
+</style>

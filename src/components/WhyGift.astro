@@ -1,0 +1,94 @@
+---
+import { Icon } from 'astro-icon/components';
+import SectionHeading from './SectionHeading.astro';
+
+const reasons = [
+  {
+    title: 'تجربة فاخرة',
+    text: 'بيئة راقية صُممت خصيصًا للرجل',
+    icon: 'mdi:crown-outline',
+  },
+  {
+    title: 'اهتمام يليق به',
+    text: 'اختيار يُعبّر عن تقديركِ لمكانته',
+    icon: 'mdi:heart-outline',
+  },
+  {
+    title: 'لحظات لا تُنسى',
+    text: 'تجربة يتذكر تفاصيلها بامتنان',
+    icon: 'mdi:star-four-points-outline',
+  },
+  {
+    title: 'بيئة مريحة',
+    text: 'أجواء هادئة تضمن له استرخاءً كاملاً',
+    icon: 'mdi:shield-check-outline',
+  },
+];
+---
+
+<section class="section why-gift" id="why-gift">
+  <div class="container">
+    <SectionHeading
+      eyebrow="لماذا الإهداء من روم سبا"
+      title="لأن الهدية الحقيقية شعور"
+      highlight="شعور"
+    />
+    <div class="why-gift__grid">
+      {
+        reasons.map((reason) => (
+          <article class="why-gift__card reveal">
+            <div class="why-gift__icon" aria-hidden="true">
+              <Icon name={reason.icon} class="icon icon--lg" />
+            </div>
+            <h3>{reason.title}</h3>
+            <p>{reason.text}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .why-gift__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .why-gift__card {
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: transparent;
+  }
+
+  .why-gift__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    margin-bottom: 0.9rem;
+    color: var(--color-accent-soft);
+  }
+
+  .why-gift__card h3 {
+    margin-bottom: 0.45rem;
+    font-size: 1.15rem;
+  }
+
+  .why-gift__card p {
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 800px) {
+    .why-gift__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .why-gift__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

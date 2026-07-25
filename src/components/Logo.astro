@@ -1,0 +1,106 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  class?: string;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const { class: className = '', size = 'md' } = Astro.props;
+---
+
+<span class:list={['logo', `logo--${size}`, className]}>
+  <img class="logo__mark" src="/images/logo-mark.png" alt="" width="80" height="80" />
+  <span class="logo__text">
+    <span class="logo__ar">{site.nameAr}</span>
+    <span class="logo__en">{site.nameEn}</span>
+  </span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    line-height: 1.1;
+  }
+
+  .logo__mark {
+    object-fit: contain;
+    display: block;
+  }
+
+  .logo__text {
+    display: grid;
+    justify-items: center;
+    gap: 0.1rem;
+  }
+
+  .logo__ar {
+    font-weight: 800;
+    color: var(--color-text);
+  }
+
+  .logo__en {
+    font-family: var(--font-display);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-accent-soft);
+    font-weight: 600;
+  }
+
+  .logo--sm .logo__mark {
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+
+  .logo--sm .logo__ar {
+    font-size: 0.85rem;
+  }
+
+  .logo--sm .logo__en {
+    font-size: 0.55rem;
+  }
+
+  .logo--md .logo__mark {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .logo--md .logo__ar {
+    font-size: 0.9rem;
+  }
+
+  .logo--md .logo__en {
+    font-size: 0.58rem;
+  }
+
+  @media (min-width: 768px) {
+    .logo--md .logo__mark {
+      width: 2.35rem;
+      height: 2.35rem;
+    }
+
+    .logo--md .logo__ar {
+      font-size: 0.98rem;
+    }
+
+    .logo--md .logo__en {
+      font-size: 0.62rem;
+    }
+  }
+
+  .logo--lg .logo__mark {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+
+  .logo--lg .logo__ar {
+    font-size: 1.45rem;
+  }
+
+  .logo--lg .logo__en {
+    font-size: 0.85rem;
+  }
+</style>

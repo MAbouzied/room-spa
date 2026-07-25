@@ -1,0 +1,197 @@
+---
+import { Icon } from 'astro-icon/components';
+import { site } from '../data/site';
+import Button from './Button.astro';
+
+interface Props {
+  variant?: 'home' | 'gift';
+}
+
+const { variant = 'home' } = Astro.props;
+const isGift = variant === 'gift';
+---
+
+<section class:list={['hero', isGift && 'hero--gift']} id="hero">
+  {
+    !isGift && (
+      <>
+        <div class="hero__media" aria-hidden="true">
+          <video
+            class="hero__video"
+            autoplay
+            muted
+            playsinline
+            preload="metadata"
+            poster="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=2000&q=70"
+          >
+            <source src="/videos/hero.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="hero__overlay" aria-hidden="true" />
+      </>
+    )
+  }
+  <div class="hero__content container">
+    {
+      isGift ? (
+        <>
+          <p class="hero__badge">
+            <Icon name="mdi:gift-outline" class="icon icon--md" aria-hidden="true" />
+            إهداءات روم سبا
+          </p>
+          <h1>
+            أهديه <span class="text-gradient-gold">لحظة</span>
+            <br />
+            <span class="text-gradient-gold">هدوء</span> حقيقية
+          </h1>
+          <p class="hero__lead">
+            أنتِ تختارين الباقة، ونحن نتولّى استقباله وضيافته وخدمته بأرقى صورة تليق به
+          </p>
+          <div class="hero__actions">
+            <Button href={site.whatsappGiftUrl} variant="accent" shape="xl" external>
+              <Icon name="mdi:gift-outline" class="icon icon--md" aria-hidden="true" />
+              أهديه الآن
+            </Button>
+            <Button href="#packages" variant="outline" shape="xl">تصفّحي الباقات</Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h1>
+            <span class="text-gradient-gold">الفخامة..</span> تزهى بك
+          </h1>
+          <p class="hero__lead">
+            الوجهة الرجالية الأولى في الرياض، حيث تبدأ تجربة مختلفة تليق بذوقك.
+          </p>
+          <div class="hero__actions">
+            <Button href={site.whatsappBookUrl} variant="whatsapp-dark" shape="xl" external>
+              <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
+              احجز عبر الواتساب
+            </Button>
+            <Button href={`tel:${site.phoneTel}`} variant="accent" shape="xl">
+              <Icon name="mdi:phone" class="icon icon--md" aria-hidden="true" />
+              {site.phoneDisplay}
+            </Button>
+          </div>
+        </>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: calc(var(--header-h) + 2.5rem) 0 4.5rem;
+    overflow: hidden;
+  }
+
+  .hero--gift {
+    min-height: min(88svh, 44rem);
+    padding-top: calc(var(--header-h) + 4rem);
+    background:
+      radial-gradient(circle at 50% 20%, rgba(156, 143, 124, 0.12), transparent 50%),
+      linear-gradient(180deg, rgba(24, 35, 24, 0.55), transparent 70%);
+  }
+
+  .hero__media {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(32, 46, 31, 0.35),
+      rgba(32, 46, 31, 0.25),
+      rgba(32, 46, 31, 0.78)
+    );
+    pointer-events: none;
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 52rem;
+    animation: heroIn 0.9s var(--ease-out) both;
+  }
+
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 1.05rem;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-accent-soft);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 7vw, 4.75rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .hero__lead {
+    margin-top: 1.15rem;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--color-text-muted);
+    max-width: 40rem;
+    margin-inline: auto;
+    line-height: 1.85;
+  }
+
+  .hero__actions {
+    margin-top: 2.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.85rem;
+  }
+
+  @media (max-width: 479px) {
+    .hero {
+      min-height: 100svh;
+      padding-top: calc(var(--header-h) + 1.5rem);
+      padding-bottom: 3rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.95rem, 9vw, 2.5rem);
+    }
+
+    .hero__actions {
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+  }
+
+  @keyframes heroIn {
+    from {
+      opacity: 0;
+      transform: translateY(1.25rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

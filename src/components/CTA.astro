@@ -1,0 +1,106 @@
+---
+import { Icon } from 'astro-icon/components';
+import { site } from '../data/site';
+import Button from './Button.astro';
+
+interface Props {
+  variant?: 'home' | 'gift';
+}
+
+const { variant = 'home' } = Astro.props;
+const isGift = variant === 'gift';
+---
+
+<section class:list={['section', 'cta', isGift && 'cta--gift', !isGift && 'section--gradient']}>
+  <div class="container cta__inner reveal">
+    {
+      isGift ? (
+        <>
+          <h2>
+            اجعلي اهتمامكِ <span class="text-gradient-gold">يصل إليه</span>
+          </h2>
+          <p>
+            تواصلي معنا الآن وسنتولى كل التفاصيل — من اختيار التوقيت المناسب وحتى استقباله بأرقى ما
+            يستحق.
+          </p>
+          <div class="cta__actions">
+            <Button href={site.whatsappGiftUrl} variant="accent" shape="xl" external>
+              <Icon name="mdi:message-text-outline" class="icon icon--md" aria-hidden="true" />
+              أهديه الآن
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h2>
+            جاهز لتجربة <span class="text-gradient-gold">استثنائية</span>؟
+          </h2>
+          <p>
+            احجز موعدك الآن واستمتع بأفضل تجربة سبا رجالية في الرياض. فريقنا ينتظرك على مدار الساعة.
+          </p>
+          <div class="cta__actions">
+            <Button href={site.whatsappBookUrl} variant="whatsapp" shape="xl" external>
+              <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
+              احجز عبر الواتساب
+            </Button>
+            <Button href={`tel:${site.phoneTel}`} variant="outline" shape="xl">
+              <Icon name="mdi:phone" class="icon icon--md" aria-hidden="true" />
+              اتصل بنا الآن
+            </Button>
+          </div>
+        </>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .cta--gift {
+    padding-block: clamp(5rem, 10vw, 7rem);
+  }
+
+  .cta__inner {
+    text-align: center;
+  }
+
+  .cta:not(.cta--gift) .cta__inner {
+    padding: clamp(2rem, 5vw, 3.5rem);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-soft);
+    background:
+      radial-gradient(circle at 50% 0%, rgba(156, 143, 124, 0.16), transparent 55%),
+      rgba(0, 0, 0, 0.12);
+  }
+
+  .cta h2 {
+    font-size: clamp(1.75rem, 4vw, 2.6rem);
+    margin-bottom: 0.85rem;
+    font-weight: 700;
+  }
+
+  .cta p {
+    color: var(--color-text-muted);
+    max-width: 38rem;
+    margin-inline: auto;
+    font-size: 1.05rem;
+  }
+
+  .cta__actions {
+    margin-top: 1.85rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.85rem;
+  }
+
+  @media (max-width: 479px) {
+    .cta h2 {
+      font-size: clamp(1.45rem, 7vw, 1.85rem);
+    }
+
+    .cta__actions {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>

@@ -1,0 +1,273 @@
+---
+import { Icon } from 'astro-icon/components';
+import { site } from '../data/site';
+import Button from './Button.astro';
+import Logo from './Logo.astro';
+
+interface Props {
+  variant?: 'home' | 'gift';
+}
+
+const { variant = 'home' } = Astro.props;
+
+const homeLinks = [
+  { href: '/#hero', label: 'الرئيسية' },
+  { href: '/#about', label: 'من نحن' },
+  { href: '/#photos', label: 'صورنا' },
+  { href: '/#services', label: 'خدماتنا' },
+  { href: '/#packages', label: 'الباقات' },
+  { href: '/gift', label: 'الإهداءات' },
+  { href: '/#branches', label: 'الفروع' },
+  { href: '/#testimonials', label: 'آراء العملاء' },
+];
+
+const giftLinks = [
+  { href: '/gift', label: 'الرئيسية' },
+  { href: '/gift#recipients', label: 'لمن تُهدين' },
+  { href: '/gift#why-gift', label: 'لماذا روم سبا' },
+  { href: '/gift#packages', label: 'الباقات' },
+  { href: '/gift#testimonials', label: 'آراء العملاء' },
+  { href: '/gift#branches', label: 'فروعنا' },
+];
+
+const links = variant === 'gift' ? giftLinks : homeLinks;
+---
+
+<header class="site-header" data-header>
+  <div class="site-header__inner container">
+    <a class="site-header__brand" href="/" aria-label="الذهاب لبداية الصفحة">
+      <Logo />
+    </a>
+
+    <nav class="site-header__nav" aria-label="التنقل الرئيسي" data-nav>
+      {
+        links.map((link) => (
+          <a href={link.href}>{link.label}</a>
+        ))
+      }
+    </nav>
+
+    <div class="site-header__actions">
+      <div class="site-header__cta">
+        <Button href={site.whatsappBookUrl} variant="accent" external>
+          <Icon name="mdi:message-text-outline" class="icon icon--md" aria-hidden="true" />
+          تواصل معنا
+        </Button>
+      </div>
+      <button
+        class="site-header__menu"
+        type="button"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        data-menu-toggle
+      >
+        <span class="visually-hidden">فتح القائمة</span>
+        <Icon name="mdi:menu" class="icon icon--lg site-header__menu-open" aria-hidden="true" />
+        <Icon name="mdi:close" class="icon icon--lg site-header__menu-close" aria-hidden="true" />
+      </button>
+    </div>
+  </div>
+
+  <div class="site-header__drawer" id="mobile-nav" data-drawer hidden>
+    <nav aria-label="تنقل الجوال">
+      {
+        links.map((link) => (
+          <a href={link.href} data-drawer-link>
+            {link.label}
+          </a>
+        ))
+      }
+      <Button href={site.whatsappBookUrl} variant="accent" external>
+        <Icon name="mdi:message-text-outline" class="icon icon--md" aria-hidden="true" />
+        تواصل معنا
+      </Button>
+    </nav>
+  </div>
+</header>
+
+<script>
+  let scrollController: AbortController | null = null;
+
+  const closeDrawer = () => {
+    const toggle = document.querySelector('[data-menu-toggle]');
+    const drawer = document.querySelector('[data-drawer]');
+    if (!(toggle instanceof HTMLButtonElement) || !(drawer instanceof HTMLElement)) return;
+    toggle.setAttribute('aria-expanded', 'false');
+    drawer.hidden = true;
+    document.body.style.overflow = '';
+  };
+
+  const initHeader = () => {
+    const header = document.querySelector('[data-header]');
+    const toggle = document.querySelector('[data-menu-toggle]');
+    const drawer = document.querySelector('[data-drawer]');
+    const drawerLinks = document.querySelectorAll('[data-drawer-link]');
+
+    const setOpen = (open: boolean) => {
+      if (!(toggle instanceof HTMLButtonElement) || !(drawer instanceof HTMLElement)) return;
+      toggle.setAttribute('aria-expanded', String(open));
+      drawer.hidden = !open;
+      document.body.style.overflow = open ? 'hidden' : '';
+    };
+
+    if (toggle instanceof HTMLButtonElement && !toggle.dataset.bound) {
+      toggle.dataset.bound = 'true';
+      toggle.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        setOpen(!open);
+      });
+    }
+
+    drawerLinks.forEach((link) => {
+      if (!(link instanceof HTMLElement) || link.dataset.bound) return;
+      link.dataset.bound = 'true';
+      link.addEventListener('click', () => setOpen(false));
+    });
+
+    scrollController?.abort();
+    scrollController = new AbortController();
+    const onScroll = () => {
+      header?.classList.toggle('is-scrolled', window.scrollY > 24);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, {
+      passive: true,
+      signal: scrollController.signal,
+    });
+  };
+
+  document.addEventListener('astro:page-load', initHeader);
+  document.addEventListener('astro:before-swap', closeDrawer);
+</script>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 50;
+    height: var(--header-h);
+    transition: background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+  }
+
+  .site-header.is-scrolled {
+    background: rgba(24, 35, 24, 0.92);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 100%;
+  }
+
+  .site-header__brand {
+    display: inline-flex;
+  }
+
+  .site-header__nav {
+    display: none;
+    align-items: center;
+    gap: 1.1rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .site-header__nav a {
+    opacity: 0.88;
+    transition: opacity 0.2s;
+  }
+
+  .site-header__nav a:hover {
+    opacity: 1;
+    color: var(--color-accent-soft);
+  }
+
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .site-header__cta {
+    display: none;
+  }
+
+  .site-header__menu {
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    display: grid;
+    place-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--color-text);
+  }
+
+  .site-header__menu-close {
+    display: none;
+  }
+
+  .site-header__menu[aria-expanded='true'] .site-header__menu-open {
+    display: none;
+  }
+
+  .site-header__menu[aria-expanded='true'] .site-header__menu-close {
+    display: block;
+  }
+
+  .site-header__drawer {
+    position: fixed;
+    inset: var(--header-h) 0 0;
+    background: rgba(24, 35, 24, 0.97);
+    padding: 1.5rem;
+    overflow: auto;
+  }
+
+  .site-header__drawer nav {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .site-header__drawer a:not(.btn) {
+    padding: 0.9rem 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+    font-weight: 600;
+  }
+
+  .site-header__drawer .btn {
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  @media (min-width: 768px) and (max-width: 1099px) {
+    .site-header__cta {
+      display: block;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .site-header__nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 48rem;
+      gap: 0.85rem 1rem;
+      font-size: 0.88rem;
+    }
+
+    .site-header__cta {
+      display: block;
+    }
+
+    .site-header__menu,
+    .site-header__drawer {
+      display: none;
+    }
+  }
+</style>

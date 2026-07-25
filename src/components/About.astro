@@ -1,0 +1,107 @@
+---
+import { Icon } from 'astro-icon/components';
+import SectionHeading from './SectionHeading.astro';
+
+const features = [
+  {
+    title: 'فريق احترافي',
+    text: 'مختصون ذو كفاءة عالية',
+    icon: 'mdi:account-tie',
+  },
+  {
+    title: 'متاح ٢٤ ساعة',
+    text: 'نستقبلك في أي وقت طوال أيام الأسبوع',
+    icon: 'mdi:clock-outline',
+  },
+  {
+    title: 'خصوصية مطلقة',
+    text: 'غرف خاصة معزولة تضمن راحتك التامة',
+    icon: 'mdi:shield-check-outline',
+  },
+  {
+    title: 'سبا متكامل',
+    text: 'خدمات المساج والحمام المغربي وتنظيف البشرة في مكان واحد',
+    icon: 'mdi:star-four-points-outline',
+  },
+];
+---
+
+<section class="section section--gradient about" id="about">
+  <div class="container">
+    <SectionHeading
+      eyebrow="من نحن"
+      title="وجهة الرجل الأولى للراحة والرفاهية"
+      highlight="والرفاهية"
+      lead="روم سبا هو المكان الذي يجمع بين الفخامة والاسترخاء في آنٍ واحد، بخدمات مصممة خصيصًا للعناية بالرجل، يقدمها كادر احترافي يكرّس وقته واهتمامه لك."
+      align="start"
+    />
+    <div class="about__grid">
+      {
+        features.map((feature) => (
+          <article class="about__card reveal">
+            <div class="about__icon" aria-hidden="true">
+              <Icon name={feature.icon} class="icon icon--lg" />
+            </div>
+            <p class="about__title">{feature.title}</p>
+            <p class="about__text">{feature.text}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .about__grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  .about__card {
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: transparent;
+    text-align: center;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s var(--ease-out);
+  }
+
+  .about__card:hover {
+    background: var(--color-surface);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .about__icon {
+    width: 3rem;
+    height: 3rem;
+    margin: 0 auto 1rem;
+    display: grid;
+    place-items: center;
+    color: var(--color-accent-soft);
+  }
+
+  .about__title {
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .about__text {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  @media (min-width: 700px) {
+    .about__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1000px) {
+    .about__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

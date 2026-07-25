@@ -1,0 +1,152 @@
+---
+import { Icon } from 'astro-icon/components';
+import { site } from '../data/site';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  highlight?: string;
+  lead?: string;
+  variant?: 'home' | 'gift';
+}
+
+const {
+  eyebrow = 'فروعنا',
+  title = 'فروعنا في الرياض',
+  highlight = 'الرياض',
+  lead = 'ستجد فرعًا قريبًا منك في الرياض، بمواعيد عمل تناسبك طوال أيام الأسبوع.',
+  variant = 'home',
+} = Astro.props;
+
+const isGift = variant === 'gift';
+---
+
+<section class="section branches" id="branches">
+  <div class="container">
+    <SectionHeading eyebrow={eyebrow} title={title} highlight={highlight} lead={lead || undefined} />
+    <div class="branches__grid">
+      {
+        site.branches.map((branch) => {
+          const [line1, line2] = branch.address.split(' - ');
+          return (
+            <a class:list={['branches__card', 'reveal', isGift && 'branches__card--gift']} href={branch.mapsUrl}>
+              <div class="branches__icon" aria-hidden="true">
+                <Icon name="mdi:map-marker-outline" class="icon icon--lg" />
+              </div>
+              <h3>{branch.name}</h3>
+              <p>{line1}</p>
+              {line2 && <p>{line2}</p>}
+              {!isGift && <p class="branches__hours">{branch.hours}</p>}
+              {!isGift ? (
+                <div class="branches__meta">
+                  <span class="branches__phone">
+                    <Icon name="mdi:phone" class="icon icon--sm" aria-hidden="true" />
+                    {site.phoneDisplay}
+                  </span>
+                  <span class="branches__map">
+                    <Icon name="mdi:map-outline" class="icon icon--sm" aria-hidden="true" />
+                    الموقع
+                  </span>
+                </div>
+              ) : (
+                <span class="branches__open">افتح الموقع</span>
+              )}
+            </a>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .branches__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .branches__card {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: rgba(0, 0, 0, 0.12);
+    transition: background 0.2s, transform 0.2s var(--ease-out), border-color 0.2s;
+  }
+
+  .branches__card:hover {
+    background: var(--color-surface-hover);
+    transform: translateY(-2px);
+    border-color: var(--color-accent);
+  }
+
+  .branches__card--gift {
+    text-align: center;
+    justify-items: center;
+    padding-block: 1.75rem;
+  }
+
+  .branches__icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    margin-bottom: 0.35rem;
+    color: var(--color-accent-soft);
+    border: 1px solid var(--color-border);
+    background: transparent;
+  }
+
+  .branches__card h3 {
+    font-size: 1.15rem;
+  }
+
+  .branches__card p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .branches__hours {
+    font-weight: 600;
+    color: var(--color-accent-soft) !important;
+  }
+
+  .branches__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: 0.5rem;
+    font-weight: 700;
+  }
+
+  .branches__phone,
+  .branches__map {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .branches__map,
+  .branches__open {
+    color: var(--color-accent-soft);
+    font-weight: 700;
+    margin-top: 0.65rem;
+  }
+
+  @media (min-width: 800px) {
+    .branches__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .branches__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

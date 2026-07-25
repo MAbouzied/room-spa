@@ -1,0 +1,170 @@
+---
+import { Icon } from 'astro-icon/components';
+import { site } from '../data/site';
+import { serviceCategories } from '../data/services';
+import SectionHeading from './SectionHeading.astro';
+
+const categoryIcons: Record<string, string> = {
+  massage: 'mdi:hand-heart',
+  hammam: 'mdi:shower',
+  pedicure: 'ph:hand',
+  skin: 'mdi:face-man-shimmer-outline',
+};
+---
+
+<section class="section services" id="services">
+  <div class="container">
+    <SectionHeading
+      eyebrow="خدماتنا"
+      title="نقدم مجموعة متكاملة من الخدمات المصممة بعناية"
+      highlight="متكاملة"
+      breakBefore="من الخدمات"
+      lead="لتمنحك راحة عميقة تنعكس على صحتك الجسدية والنفسية"
+    />
+    <div class="services__list">
+      {
+        serviceCategories.map((category) => (
+          <article class="services__category reveal">
+            <h3>
+              <Icon
+                name={categoryIcons[category.id] ?? 'mdi:spa-outline'}
+                class="icon icon--lg"
+                aria-hidden="true"
+              />
+              {category.title}
+            </h3>
+            <div class="services__items">
+              {category.items.map((item) => (
+                <div class="services__item">
+                  <div class="services__item-top">
+                    <p class="services__name">{item.name}</p>
+                    <div class="services__meta">
+                      <span class="services__price">{item.price} ريال</span>
+                      <a
+                        class="services__book"
+                        href={site.whatsappBookUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`احجز ${item.name}`}
+                      >
+                        <Icon name="mdi:calendar-check" class="icon icon--sm" aria-hidden="true" />
+                        احجز
+                      </a>
+                    </div>
+                  </div>
+                  <p class="services__desc">{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .services__list {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .services__category {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    padding: 1.5rem;
+  }
+
+  .services__category h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 1.35rem;
+    margin-bottom: 1.25rem;
+    color: var(--color-accent-soft);
+  }
+
+  .services__items {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .services__item {
+    padding: 1rem 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .services__item:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .services__item-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .services__name {
+    font-weight: 700;
+    font-size: 1.05rem;
+    overflow-wrap: break-word;
+  }
+
+  .services__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .services__price {
+    font-weight: 800;
+    color: var(--color-accent-soft);
+  }
+
+  .services__book {
+    min-height: 2.75rem;
+    min-width: 4.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: #1a2219;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+
+  @media (max-width: 479px) {
+    .services__item-top {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .services__meta {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  .services__book:hover {
+    background: var(--color-accent-soft);
+  }
+
+  .services__desc {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  @media (min-width: 900px) {
+    .services__list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

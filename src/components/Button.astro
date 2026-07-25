@@ -1,0 +1,114 @@
+---
+interface Props {
+  href: string;
+  variant?: 'whatsapp' | 'whatsapp-dark' | 'accent' | 'outline' | 'ghost';
+  shape?: 'pill' | 'xl';
+  class?: string;
+  external?: boolean;
+}
+
+const {
+  href,
+  variant = 'accent',
+  shape = 'pill',
+  class: className = '',
+  external = false,
+} = Astro.props;
+
+const rel = external ? 'noopener noreferrer' : undefined;
+const target = external ? '_blank' : undefined;
+---
+
+<a
+  class:list={['btn', `btn--${variant}`, `btn--shape-${shape}`, className]}
+  href={href}
+  rel={rel}
+  target={target}
+>
+  <slot />
+</a>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-height: 3rem;
+    min-width: 2.75rem;
+    padding: 0.75rem 1.4rem;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+    transition:
+      background 0.2s var(--ease-out),
+      color 0.2s var(--ease-out),
+      border-color 0.2s var(--ease-out),
+      transform 0.2s var(--ease-out);
+  }
+
+  .btn--shape-xl {
+    border-radius: 0.75rem;
+    padding: 0.9rem 2rem;
+    min-height: 3.25rem;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn--whatsapp {
+    background: var(--color-whatsapp);
+    color: #06210f;
+  }
+
+  .btn--whatsapp:hover {
+    background: var(--color-whatsapp-dark);
+  }
+
+  .btn--whatsapp-dark {
+    background: var(--color-hero-wa);
+    color: var(--color-text);
+    border: 1px solid rgba(192, 166, 140, 0.25);
+  }
+
+  .btn--whatsapp-dark:hover {
+    background: #354a37;
+  }
+
+  .btn--accent {
+    background: var(--color-accent);
+    color: #1a2219;
+  }
+
+  .btn--accent:hover {
+    background: var(--color-accent-soft);
+  }
+
+  .btn--outline {
+    border: 1px solid var(--color-accent);
+    color: var(--color-text);
+    background: transparent;
+  }
+
+  .btn--outline:hover {
+    background: rgba(156, 143, 124, 0.12);
+  }
+
+  .btn--ghost {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-text);
+  }
+
+  .btn--ghost:hover {
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  @media (max-width: 479px) {
+    .btn {
+      width: 100%;
+      max-width: 20rem;
+    }
+  }
+</style>

@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Gallery from '../components/Gallery.astro';
+import Services from '../components/Services.astro';
+import Packages from '../components/Packages.astro';
+import GiftBanner from '../components/GiftBanner.astro';
+import Branches from '../components/Branches.astro';
+import Testimonials from '../components/Testimonials.astro';
+import FAQ from '../components/FAQ.astro';
+import CTA from '../components/CTA.astro';
+import { homeTestimonials } from '../data/testimonials';
+import { site } from '../data/site';
+import {
+  buildGraph,
+  organizationSchema,
+  websiteSchema,
+  localBusinessSchema,
+  branchListSchema,
+  servicesItemListSchema,
+  packagesItemListSchema,
+  faqPageSchema,
+  breadcrumbSchema,
+  webPageSchema,
+} from '../lib/schema';
+
+const title = `${site.nameAr} | أفخم سبا رجالي في الرياض`;
+const description = site.seoDescription;
+const path = '/';
+
+const schemas = [
+  buildGraph([
+    organizationSchema(),
+    websiteSchema(),
+    localBusinessSchema(),
+    webPageSchema({ title, description, path }),
+    breadcrumbSchema([{ name: 'الرئيسية', path: '/' }]),
+    servicesItemListSchema(),
+    packagesItemListSchema('/'),
+    branchListSchema(),
+    faqPageSchema(),
+  ]),
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  path={path}
+  navVariant="home"
+  schemas={schemas}
+  keywords={[
+    'سبا رجالي الرياض',
+    'روم سبا',
+    'مساج رجالي',
+    'حمام مغربي للرجال',
+    'باقات سبا',
+    'Room Spa Riyadh',
+  ]}
+>
+  <Hero />
+  <About />
+  <Gallery />
+  <Services />
+  <Packages />
+  <GiftBanner />
+  <Branches />
+  <Testimonials items={homeTestimonials} />
+  <FAQ />
+  <CTA />
+</BaseLayout>

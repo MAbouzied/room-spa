@@ -1,0 +1,106 @@
+---
+import SectionHeading from './SectionHeading.astro';
+
+const recipients = [
+  {
+    title: 'زوجكِ',
+    text: 'بعد يوم طويل، يستحق ساعة من الراحة المطلقة',
+    emoji: '💍',
+  },
+  {
+    title: 'والدكِ',
+    text: 'أجمل ردّ لجميله — اهتمام يلمس قلبه',
+    emoji: '👨‍🦳',
+  },
+  {
+    title: 'أخوكِ',
+    text: 'هدية مميزة تُذكّره بمكانته عندكِ',
+    emoji: '🤝',
+  },
+  {
+    title: 'ابنكِ',
+    text: 'احتفلي بإنجازه بتجربة رجالية فاخرة',
+    emoji: '🎓',
+  },
+];
+---
+
+<section class="section section--gradient recipients" id="recipients">
+  <div class="container">
+    <SectionHeading
+      eyebrow="لمن تُهدين"
+      title="لرجلٍ استثنائي، هديةٌ تليق بمقامه"
+      highlight="تليق بمقامه"
+      lead="اختاري له لحظة هدوء تليق بمكانته في قلبكِ"
+    />
+    <div class="recipients__grid">
+      {
+        recipients.map((item) => (
+          <article class="recipients__card reveal">
+            <span class="recipients__emoji" aria-hidden="true">
+              {item.emoji}
+            </span>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .recipients__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .recipients__card {
+    padding: 1.75rem 1.35rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: rgba(0, 0, 0, 0.14);
+    text-align: center;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  }
+
+  .recipients__card:hover {
+    background: var(--color-surface);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .recipients__emoji {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .recipients__card h3 {
+    margin-bottom: 0.55rem;
+    font-size: 1.2rem;
+    color: var(--color-accent-soft);
+  }
+
+  .recipients__card p {
+    color: var(--color-text-muted);
+    font-size: 0.98rem;
+    line-height: 1.7;
+  }
+
+  @media (min-width: 800px) {
+    .recipients__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .recipients__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

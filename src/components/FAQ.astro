@@ -1,0 +1,96 @@
+---
+import { faqItems } from '../data/faq';
+import SectionHeading from './SectionHeading.astro';
+---
+
+<section class="section faq" id="faq" itemscope itemtype="https://schema.org/FAQPage">
+  <div class="container faq__inner">
+    <SectionHeading eyebrow="الأسئلة الشائعة" title="كل ما تحتاج معرفته" highlight="معرفته" />
+    <div class="faq__list reveal" data-faq>
+      {
+        faqItems.map((item, index) => (
+          <details
+            class="faq__item"
+            open={index === 0}
+            itemscope
+            itemprop="mainEntity"
+            itemtype="https://schema.org/Question"
+          >
+            <summary itemprop="name">{item.question}</summary>
+            <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">{item.answer}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  const initFaq = () => {
+    const root = document.querySelector('[data-faq]');
+    if (!(root instanceof HTMLElement) || root.dataset.bound) return;
+    root.dataset.bound = 'true';
+
+    root.querySelectorAll('details').forEach((details) => {
+      details.addEventListener('toggle', () => {
+        if (!details.open) return;
+        root.querySelectorAll('details').forEach((other) => {
+          if (other !== details) other.open = false;
+        });
+      });
+    });
+  };
+
+  document.addEventListener('astro:page-load', initFaq);
+</script>
+
+<style>
+  .faq__inner {
+    max-width: 48rem;
+  }
+
+  .faq__list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .faq__item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    padding: 0.35rem 1rem;
+  }
+
+  .faq__item summary {
+    cursor: pointer;
+    list-style: none;
+    font-weight: 700;
+    padding: 0.95rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .faq__item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__item summary::after {
+    content: '+';
+    color: var(--color-accent-soft);
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .faq__item[open] summary::after {
+    content: '−';
+  }
+
+  .faq__item p {
+    padding: 0 0 1rem;
+    color: var(--color-text-muted);
+  }
+</style>

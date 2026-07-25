@@ -1,0 +1,194 @@
+---
+import { Icon } from 'astro-icon/components';
+import { site } from '../data/site';
+import Logo from './Logo.astro';
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    <div class="site-footer__brand">
+      <Logo size="lg" />
+      <h3>{site.nameAr} {site.tagline}</h3>
+      <p>{site.description}</p>
+    </div>
+
+    <div class="site-footer__cols">
+      <div>
+        <h4>فروعنا</h4>
+        <ul>
+          {
+            site.branches.map((branch) => (
+              <li>
+                <a href={branch.mapsUrl}>
+                  <Icon name="mdi:map-marker-outline" class="icon icon--sm" aria-hidden="true" />
+                  {branch.name}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <h4>تواصل معنا</h4>
+        <div class="site-footer__contact">
+          <a href={`tel:${site.phoneTel}`}>
+            <Icon name="mdi:phone" class="icon icon--sm" aria-hidden="true" />
+            {site.phoneDisplay}
+          </a>
+          <a href={site.whatsappBookUrl} target="_blank" rel="noopener noreferrer">
+            <Icon name="mdi:whatsapp" class="icon icon--sm" aria-hidden="true" />
+            واتساب
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-footer__follow">
+      <h4>تابعنا</h4>
+      <div class="site-footer__social">
+        <a href={site.social.snapchat} aria-label="Snapchat" class="site-footer__social-link">
+          <Icon name="mdi:snapchat" class="icon icon--md" aria-hidden="true" />
+        </a>
+        <a href={site.social.instagram} aria-label="Instagram" class="site-footer__social-link">
+          <Icon name="mdi:instagram" class="icon icon--md" aria-hidden="true" />
+        </a>
+        <a href={site.social.tiktok} aria-label="TikTok" class="site-footer__social-link">
+          <Icon name="simple-icons:tiktok" class="icon icon--md" aria-hidden="true" />
+        </a>
+      </div>
+    </div>
+  </div>
+  <p class="site-footer__copy container">
+    جميع الحقوق محفوظة © {new Date().getFullYear()} {site.nameEn} - {site.nameAr}
+  </p>
+</footer>
+
+<style>
+  .site-footer {
+    background: rgba(18, 28, 18, 0.72);
+    border-top: 1px solid var(--color-border-soft);
+    padding-block: 3.5rem 1.75rem;
+  }
+
+  .site-footer__grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .site-footer__brand {
+    text-align: center;
+  }
+
+  .site-footer__brand h3 {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    line-height: 1.5;
+  }
+
+  .site-footer__brand p {
+    margin-top: 0.65rem;
+    color: var(--color-text-muted);
+    max-width: 32rem;
+    margin-inline: auto;
+  }
+
+  .site-footer h4 {
+    font-size: 1rem;
+    margin-bottom: 0.9rem;
+    color: var(--color-accent-soft);
+  }
+
+  .site-footer__cols {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-footer ul {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .site-footer a {
+    color: var(--color-text-muted);
+    transition: color 0.2s;
+  }
+
+  .site-footer a:hover {
+    color: var(--color-text);
+  }
+
+  .site-footer__contact,
+  .site-footer ul a {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .site-footer__contact a,
+  .site-footer ul a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+  }
+
+  .site-footer__follow {
+    text-align: center;
+  }
+
+  .site-footer__social {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .site-footer__social-link {
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    display: grid;
+    place-items: center;
+    color: var(--color-text);
+  }
+
+  .site-footer__social-link:hover {
+    border-color: var(--color-accent-soft);
+    color: var(--color-accent-soft);
+  }
+
+  .site-footer__copy {
+    margin-top: 2.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-border-soft);
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  @media (min-width: 900px) {
+    .site-footer__grid {
+      grid-template-columns: 1.3fr 1fr 0.7fr;
+      align-items: start;
+    }
+
+    .site-footer__brand {
+      text-align: start;
+    }
+
+    .site-footer__brand p {
+      margin-inline: 0;
+    }
+
+    .site-footer__follow {
+      text-align: start;
+    }
+
+    .site-footer__social {
+      justify-content: flex-start;
+    }
+  }
+</style>

@@ -1,0 +1,299 @@
+---
+import { Icon } from 'astro-icon/components';
+import { packages, giftWhatsappUrl } from '../data/packages';
+import { site } from '../data/site';
+import SectionHeading from './SectionHeading.astro';
+import Button from './Button.astro';
+
+interface Props {
+  mode?: 'book' | 'gift';
+  eyebrow?: string;
+  title?: string;
+  highlight?: string;
+  lead?: string;
+  showNote?: boolean;
+}
+
+const {
+  mode = 'book',
+  eyebrow = 'باقاتنا',
+  title = 'اختر الباقة المناسبة لاحتياجك',
+  highlight = 'المناسبة',
+  lead = 'باقات متنوعة مصممة خصيصًا لك، لتمنحك تجربة متكاملة بكل تفاصيلها.',
+  showNote = true,
+} = Astro.props;
+
+const isGift = mode === 'gift';
+const featuredId = isGift ? 'royal' : packages.find((pkg) => pkg.featured)?.id;
+---
+
+<section class:list={['section', 'packages', isGift ? 'section--gradient' : 'section--alt']} id="packages">
+  <div class="container">
+    <SectionHeading eyebrow={eyebrow} title={title} highlight={highlight} lead={lead || undefined} />
+    {
+      isGift && (
+        <div class="packages__tags reveal">
+          <span>
+            <Icon name="mdi:card-account-details-outline" class="icon icon--sm" aria-hidden="true" />
+            بطاقة إهداء مع كل باقة
+          </span>
+          <span>
+            <Icon name="mdi:flower-outline" class="icon icon--sm" aria-hidden="true" />
+            متوفر باقات ورد للإهداء
+          </span>
+        </div>
+      )
+    }
+    <div class="packages__grid">
+      {
+        packages.map((pkg) => (
+          <article class:list={['packages__card', 'reveal', pkg.id === featuredId && 'is-featured']}>
+            {pkg.id === featuredId && !isGift && <p class="packages__badge">الأكثر مبيعاً</p>}
+            {pkg.id === featuredId && isGift && <p class="packages__badge">الأكثر إهداءً</p>}
+            <div class="packages__head">
+              <h3>{pkg.name}</h3>
+              <p>{isGift && pkg.giftDescription ? pkg.giftDescription : pkg.description}</p>
+              <div class="packages__price">
+                <span class="packages__amount">{pkg.price}</span>
+                <span class="packages__currency">ريال</span>
+              </div>
+              <div class="packages__save">
+                <span>بدلاً من</span>
+                <s>{pkg.originalPrice} ريال</s>
+                <span class="packages__save-badge">وفر {pkg.savingsPercent}%</span>
+              </div>
+            </div>
+            <ul>
+              {pkg.features.map((feature) => (
+                <li>
+                  <Icon name="mdi:check-circle" class="icon icon--md packages__check" aria-hidden="true" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            {isGift && (
+              <p class="packages__gift-note">
+                <Icon name="mdi:email-fast-outline" class="icon icon--sm" aria-hidden="true" />
+                يتوفر بطاقة إهداء إلكترونية
+              </p>
+            )}
+            <div class="packages__actions">
+              {isGift ? (
+                <Button
+                  href={giftWhatsappUrl(pkg.giftWhatsappText, site.whatsappNumber)}
+                  variant="accent"
+                  shape="xl"
+                  external
+                >
+                  <Icon name="mdi:gift" class="icon icon--md" aria-hidden="true" />
+                  أهدِ هذه الباقة
+                </Button>
+              ) : (
+                <>
+                  <Button href={site.whatsappBookUrl} variant="accent" shape="xl" external>
+                    <Icon name="mdi:calendar-check" class="icon icon--md" aria-hidden="true" />
+                    احجز هذه الباقة
+                  </Button>
+                  <a class="packages__gift-link" href="/gift">
+                    <Icon name="mdi:gift-outline" class="icon icon--sm" aria-hidden="true" />
+                    إهداء
+                  </a>
+                </>
+              )}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+    {
+      showNote && !isGift && (
+        <p class="packages__note reveal">
+          جميع الباقات تشمل مشروب ترحيبي وأجواء استرخاء كاملة.
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .packages__tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.65rem;
+    margin: -1rem 0 2rem;
+  }
+
+  .packages__tags span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-accent-soft);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .packages__grid {
+    display: grid;
+    gap: 1.15rem;
+  }
+
+  .packages__card {
+    position: relative;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: rgba(0, 0, 0, 0.14);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+
+  .packages__card.is-featured {
+    border-color: var(--color-accent-soft);
+    background: linear-gradient(180deg, rgba(156, 143, 124, 0.14), transparent 45%),
+      rgba(0, 0, 0, 0.18);
+  }
+
+  .packages__badge {
+    position: absolute;
+    top: 0.9rem;
+    inset-inline-start: 0.9rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: #1a2219;
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  .packages__head h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .packages__head > p {
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .packages__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+  }
+
+  .packages__amount {
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .packages__currency {
+    color: var(--color-accent-soft);
+    font-weight: 700;
+  }
+
+  .packages__save {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.55rem;
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+  }
+
+  .packages__save-badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-pill);
+    background: rgba(37, 211, 102, 0.15);
+    color: #8dffb4;
+    font-weight: 700;
+  }
+
+  .packages__card ul {
+    display: grid;
+    gap: 0.65rem;
+    flex: 1;
+  }
+
+  .packages__card li {
+    display: flex;
+    gap: 0.55rem;
+    color: var(--color-text-muted);
+  }
+
+  .packages__check {
+    color: var(--color-accent-soft);
+    margin-top: 0.15rem;
+  }
+
+  .packages__gift-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-accent-soft);
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .packages__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .packages__gift-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-height: 2.75rem;
+    padding: 0.35rem 0.75rem;
+    font-weight: 700;
+    color: var(--color-accent-soft);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .packages__head h3,
+  .packages__card li {
+    overflow-wrap: break-word;
+  }
+
+  @media (max-width: 479px) {
+    .packages__actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .packages__actions :global(.btn),
+    .packages__gift-link {
+      width: 100%;
+    }
+  }
+
+  .packages__note {
+    margin-top: 1.75rem;
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 800px) {
+    .packages__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .packages__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

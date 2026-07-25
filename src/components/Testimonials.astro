@@ -1,0 +1,84 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { Testimonial } from '../data/testimonials';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  items: Testimonial[];
+  eyebrow?: string;
+  title?: string;
+  highlight?: string;
+}
+
+const {
+  items,
+  eyebrow = 'آراء العملاء',
+  title = 'ماذا يقول عملاؤنا',
+  highlight = 'عملاؤنا',
+} = Astro.props;
+---
+
+<section class="section testimonials" id="testimonials">
+  <div class="container">
+    <SectionHeading eyebrow={eyebrow} title={title} highlight={highlight} />
+    <div class="testimonials__grid">
+      {
+        items.map((item) => (
+          <article class="testimonials__card reveal">
+            <div class="testimonials__stars" aria-label="تقييم 5 من 5">
+              {Array.from({ length: 5 }).map(() => (
+                <Icon name="mdi:star" class="icon icon--md" aria-hidden="true" />
+              ))}
+            </div>
+            <p class="testimonials__quote">{item.quote}</p>
+            <div>
+              <p class="testimonials__name">{item.name}</p>
+              {item.meta && <p class="testimonials__meta">{item.meta}</p>}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .testimonials__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .testimonials__card {
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: rgba(0, 0, 0, 0.12);
+  }
+
+  .testimonials__stars {
+    display: flex;
+    gap: 0.15rem;
+    color: var(--color-accent-soft);
+  }
+
+  .testimonials__quote {
+    color: var(--color-text-muted);
+  }
+
+  .testimonials__name {
+    font-weight: 800;
+  }
+
+  .testimonials__meta {
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+  }
+
+  @media (min-width: 800px) {
+    .testimonials__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

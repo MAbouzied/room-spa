@@ -1,0 +1,117 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  /** Word/phrase inside title to render with gold gradient */
+  highlight?: string;
+  /** Insert a line break before this phrase (desktop+) */
+  breakBefore?: string;
+  lead?: string;
+  align?: 'start' | 'center';
+}
+
+const { eyebrow, title, highlight, breakBefore, lead, align = 'center' } = Astro.props;
+
+type TitlePart =
+  | { type: 'text'; value: string }
+  | { type: 'gold'; value: string }
+  | { type: 'br' };
+
+const buildTitleParts = (): TitlePart[] => {
+  let remaining = title;
+  const parts: TitlePart[] = [];
+
+  const pushText = (value: string) => {
+    if (!value) return;
+    if (breakBefore && value.includes(breakBefore)) {
+      const [before, after] = value.split(breakBefore);
+      if (before) parts.push({ type: 'text', value: before });
+      parts.push({ type: 'br' });
+      parts.push({ type: 'text', value: breakBefore + after });
+      return;
+    }
+    parts.push({ type: 'text', value });
+  };
+
+  if (highlight && remaining.includes(highlight)) {
+    const [before, after] = remaining.split(highlight);
+    pushText(before);
+    parts.push({ type: 'gold', value: highlight });
+    pushText(after);
+  } else {
+    pushText(remaining);
+  }
+
+  return parts;
+};
+
+const titleParts = buildTitleParts();
+---
+
+<div class:list={['section-heading', `section-heading--${align}`, 'reveal']}>
+  <p class="section-heading__eyebrow">{eyebrow}</p>
+  <h2 class="section-heading__title">
+    {
+      titleParts.map((part) =>
+        part.type === 'gold' ? (
+          <span class="text-gradient-gold">{part.value}</span>
+        ) : part.type === 'br' ? (
+          <br class="section-heading__break" />
+        ) : (
+          part.value
+        ),
+      )
+    }
+  </h2>
+  {lead && <p class="section-heading__lead">{lead}</p>}
+</div>
+
+<style>
+  .section-heading {
+    max-width: 42rem;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .section-heading--center {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .section-heading--start {
+    text-align: start;
+    margin-inline: 0;
+  }
+
+  .section-heading__eyebrow {
+    color: var(--color-accent-soft);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    margin-bottom: 1rem;
+  }
+
+  .section-heading__title {
+    font-size: clamp(1.7rem, 4vw, 3.4rem);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+  }
+
+  .section-heading__break {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .section-heading__break {
+      display: block;
+    }
+  }
+
+  .section-heading__lead {
+    margin-top: 1.1rem;
+    color: var(--color-text-muted);
+    font-size: clamp(0.95rem, 1.5vw, 1.125rem);
+    line-height: 1.85;
+  }
+</style>

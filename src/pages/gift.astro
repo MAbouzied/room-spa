@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import GiftRecipients from '../components/GiftRecipients.astro';
+import Packages from '../components/Packages.astro';
+import WhyGift from '../components/WhyGift.astro';
+import Testimonials from '../components/Testimonials.astro';
+import Branches from '../components/Branches.astro';
+import CTA from '../components/CTA.astro';
+import { giftTestimonials } from '../data/testimonials';
+import { site } from '../data/site';
+import {
+  buildGraph,
+  organizationSchema,
+  websiteSchema,
+  localBusinessSchema,
+  packagesItemListSchema,
+  branchListSchema,
+  breadcrumbSchema,
+  webPageSchema,
+} from '../lib/schema';
+
+const title = `إهداءات ${site.nameAr} | أهديه لحظة هدوء`;
+const description =
+  'أهدِ من تحبين تجربة سبا فاخرة في روم سبا — باقات إهداء مع بطاقة إلكترونية وخدمة حجز سهلة عبر الواتساب.';
+const path = '/gift';
+
+const schemas = [
+  buildGraph([
+    organizationSchema(),
+    websiteSchema(),
+    localBusinessSchema(),
+    webPageSchema({
+      title,
+      description,
+      path,
+      type: 'WebPage',
+    }),
+    breadcrumbSchema([
+      { name: 'الرئيسية', path: '/' },
+      { name: 'الإهداءات', path: '/gift' },
+    ]),
+    packagesItemListSchema('/gift'),
+    {
+      '@type': 'ItemList',
+      '@id': `${site.siteUrl.replace(/\/$/, '')}/gift#gift-occasions`,
+      name: 'لمن تُهدين من روم سبا',
+      itemListOrder: 'https://schema.org/ItemListOrderAscending',
+      numberOfItems: 4,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'زوجكِ' },
+        { '@type': 'ListItem', position: 2, name: 'والدكِ' },
+        { '@type': 'ListItem', position: 3, name: 'أخوكِ' },
+        { '@type': 'ListItem', position: 4, name: 'ابنكِ' },
+      ],
+    },
+    branchListSchema(),
+  ]),
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  path={path}
+  navVariant="gift"
+  schemas={schemas}
+  keywords={[
+    'إهداء سبا',
+    'هدية سبا للرجال',
+    'باقات إهداء',
+    'روم سبا إهداءات',
+    'هدية زوج',
+    'Room Spa gift',
+  ]}
+>
+  <Hero variant="gift" />
+  <GiftRecipients />
+  <Packages
+    mode="gift"
+    eyebrow="باقات الإهداء"
+    title="اختاري الباقة المناسبة"
+    highlight="المناسبة"
+    lead=""
+    showNote={false}
+  />
+  <WhyGift />
+  <Testimonials
+    items={giftTestimonials}
+    eyebrow="تجارب مُلهِمة"
+    title="ذكريات جميلة"
+    highlight="جميلة"
+  />
+  <Branches
+    variant="gift"
+    eyebrow="فروعنا"
+    title="اختاري الفرع الأقرب إليه"
+    highlight="الأقرب إليه"
+    lead=""
+  />
+  <CTA variant="gift" />
+</BaseLayout>
