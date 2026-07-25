@@ -1,57 +1,39 @@
 # Room Spa (روم سبا)
 
-Static Arabic RTL marketing site for Room Spa — Astro + Cloudflare Workers.
+Static Astro website for Room Spa, deployed to Cloudflare Workers.
 
-Live structure mirrors a luxury men’s spa landing experience: home + gift pages, SEO schema, and soft client-side navigation.
+## Requirements
 
-## Stack
+- Node.js 22.12 or newer
+- npm
 
-- [Astro](https://astro.build/) (static)
-- `astro-icon` + Iconify sets
-- `@astrojs/sitemap`
-- Cloudflare Workers static assets via Wrangler
-
-## Commands
-
-| Command | Action |
-| --- | --- |
-| `npm install` | Install dependencies |
-| `npm run dev` | Local Astro dev server |
-| `npm run build` | Production build to `./dist` |
-| `npm run preview` | Preview the Astro build locally |
-| `npm run deploy` | Build + deploy to Cloudflare Workers |
-| `npm run cf:dev` | Build + run Wrangler local Workers preview |
-
-## Deploy to Cloudflare Workers
-
-This repo is configured for [Cloudflare Workers static assets](https://developers.cloudflare.com/workers/static-assets/) using `wrangler.jsonc`.
-
-### One-time setup
-
-1. Create a Cloudflare account and note your **Account ID**.
-2. Create an API token with **Workers Scripts:Edit** (and Account read if needed).
-3. Locally (optional):
+## Local development
 
 ```sh
-npx wrangler login
+npm install
+npm run dev
+```
+
+## Cloudflare deployment
+
+Same approach as Najma Spa: build into `dist/` and serve with Wrangler static assets.
+No GitHub Actions worker — deploy via Wrangler CLI or Cloudflare Git integration.
+
+```sh
+npm run preview:cf
 npm run deploy
 ```
 
-### GitHub Actions (recommended)
+For Cloudflare Git integration (Workers → Connect to Git), use:
 
-Add repository secrets:
-
-- `CLOUDFLARE_API_TOKEN`
-- `CLOUDFLARE_ACCOUNT_ID`
-
-Push to `main` (or run **Deploy to Cloudflare Workers** manually). The workflow builds the site and runs `wrangler deploy`.
-
-### Custom domain
-
-In Cloudflare Dashboard → Workers & Pages → `room-spa` → Settings → Domains, attach your domain (e.g. `roomspa.sa`). Keep `site` in `astro.config.mjs` aligned with the production URL for sitemap/canonicals.
+- Production branch: `main`
+- Build command: `npm run build`
+- Deploy command: `npx wrangler deploy`
+- Build output directory: `dist` (only when the dashboard requests it)
+- Node.js version: `22`
 
 ## Project notes
 
-- Content/config placeholders live in `src/data/site.ts`
-- Routes: `/` (home), `/gift` (gift landing)
-- No CMS / no blog
+- Placeholder business data: `src/data/site.ts`
+- Routes: `/`, `/gift`, `404`
+- Soft client navigation via Astro `ClientRouter`

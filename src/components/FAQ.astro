@@ -10,15 +10,25 @@ import SectionHeading from './SectionHeading.astro';
       {
         faqItems.map((item, index) => (
           <details
-            class="faq__item"
+            class:list={['faq__item', index === 0 && 'is-open']}
             open={index === 0}
             itemscope
             itemprop="mainEntity"
             itemtype="https://schema.org/Question"
           >
-            <summary itemprop="name">{item.question}</summary>
-            <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-              <p itemprop="text">{item.answer}</p>
+            <summary itemprop="name">
+              <span>{item.question}</span>
+              <span class="faq__icon" aria-hidden="true" />
+            </summary>
+            <div class="faq__content">
+              <div
+                class="faq__content-inner"
+                itemscope
+                itemprop="acceptedAnswer"
+                itemtype="https://schema.org/Answer"
+              >
+                <p itemprop="text">{item.answer}</p>
+              </div>
             </div>
           </details>
         ))
@@ -28,17 +38,79 @@ import SectionHeading from './SectionHeading.astro';
 </section>
 
 <script>
+  const OPEN_MS = 360;
+
+  const prefersReducedMotion = () =>
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const openItem = (details: HTMLDetailsElement) => {
+    details.open = true;
+    if (prefersReducedMotion()) {
+      details.classList.add('is-open');
+      return;
+    }
+    // Force closed grid state, then expand on next frame
+    details.classList.remove('is-open');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        details.classList.add('is-open');
+      });
+    });
+  };
+
+  const closeItem = (details: HTMLDetailsElement) => {
+    if (prefersReducedMotion()) {
+      details.classList.remove('is-open');
+      details.open = false;
+      return;
+    }
+
+    details.classList.remove('is-open');
+    const panel = details.querySelector('.faq__content');
+    let settled = false;
+
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      details.open = false;
+    };
+
+    panel?.addEventListener(
+      'transitionend',
+      (event) => {
+        if (event.target !== panel) return;
+        finish();
+      },
+      { once: true },
+    );
+
+    window.setTimeout(finish, OPEN_MS + 40);
+  };
+
   const initFaq = () => {
     const root = document.querySelector('[data-faq]');
     if (!(root instanceof HTMLElement) || root.dataset.bound) return;
     root.dataset.bound = 'true';
 
-    root.querySelectorAll('details').forEach((details) => {
-      details.addEventListener('toggle', () => {
-        if (!details.open) return;
-        root.querySelectorAll('details').forEach((other) => {
-          if (other !== details) other.open = false;
+    root.querySelectorAll('details.faq__item').forEach((node) => {
+      if (!(node instanceof HTMLDetailsElement)) return;
+      const summary = node.querySelector('summary');
+      if (!(summary instanceof HTMLElement)) return;
+
+      if (node.open) node.classList.add('is-open');
+
+      summary.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const willOpen = !node.classList.contains('is-open');
+
+        root.querySelectorAll('details.faq__item').forEach((other) => {
+          if (!(other instanceof HTMLDetailsElement) || other === node) return;
+          if (other.classList.contains('is-open') || other.open) closeItem(other);
         });
+
+        if (willOpen) openItem(node);
+        else closeItem(node);
       });
     });
   };
@@ -61,6 +133,14 @@ import SectionHeading from './SectionHeading.astro';
     border-radius: var(--radius-md);
     background: var(--color-surface);
     padding: 0.35rem 1rem;
+    transition:
+      border-color 0.3s var(--ease-out),
+      background 0.3s var(--ease-out);
+  }
+
+  .faq__item.is-open {
+    border-color: rgba(156, 143, 124, 0.55);
+    background: rgba(255, 255, 255, 0.04);
   }
 
   .faq__item summary {
@@ -72,25 +152,69 @@ import SectionHeading from './SectionHeading.astro';
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    user-select: none;
   }
 
   .faq__item summary::-webkit-details-marker {
     display: none;
   }
 
-  .faq__item summary::after {
-    content: '+';
-    color: var(--color-accent-soft);
-    font-size: 1.25rem;
+  .faq__icon {
+    position: relative;
+    width: 1.1rem;
+    height: 1.1rem;
     flex-shrink: 0;
+    color: var(--color-accent-soft);
   }
 
-  .faq__item[open] summary::after {
-    content: '−';
+  .faq__icon::before,
+  .faq__icon::after {
+    content: '';
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 0.7rem;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+    transform: translate(-50%, -50%);
+    transition: transform 0.3s var(--ease-out), opacity 0.3s var(--ease-out);
+  }
+
+  .faq__icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  .faq__item.is-open .faq__icon::after {
+    transform: translate(-50%, -50%) rotate(90deg) scaleX(0);
+    opacity: 0;
+  }
+
+  .faq__content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.36s var(--ease-out);
+  }
+
+  .faq__item.is-open .faq__content {
+    grid-template-rows: 1fr;
+  }
+
+  .faq__content-inner {
+    overflow: hidden;
+    min-height: 0;
   }
 
   .faq__item p {
     padding: 0 0 1rem;
     color: var(--color-text-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq__item,
+    .faq__content,
+    .faq__icon::before,
+    .faq__icon::after {
+      transition: none;
+    }
   }
 </style>

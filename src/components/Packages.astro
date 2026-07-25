@@ -140,10 +140,16 @@ const featuredId = isGift ? 'royal' : packages.find((pkg) => pkg.featured)?.id;
   .packages__grid {
     display: grid;
     gap: 1.15rem;
+    align-items: stretch;
+    /* Room for absolute badge half above the card border */
+    padding-top: 0.9rem;
   }
 
   .packages__card {
     position: relative;
+    height: 100%;
+    min-height: 100%;
+    overflow: visible;
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
     background: rgba(0, 0, 0, 0.14);
@@ -161,14 +167,20 @@ const featuredId = isGift ? 'royal' : packages.find((pkg) => pkg.featured)?.id;
 
   .packages__badge {
     position: absolute;
-    top: 0.9rem;
-    inset-inline-start: 0.9rem;
-    padding: 0.3rem 0.7rem;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    margin: 0;
+    padding: 0.3rem 0.85rem;
     border-radius: var(--radius-pill);
     background: var(--color-accent);
     color: #1a2219;
     font-size: 0.8rem;
     font-weight: 800;
+    white-space: nowrap;
+    line-height: 1.3;
+    pointer-events: none;
   }
 
   .packages__head h3 {
@@ -247,6 +259,17 @@ const featuredId = isGift ? 'royal' : packages.find((pkg) => pkg.featured)?.id;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
+  }
+
+  /* Keep CTAs pinned to the bottom when feature lists differ in length */
+  .packages__card > .packages__actions,
+  .packages__card > .packages__gift-note {
+    margin-top: 0;
+  }
+
+  .packages__card > ul + .packages__actions,
+  .packages__card > ul + .packages__gift-note {
+    margin-top: auto;
   }
 
   .packages__gift-link {

@@ -1,26 +1,34 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { site } from '../data/site';
-import Logo from './Logo.astro';
+
+const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <div class="container site-footer__grid">
+  <div class="container site-footer__inner">
     <div class="site-footer__brand">
-      <Logo size="lg" />
+      <img
+        class="site-footer__logo"
+        src="/images/logo-full.png"
+        alt={site.nameAr}
+        width="180"
+        height="80"
+        loading="lazy"
+      />
       <h3>{site.nameAr} {site.tagline}</h3>
       <p>{site.description}</p>
     </div>
 
     <div class="site-footer__cols">
-      <div>
+      <div class="site-footer__col">
         <h4>فروعنا</h4>
         <ul>
           {
             site.branches.map((branch) => (
               <li>
-                <a href={branch.mapsUrl}>
-                  <Icon name="mdi:map-marker-outline" class="icon icon--sm" aria-hidden="true" />
+                <a href={branch.mapsUrl} target="_blank" rel="noopener noreferrer">
+                  <Icon name="mdi:map-marker" class="icon icon--sm site-footer__pin" aria-hidden="true" />
                   {branch.name}
                 </a>
               </li>
@@ -28,15 +36,16 @@ import Logo from './Logo.astro';
           }
         </ul>
       </div>
-      <div>
+
+      <div class="site-footer__col">
         <h4>تواصل معنا</h4>
         <div class="site-footer__contact">
           <a href={`tel:${site.phoneTel}`}>
-            <Icon name="mdi:phone" class="icon icon--sm" aria-hidden="true" />
-            {site.phoneDisplay}
+            <Icon name="mdi:phone-outline" class="icon icon--sm" aria-hidden="true" />
+            <span dir="ltr">{site.phoneDisplay}</span>
           </a>
           <a href={site.whatsappBookUrl} target="_blank" rel="noopener noreferrer">
-            <Icon name="mdi:whatsapp" class="icon icon--sm" aria-hidden="true" />
+            <Icon name="mdi:message-outline" class="icon icon--sm" aria-hidden="true" />
             واتساب
           </a>
         </div>
@@ -46,149 +55,162 @@ import Logo from './Logo.astro';
     <div class="site-footer__follow">
       <h4>تابعنا</h4>
       <div class="site-footer__social">
-        <a href={site.social.snapchat} aria-label="Snapchat" class="site-footer__social-link">
+        <a href={site.social.snapchat} target="_blank" rel="noopener noreferrer" aria-label="Snapchat">
           <Icon name="mdi:snapchat" class="icon icon--md" aria-hidden="true" />
         </a>
-        <a href={site.social.instagram} aria-label="Instagram" class="site-footer__social-link">
+        <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
           <Icon name="mdi:instagram" class="icon icon--md" aria-hidden="true" />
         </a>
-        <a href={site.social.tiktok} aria-label="TikTok" class="site-footer__social-link">
-          <Icon name="simple-icons:tiktok" class="icon icon--md" aria-hidden="true" />
+        <a href={site.social.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+          <Icon name="simple-icons:tiktok" class="icon icon--sm" aria-hidden="true" />
         </a>
       </div>
     </div>
+
+    <p class="site-footer__copy">
+      جميع الحقوق محفوظة © {year} {site.nameEn} - {site.nameAr}
+    </p>
   </div>
-  <p class="site-footer__copy container">
-    جميع الحقوق محفوظة © {new Date().getFullYear()} {site.nameEn} - {site.nameAr}
-  </p>
 </footer>
 
 <style>
   .site-footer {
-    background: rgba(18, 28, 18, 0.72);
+    padding-block: clamp(3rem, 6vw, 4rem) 1.75rem;
     border-top: 1px solid var(--color-border-soft);
-    padding-block: 3.5rem 1.75rem;
+    background: transparent;
   }
 
-  .site-footer__grid {
-    display: grid;
-    gap: 2.5rem;
+  .site-footer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .site-footer__brand {
     text-align: center;
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  .site-footer__logo {
+    display: block;
+    height: 4rem;
+    width: auto;
+    margin: 0 auto 1.25rem;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(92%) sepia(8%) saturate(180%) hue-rotate(8deg)
+      brightness(95%) contrast(88%);
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__logo {
+      height: 5rem;
+    }
   }
 
   .site-footer__brand h3 {
-    margin-top: 1rem;
-    font-size: 1.2rem;
-    line-height: 1.5;
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.75rem;
   }
 
   .site-footer__brand p {
-    margin-top: 0.65rem;
     color: var(--color-text-muted);
+    font-size: clamp(0.8125rem, 1.5vw, 0.875rem);
+    line-height: 1.8;
     max-width: 32rem;
     margin-inline: auto;
   }
 
   .site-footer h4 {
-    font-size: 1rem;
-    margin-bottom: 0.9rem;
-    color: var(--color-accent-soft);
-  }
-
-  .site-footer__cols {
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .site-footer ul {
-    display: grid;
-    gap: 0.55rem;
-  }
-
-  .site-footer a {
-    color: var(--color-text-muted);
-    transition: color 0.2s;
-  }
-
-  .site-footer a:hover {
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
     color: var(--color-text);
   }
 
-  .site-footer__contact,
-  .site-footer ul a {
-    display: grid;
-    gap: 0.55rem;
+  .site-footer__cols {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    width: 100%;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
   }
 
-  .site-footer__contact a,
-  .site-footer ul a {
+  .site-footer__col {
+    text-align: center;
+  }
+
+  .site-footer__col ul,
+  .site-footer__contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .site-footer__col a,
+  .site-footer__contact a {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    min-height: 2.75rem;
+    gap: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: clamp(0.75rem, 1.4vw, 0.875rem);
+    transition: color 0.2s;
+  }
+
+  .site-footer__col a:hover,
+  .site-footer__contact a:hover {
+    color: var(--color-accent);
+  }
+
+  .site-footer__pin {
+    color: var(--color-accent);
+    flex-shrink: 0;
   }
 
   .site-footer__follow {
     text-align: center;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
   }
 
   .site-footer__social {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
     gap: 0.75rem;
   }
 
-  .site-footer__social-link {
-    width: 2.75rem;
-    height: 2.75rem;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
+  .site-footer__social a {
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 50%;
-    border: 1px solid var(--color-border);
     display: grid;
     place-items: center;
-    color: var(--color-text);
+    color: var(--color-accent);
+    background: rgba(156, 143, 124, 0.1);
+    transition: background 0.2s;
   }
 
-  .site-footer__social-link:hover {
-    border-color: var(--color-accent-soft);
-    color: var(--color-accent-soft);
+  .site-footer__social a:hover {
+    background: rgba(156, 143, 124, 0.2);
   }
 
   .site-footer__copy {
-    margin-top: 2.75rem;
-    padding-top: 1.25rem;
+    width: 100%;
+    padding-top: 1.5rem;
     border-top: 1px solid var(--color-border-soft);
-    color: var(--color-text-muted);
-    font-size: 0.9rem;
     text-align: center;
+    color: var(--color-text-muted);
+    font-size: clamp(0.6875rem, 1.2vw, 0.75rem);
   }
 
-  @media (min-width: 900px) {
-    .site-footer__grid {
-      grid-template-columns: 1.3fr 1fr 0.7fr;
-      align-items: start;
-    }
-
-    .site-footer__brand {
-      text-align: start;
-    }
-
-    .site-footer__brand p {
-      margin-inline: 0;
-    }
-
-    .site-footer__follow {
-      text-align: start;
-    }
-
-    .site-footer__social {
-      justify-content: flex-start;
+  @media (min-width: 768px) {
+    .site-footer__cols {
+      flex-direction: row;
+      gap: 4rem;
     }
   }
 </style>
