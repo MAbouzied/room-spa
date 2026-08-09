@@ -29,7 +29,7 @@ export const site = {
     registrationNumber: '302212729300003',
     crNumber: '2511020960',
     certificateUrl: '/images/legal/vat-certificate.png',
-    badgeUrl: '/images/legal/vat-badge.svg',
+    badgeUrl: '/images/legal/zatca-logo.svg',
     authorityNameAr: 'هيئة الزكاة والضريبة والجمارك',
     authorityUrl: 'https://zatca.gov.sa',
   },
