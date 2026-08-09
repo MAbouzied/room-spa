@@ -25,9 +25,9 @@ export const site = {
   social: {
     instagram: 'https://www.instagram.com/roomspa2',
   },
-  /** Google Maps place: https://maps.app.goo.gl/3Wknt71DFCsRBQRT6 */
+  /** Google Maps place: https://maps.app.goo.gl/CsiPPxgE123WN8GA7 */
   google: {
-    mapsUrl: 'https://maps.app.goo.gl/3Wknt71DFCsRBQRT6',
+    mapsUrl: 'https://maps.app.goo.gl/CsiPPxgE123WN8GA7',
     ratingValue: 4.3,
     reviewCount: 267,
   },
@@ -45,7 +45,7 @@ export const site = {
       name: 'حفر الباطن',
       address: 'أبو بكر الصديق، المصيف - حفر الباطن 31993',
       hours: '24 ساعة • 7 أيام',
-      mapsUrl: 'https://maps.app.goo.gl/3Wknt71DFCsRBQRT6',
+      mapsUrl: 'https://maps.app.goo.gl/CsiPPxgE123WN8GA7',
     },
   ],
 } as const;
