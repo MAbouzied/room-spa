@@ -15,9 +15,10 @@ const homeLinks = [
   { href: '/#about', label: 'من نحن' },
   { href: '/#photos', label: 'صورنا' },
   { href: '/#services', label: 'خدماتنا' },
+  { href: '/#offers', label: 'العروض' },
   { href: '/#packages', label: 'الباقات' },
   { href: '/gift', label: 'الإهداءات' },
-  { href: '/#branches', label: 'الفروع' },
+  { href: '/#branches', label: 'موقعنا' },
   { href: '/#testimonials', label: 'آراء العملاء' },
 ];
 
@@ -27,7 +28,7 @@ const giftLinks = [
   { href: '/gift#why-gift', label: 'لماذا روم سبا' },
   { href: '/gift#packages', label: 'الباقات' },
   { href: '/gift#testimonials', label: 'آراء العملاء' },
-  { href: '/gift#branches', label: 'فروعنا' },
+  { href: '/gift#branches', label: 'موقعنا' },
 ];
 
 const links = variant === 'gift' ? giftLinks : homeLinks;
@@ -142,7 +143,8 @@ const links = variant === 'gift' ? giftLinks : homeLinks;
 
 <style>
   .site-header {
-    position: fixed;
+    /* Mobile/tablet: sit over the hero, then scroll away with the page */
+    position: absolute;
     inset-inline: 0;
     top: 0;
     z-index: 50;
@@ -252,6 +254,10 @@ const links = variant === 'gift' ? giftLinks : homeLinks;
   }
 
   @media (min-width: 1100px) {
+    .site-header {
+      position: fixed;
+    }
+
     .site-header__nav {
       display: flex;
       flex-wrap: wrap;

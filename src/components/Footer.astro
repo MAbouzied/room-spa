@@ -12,8 +12,8 @@ const year = new Date().getFullYear();
         class="site-footer__logo"
         src="/images/logo-full.png"
         alt={site.nameAr}
-        width="180"
-        height="80"
+        width="849"
+        height="853"
         loading="lazy"
       />
       <h3>{site.nameAr} {site.tagline}</h3>
@@ -22,7 +22,7 @@ const year = new Date().getFullYear();
 
     <div class="site-footer__cols">
       <div class="site-footer__col">
-        <h4>فروعنا</h4>
+        <h4>موقعنا</h4>
         <ul>
           {
             site.branches.map((branch) => (
@@ -42,7 +42,7 @@ const year = new Date().getFullYear();
         <div class="site-footer__contact">
           <a href={`tel:${site.phoneTel}`}>
             <Icon name="mdi:phone-outline" class="icon icon--sm" aria-hidden="true" />
-            <span dir="ltr">{site.phoneDisplay}</span>
+            <span class="phone" dir="ltr">{site.phoneDisplay}</span>
           </a>
           <a href={site.whatsappBookUrl} target="_blank" rel="noopener noreferrer">
             <Icon name="mdi:message-outline" class="icon icon--sm" aria-hidden="true" />
@@ -55,23 +55,98 @@ const year = new Date().getFullYear();
     <div class="site-footer__follow">
       <h4>تابعنا</h4>
       <div class="site-footer__social">
-        <a href={site.social.snapchat} target="_blank" rel="noopener noreferrer" aria-label="Snapchat">
-          <Icon name="mdi:snapchat" class="icon icon--md" aria-hidden="true" />
-        </a>
         <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
           <Icon name="mdi:instagram" class="icon icon--md" aria-hidden="true" />
         </a>
-        <a href={site.social.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-          <Icon name="simple-icons:tiktok" class="icon icon--sm" aria-hidden="true" />
-        </a>
       </div>
     </div>
+
+    <div class="site-footer__vat">
+      <button
+        type="button"
+        class="site-footer__vat-trigger"
+        data-vat-open
+        aria-haspopup="dialog"
+        aria-controls="vat-certificate-dialog"
+      >
+        <img
+          class="site-footer__vat-badge"
+          src={site.vat.badgeUrl}
+          alt="شعار ضريبة القيمة المضافة"
+          width="48"
+          height="48"
+          loading="lazy"
+        />
+        <span class="site-footer__vat-text">
+          <span class="site-footer__vat-label">الرقم الضريبي</span>
+          <span class="site-footer__vat-number" dir="ltr">{site.vat.registrationNumber}</span>
+        </span>
+      </button>
+      <a
+        class="site-footer__vat-authority"
+        href={site.vat.authorityUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {site.vat.authorityNameAr}
+      </a>
+    </div>
+
+    <dialog id="vat-certificate-dialog" class="site-footer__vat-dialog" aria-labelledby="vat-certificate-title">
+      <div class="site-footer__vat-dialog-panel">
+        <div class="site-footer__vat-dialog-head">
+          <h2 id="vat-certificate-title">شهادة تسجيل ضريبة القيمة المضافة</h2>
+          <button type="button" class="site-footer__vat-close" data-vat-close aria-label="إغلاق">
+            <Icon name="mdi:close" class="icon icon--md" aria-hidden="true" />
+          </button>
+        </div>
+        <a
+          class="site-footer__vat-certificate-link"
+          href={site.vat.certificateUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            class="site-footer__vat-certificate"
+            src={site.vat.certificateUrl}
+            alt={`شهادة تسجيل ضريبة القيمة المضافة — الرقم الضريبي ${site.vat.registrationNumber}`}
+            width="800"
+            height="1132"
+            loading="lazy"
+          />
+        </a>
+      </div>
+    </dialog>
 
     <p class="site-footer__copy">
       جميع الحقوق محفوظة © {year} {site.nameEn} - {site.nameAr}
     </p>
   </div>
 </footer>
+
+<script>
+  const dialog = document.getElementById('vat-certificate-dialog');
+  if (dialog instanceof HTMLDialogElement) {
+    const openButton = document.querySelector('[data-vat-open]');
+    const closeButtons = dialog.querySelectorAll('[data-vat-close]');
+
+    openButton?.addEventListener('click', () => {
+      dialog.showModal();
+    });
+
+    closeButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        dialog.close();
+      });
+    });
+
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) {
+        dialog.close();
+      }
+    });
+  }
+</script>
 
 <style>
   .site-footer {
@@ -93,17 +168,15 @@ const year = new Date().getFullYear();
 
   .site-footer__logo {
     display: block;
-    height: 4rem;
+    height: 5.5rem;
     width: auto;
     margin: 0 auto 1.25rem;
     object-fit: contain;
-    filter: brightness(0) saturate(100%) invert(92%) sepia(8%) saturate(180%) hue-rotate(8deg)
-      brightness(95%) contrast(88%);
   }
 
   @media (min-width: 768px) {
     .site-footer__logo {
-      height: 5rem;
+      height: 6.5rem;
     }
   }
 
@@ -198,6 +271,148 @@ const year = new Date().getFullYear();
     background: rgba(156, 143, 124, 0.2);
   }
 
+  .site-footer__vat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .site-footer__vat-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    transition:
+      background 0.2s var(--ease-out),
+      border-color 0.2s var(--ease-out);
+  }
+
+  .site-footer__vat-trigger:hover,
+  .site-footer__vat-trigger:focus-visible {
+    background: var(--color-surface-hover);
+    border-color: var(--color-accent);
+    outline: none;
+  }
+
+  .site-footer__vat-badge {
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
+    object-fit: contain;
+  }
+
+  .site-footer__vat-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
+    text-align: start;
+  }
+
+  .site-footer__vat-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .site-footer__vat-number {
+    font-size: clamp(0.8125rem, 1.4vw, 0.875rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .site-footer__vat-authority {
+    font-size: 0.6875rem;
+    color: var(--color-text-muted);
+    transition: color 0.2s;
+  }
+
+  .site-footer__vat-authority:hover,
+  .site-footer__vat-authority:focus-visible {
+    color: var(--color-accent);
+  }
+
+  .site-footer__vat-dialog {
+    width: min(36rem, calc(100vw - 2rem));
+    max-height: calc(100vh - 2rem);
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+  }
+
+  .site-footer__vat-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.72);
+  }
+
+  .site-footer__vat-dialog-panel {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 2rem);
+  }
+
+  .site-footer__vat-dialog-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .site-footer__vat-dialog-head h2 {
+    margin: 0;
+    font-size: clamp(0.875rem, 1.6vw, 1rem);
+    font-weight: 700;
+  }
+
+  .site-footer__vat-close {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
+
+  .site-footer__vat-close:hover,
+  .site-footer__vat-close:focus-visible {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+    outline: none;
+  }
+
+  .site-footer__vat-certificate-link {
+    display: block;
+    overflow: auto;
+    padding: 0.75rem;
+  }
+
+  .site-footer__vat-certificate {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-sm);
+    background: var(--color-text);
+  }
+
   .site-footer__copy {
     width: 100%;
     padding-top: 1.5rem;
@@ -211,6 +426,14 @@ const year = new Date().getFullYear();
     .site-footer__cols {
       flex-direction: row;
       gap: 4rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer__vat-trigger,
+    .site-footer__vat-authority,
+    .site-footer__vat-close {
+      transition: none;
     }
   }
 </style>

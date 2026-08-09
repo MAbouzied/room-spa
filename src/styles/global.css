@@ -51,11 +51,18 @@ body {
     radial-gradient(at 80% 70%, rgba(145, 131, 110, 0.04) 0%, transparent 50%),
     var(--wave-pattern);
   background-size: auto, auto, 800px 800px;
-  background-attachment: fixed;
+  /* scroll on mobile — fixed attachment breaks composited scroll layers */
+  background-attachment: scroll;
   color: var(--color-text);
   line-height: 1.7;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+@media (min-width: 1100px) {
+  body {
+    background-attachment: fixed;
+  }
 }
 
 img,
@@ -165,6 +172,12 @@ h3 {
 .reveal.is-visible {
   opacity: 1;
   transform: none;
+}
+
+/* Phone numbers must stay LTR inside the RTL layout */
+.phone {
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 /* Soft SPA-style route swaps (ClientRouter) — no full reload / spinner */

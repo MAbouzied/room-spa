@@ -12,10 +12,10 @@ interface Props {
 }
 
 const {
-  eyebrow = 'فروعنا',
-  title = 'فروعنا في الرياض',
-  highlight = 'الرياض',
-  lead = 'ستجد فرعًا قريبًا منك في الرياض، بمواعيد عمل تناسبك طوال أيام الأسبوع.',
+  eyebrow = 'موقعنا',
+  title = 'زورنا في حفر الباطن',
+  highlight = 'حفر الباطن',
+  lead = 'نرحب بك في روم سبا بمواعيد عمل تناسبك طوال أيام الأسبوع.',
   variant = 'home',
 } = Astro.props;
 
@@ -42,7 +42,7 @@ const isGift = variant === 'gift';
                 <div class="branches__meta">
                   <span class="branches__phone">
                     <Icon name="mdi:phone" class="icon icon--sm" aria-hidden="true" />
-                    {site.phoneDisplay}
+                    <span class="phone" dir="ltr">{site.phoneDisplay}</span>
                   </span>
                   <span class="branches__map">
                     <Icon name="mdi:map-outline" class="icon icon--sm" aria-hidden="true" />
@@ -64,6 +64,8 @@ const isGift = variant === 'gift';
   .branches__grid {
     display: grid;
     gap: 1rem;
+    max-width: 28rem;
+    margin-inline: auto;
   }
 
   .branches__card {
@@ -138,15 +140,4 @@ const isGift = variant === 'gift';
     margin-top: 0.65rem;
   }
 
-  @media (min-width: 800px) {
-    .branches__grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 1100px) {
-    .branches__grid {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
 </style>

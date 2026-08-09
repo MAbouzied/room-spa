@@ -14,9 +14,7 @@ const absoluteUrl = (path = '/') => {
 const logoUrl = absoluteUrl('/images/logo-mark.png');
 const imageUrl = absoluteUrl('/images/logo-full.png');
 
-const sameAs = [site.social.instagram, site.social.snapchat, site.social.tiktok].filter(
-  (url) => url && url !== '#',
-);
+const sameAs = [site.social.instagram].filter((url) => url && url !== '#');
 
 export function organizationSchema(): JsonLd {
   return {
@@ -34,6 +32,8 @@ export function organizationSchema(): JsonLd {
     image: imageUrl,
     description: site.seoDescription,
     telephone: site.phoneTel,
+    vatID: site.vat.registrationNumber,
+    taxID: site.vat.crNumber,
     areaServed: {
       '@type': 'City',
       name: site.city,
@@ -80,6 +80,8 @@ export function localBusinessSchema(): JsonLd {
     logo: logoUrl,
     description: site.seoDescription,
     telephone: site.phoneTel,
+    vatID: site.vat.registrationNumber,
+    taxID: site.vat.crNumber,
     priceRange: '$$',
     currenciesAccepted: site.priceCurrency,
     paymentAccepted: 'Cash, Credit Card',
@@ -119,7 +121,7 @@ export function branchListSchema(): JsonLd {
   return {
     '@type': 'ItemList',
     '@id': `${absoluteUrl('/')}#branches`,
-    name: `فروع ${site.nameAr}`,
+    name: `موقع ${site.nameAr}`,
     itemListOrder: 'https://schema.org/ItemListOrderAscending',
     numberOfItems: site.branches.length,
     itemListElement: site.branches.map((branch, index) => {

@@ -26,15 +26,19 @@ const {
         items.map((item) => (
           <article class="testimonials__card reveal">
             <Icon name="mdi:format-quote-open" class="testimonials__mark" aria-hidden="true" />
-            <div class="testimonials__stars" aria-label="تقييم 5 من 5">
-              {Array.from({ length: 5 }).map(() => (
-                <Icon name="mdi:star" class="testimonials__star" aria-hidden="true" />
-              ))}
-            </div>
             <p class="testimonials__quote">{item.quote}</p>
             <div class="testimonials__author">
               <p class="testimonials__name">{item.name}</p>
-              {item.meta && <p class="testimonials__meta">{item.meta}</p>}
+              {item.meta && (
+                <p class="testimonials__meta">
+                  <span>{item.meta}</span>
+                  <span class="testimonials__stars" aria-label="تقييم 5 من 5">
+                    {Array.from({ length: 5 }).map(() => (
+                      <Icon name="mdi:star" class="testimonials__star" aria-hidden="true" />
+                    ))}
+                  </span>
+                </p>
+              )}
             </div>
           </article>
         ))
@@ -78,14 +82,15 @@ const {
   }
 
   .testimonials__stars {
-    display: flex;
-    gap: 0.12rem;
+    display: inline-flex;
+    gap: 0.08rem;
     color: var(--color-accent);
+    vertical-align: middle;
   }
 
   .testimonials__star {
-    width: 0.9rem;
-    height: 0.9rem;
+    width: 0.85rem;
+    height: 0.85rem;
   }
 
   .testimonials__quote {
@@ -105,10 +110,14 @@ const {
   }
 
   .testimonials__meta {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
     color: var(--color-text-muted);
     font-size: 0.75rem;
     font-weight: 500;
-    margin-top: 0.15rem;
+    margin-top: 0.25rem;
   }
 
   @media (min-width: 768px) {
@@ -130,8 +139,8 @@ const {
     }
 
     .testimonials__star {
-      width: 1rem;
-      height: 1rem;
+      width: 0.95rem;
+      height: 0.95rem;
     }
 
     .testimonials__quote {

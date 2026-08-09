@@ -4,6 +4,7 @@ import Hero from '../components/Hero.astro';
 import About from '../components/About.astro';
 import Gallery from '../components/Gallery.astro';
 import Services from '../components/Services.astro';
+import Offers from '../components/Offers.astro';
 import Packages from '../components/Packages.astro';
 import GiftBanner from '../components/GiftBanner.astro';
 import Branches from '../components/Branches.astro';
@@ -25,7 +26,7 @@ import {
   webPageSchema,
 } from '../lib/schema';
 
-const title = `${site.nameAr} | أفخم سبا رجالي في الرياض`;
+const title = `${site.nameAr} | أفخم سبا رجالي في حفر الباطن`;
 const description = site.seoDescription;
 const path = '/';
 
@@ -51,18 +52,19 @@ const schemas = [
   navVariant="home"
   schemas={schemas}
   keywords={[
-    'سبا رجالي الرياض',
+    'سبا رجالي حفر الباطن',
     'روم سبا',
     'مساج رجالي',
     'حمام مغربي للرجال',
     'باقات سبا',
-    'Room Spa Riyadh',
+    'Room Spa Hafr Al Batin',
   ]}
 >
   <Hero />
   <About />
   <Gallery />
   <Services />
+  <Offers />
   <Packages />
   <GiftBanner />
   <Branches />

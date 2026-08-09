@@ -16,16 +16,15 @@ const isGift = variant === 'gift';
     !isGift && (
       <>
         <div class="hero__media" aria-hidden="true">
-          <video
-            class="hero__video"
-            autoplay
-            muted
-            playsinline
-            preload="metadata"
-            poster="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=2000&q=70"
-          >
-            <source src="/videos/hero.mp4" type="video/mp4" />
-          </video>
+          <img
+            class="hero__image"
+            src="/images/gallery/spa-pool1.jpg"
+            alt=""
+            width="2000"
+            height="1333"
+            decoding="async"
+            fetchpriority="high"
+          />
         </div>
         <div class="hero__overlay" aria-hidden="true" />
       </>
@@ -61,7 +60,7 @@ const isGift = variant === 'gift';
             <span class="text-gradient-gold">الفخامة..</span> تزهى بك
           </h1>
           <p class="hero__lead">
-            الوجهة الرجالية الأولى في الرياض، حيث تبدأ تجربة مختلفة تليق بذوقك.
+            الوجهة الرجالية الأولى في حفر الباطن، حيث تبدأ تجربة مختلفة تليق بذوقك.
           </p>
           <div class="hero__actions">
             <Button href={site.whatsappBookUrl} variant="whatsapp-dark" shape="xl" external>
@@ -70,7 +69,7 @@ const isGift = variant === 'gift';
             </Button>
             <Button href={`tel:${site.phoneTel}`} variant="accent" shape="xl">
               <Icon name="mdi:phone" class="icon icon--md" aria-hidden="true" />
-              {site.phoneDisplay}
+              <span class="phone" dir="ltr">{site.phoneDisplay}</span>
             </Button>
           </div>
         </>
@@ -102,22 +101,26 @@ const isGift = variant === 'gift';
     inset: 0;
   }
 
-  .hero__video {
+  .hero__image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     pointer-events: none;
+    filter: brightness(0.55) saturate(0.85);
   }
 
   .hero__overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(32, 46, 31, 0.35),
-      rgba(32, 46, 31, 0.25),
-      rgba(32, 46, 31, 0.78)
-    );
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(24, 35, 24, 0.72),
+        rgba(24, 35, 24, 0.55) 45%,
+        rgba(24, 35, 24, 0.88)
+      ),
+      radial-gradient(ellipse at 50% 40%, transparent 20%, rgba(24, 35, 24, 0.45) 100%);
     pointer-events: none;
   }
 

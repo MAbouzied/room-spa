@@ -1,0 +1,183 @@
+---
+import { Icon } from 'astro-icon/components';
+import { offers } from '../data/offers';
+import { giftWhatsappUrl } from '../data/packages';
+import { site } from '../data/site';
+import SectionHeading from './SectionHeading.astro';
+import Button from './Button.astro';
+---
+
+<section class="section section--alt offers" id="offers">
+  <div class="container">
+    <SectionHeading
+      eyebrow="عروضنا"
+      title="عروض حصرية لتجربة استرخاء متكاملة"
+      highlight="حصرية"
+      lead="باقات عروض جاهزة بأسعار مخفضة — اختر العرض المناسب واحجز عبر واتساب."
+    />
+
+    <div class="offers__grid">
+      {
+        offers.map((offer) => (
+          <article class="offers__card reveal" data-offer-card>
+            <div class="offers__media">
+              <img
+                src={offer.image}
+                alt={offer.name}
+                width="723"
+                height="1024"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="offers__body">
+              <h3>{offer.name}</h3>
+              <div class="offers__price">
+                <span class="offers__amount">{offer.price}</span>
+                <span class="offers__currency">ريال</span>
+                <s>
+                  <span class="sr-only">السعر قبل الخصم </span>
+                  {offer.originalPrice} ريال
+                </s>
+              </div>
+              <ul>
+                {offer.features.map((feature) => (
+                  <li>
+                    <Icon name="mdi:check-circle" class="icon icon--md offers__check" aria-hidden="true" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <div class="offers__actions">
+                <Button
+                  href={giftWhatsappUrl(offer.whatsappText, site.whatsappNumber)}
+                  variant="accent"
+                  shape="xl"
+                  external
+                >
+                  <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
+                  احجز هذا العرض
+                </Button>
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .offers__grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .offers__card {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: rgba(0, 0, 0, 0.14);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .offers__media {
+    background: var(--color-bg-deep);
+  }
+
+  .offers__media img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 723 / 1024;
+    object-fit: contain;
+  }
+
+  .offers__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1.25rem 1.35rem 1.4rem;
+    flex: 1;
+  }
+
+  .offers__body h3 {
+    font-size: 1.35rem;
+    margin: 0;
+  }
+
+  .offers__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.45rem;
+  }
+
+  .offers__amount {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-accent-soft);
+  }
+
+  .offers__currency {
+    font-weight: 700;
+    color: var(--color-accent-soft);
+  }
+
+  .offers__price s {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .offers__body ul {
+    display: grid;
+    gap: 0.55rem;
+    flex: 1;
+  }
+
+  .offers__body li {
+    display: flex;
+    gap: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .offers__check {
+    color: var(--color-accent-soft);
+    margin-top: 0.1rem;
+  }
+
+  .offers__actions {
+    margin-top: auto;
+  }
+
+  .offers__actions :global(.btn) {
+    width: 100%;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (min-width: 700px) {
+    .offers__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .offers__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>
