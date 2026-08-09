@@ -111,8 +111,15 @@ export function localBusinessSchema(): JsonLd {
         closes: '23:59',
       },
     ],
-    hasMap: site.branches[0]?.mapsUrl !== '#' ? site.branches[0]?.mapsUrl : undefined,
-    sameAs,
+    hasMap: site.google.mapsUrl,
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: site.google.ratingValue,
+      reviewCount: site.google.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    sameAs: [...sameAs, site.google.mapsUrl],
     parentOrganization: { '@id': `${absoluteUrl('/')}#organization` },
   };
 }

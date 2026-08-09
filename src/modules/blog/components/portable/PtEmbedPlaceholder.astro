@@ -1,0 +1,15 @@
+---
+import type { Props as PortableProps, TypedObject } from 'astro-portabletext/types';
+
+interface EmbedPlaceholderNode extends TypedObject {
+  _type: 'embedPlaceholder';
+  label?: string;
+}
+
+type Props = PortableProps<EmbedPlaceholderNode>;
+
+const { node } = Astro.props;
+const label = typeof node.label === 'string' ? node.label : 'محتوى مضمّن قريباً';
+---
+
+<div class="blog-body__embed" role="note">{label}</div>

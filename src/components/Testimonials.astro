@@ -1,5 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
+import { site } from '../data/site';
 import type { Testimonial } from '../data/testimonials';
 import SectionHeading from './SectionHeading.astro';
 
@@ -8,6 +9,7 @@ interface Props {
   eyebrow?: string;
   title?: string;
   highlight?: string;
+  showGoogleRating?: boolean;
 }
 
 const {
@@ -15,12 +17,33 @@ const {
   eyebrow = 'آراء العملاء',
   title = 'ماذا يقول عملاؤنا',
   highlight = 'عملاؤنا',
+  showGoogleRating = true,
 } = Astro.props;
+
+const ratingLabel = `${site.google.ratingValue} من 5`;
+const reviewCountLabel = `${site.google.reviewCount} تقييم على Google`;
 ---
 
 <section class="section section--gradient testimonials" id="testimonials">
   <div class="container">
     <SectionHeading eyebrow={eyebrow} title={title} highlight={highlight} />
+    {
+      showGoogleRating && (
+        <a
+          class="testimonials__google reveal"
+          href={site.google.mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="testimonials__google-score" aria-label={`تقييم Google ${ratingLabel}`}>
+            <Icon name="mdi:star" class="testimonials__google-star" aria-hidden="true" />
+            <strong>{site.google.ratingValue}</strong>
+          </span>
+          <span class="testimonials__google-meta">{reviewCountLabel}</span>
+          <span class="testimonials__google-link">عرض على الخريطة</span>
+        </a>
+      )
+    }
     <div class="testimonials__grid">
       {
         items.map((item) => (
@@ -48,6 +71,58 @@ const {
 </section>
 
 <style>
+  .testimonials__google {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem 1rem;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 1.75rem;
+    padding: 0.7rem 1.1rem;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-pill);
+    background: rgba(0, 0, 0, 0.16);
+    color: var(--color-text);
+    text-decoration: none;
+    transition:
+      background 0.2s var(--ease-out),
+      border-color 0.2s var(--ease-out),
+      transform 0.2s var(--ease-out);
+  }
+
+  .testimonials__google:hover {
+    background: rgba(156, 143, 124, 0.12);
+    border-color: rgba(156, 143, 124, 0.45);
+    transform: translateY(-1px);
+  }
+
+  .testimonials__google-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--color-accent);
+    font-size: 1.05rem;
+  }
+
+  .testimonials__google-star {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .testimonials__google-meta {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .testimonials__google-link {
+    color: var(--color-accent-soft);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
   .testimonials__grid {
     display: grid;
     gap: 1rem;

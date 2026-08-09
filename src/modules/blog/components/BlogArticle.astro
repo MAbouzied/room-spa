@@ -1,0 +1,109 @@
+---
+/**
+ * THESIS: Title owns the first read; the cover proves the topic; body carries the full Read experience.
+ * OWN-WORLD: Room Spa dark/gold + Cairo — editorial, not magazine chrome.
+ * STORY: Land on the topic, trust the spa image, read structured guidance, book.
+ * FIRST VIEWPORT: breadcrumb (page) → large H1 → meta row → dominant cover → body start.
+ * FORM: User-pinned hierarchy from staging.3baq.com.sa article detail (Read mode).
+ */
+import BlogBody from './BlogBody.astro';
+import BlogCard from './BlogCard.astro';
+import BlogImage from './BlogImage.astro';
+import BlogMeta from './BlogMeta.astro';
+import {
+  articleDescription,
+  shouldShowTableOfContents,
+  tableOfContentsForBody,
+} from '../content/content-renderers';
+import { readingTimeForPost } from '../lib/reading-time';
+import type { BlogArticleLabels, BlogPost } from '../model/blog-types';
+import { DEFAULT_BLOG_ARTICLE_LABELS } from '../model/blog-types';
+import '../styles/blog.css';
+
+export interface Props {
+  post: BlogPost;
+  relatedPosts?: readonly BlogPost[];
+  labels?: BlogArticleLabels;
+}
+
+const {
+  post,
+  relatedPosts = [],
+  labels = DEFAULT_BLOG_ARTICLE_LABELS,
+} = Astro.props;
+
+const readingTimeMinutes = readingTimeForPost(post);
+const description = articleDescription(post);
+const toc = tableOfContentsForBody(post.body);
+const showToc = shouldShowTableOfContents(toc);
+const hasBody =
+  post.body.format === 'portableText'
+    ? post.body.value.length > 0
+    : post.body.format === 'blocks'
+      ? post.body.blocks.length > 0
+      : post.body.format === 'html'
+        ? post.body.html.trim().length > 0
+        : false;
+---
+
+<div class="blog-root blog-article">
+  <header class="blog-article__masthead">
+    <p class="blog-article__category">{post.category.label}</p>
+    <h1 class="blog-article__title">{post.title}</h1>
+    {description && <p class="blog-article__description">{description}</p>}
+    <BlogMeta
+      post={post}
+      readingTimeMinutes={readingTimeMinutes}
+      labels={labels}
+      variant="article"
+      showUpdated={true}
+    />
+  </header>
+
+  <div class="blog-article__cover">
+    <BlogImage
+      src={post.cover.src}
+      alt={post.cover.alt}
+      width={post.cover.width}
+      height={post.cover.height}
+      caption={post.cover.caption}
+      focalPoint={post.cover.focalPoint}
+      loading="eager"
+    />
+  </div>
+
+  {
+    hasBody && (
+      <div class:list={['blog-article__content', { 'has-toc': showToc }]}>
+        {showToc && (
+          <nav class="blog-toc" aria-labelledby="blog-toc-heading">
+            <h2 class="blog-toc__title" id="blog-toc-heading">{labels.tableOfContents}</h2>
+            <ol>
+              {toc.map((item) => (
+                <li>
+                  <a href={`#${item.id}`}>{item.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+        <article class="blog-article__reading">
+          <BlogBody body={post.body} />
+        </article>
+      </div>
+    )
+  }
+
+  {relatedPosts.length > 0 && (
+    <section class="blog-related" aria-labelledby="blog-related-heading">
+      <h2 class="blog-section-title" id="blog-related-heading">{labels.relatedHeading}</h2>
+      <div class="blog-grid">
+        {relatedPosts.map((related) => (
+          <BlogCard post={related} labels={{ readArticle: labels.readArticle }} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <slot name="cta" />
+</div>

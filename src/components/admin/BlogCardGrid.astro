@@ -1,0 +1,183 @@
+---
+import type { AdminPost, AdminPostListStatus } from '../../lib/admin/blog-admin.ts';
+
+interface Props {
+  posts: AdminPost[];
+  search?: string;
+  status?: AdminPostListStatus;
+}
+
+const { posts, search = '', status = 'all' } = Astro.props;
+const publishedCount = posts.filter((post) => post.status === 'published').length;
+const draftCount = posts.filter((post) => post.status === 'draft').length;
+const dateLabel = (value: string | null) => value ? new Intl.DateTimeFormat('ar-SA', { dateStyle: 'medium' }).format(new Date(value)) : '—';
+---
+
+<section class="posts-view">
+  <div class="stats-grid" aria-label="ملخص المقالات">
+    <article class="stat-card"><span>الإجمالي</span><strong id="total-count">{posts.length}</strong></article>
+    <article class="stat-card"><span>منشور</span><strong id="published-count">{publishedCount}</strong></article>
+    <article class="stat-card"><span>مسودة</span><strong id="draft-count">{draftCount}</strong></article>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <div>
+        <p class="list-eyebrow">المكتبة التحريرية</p>
+        <h2>كل المقالات</h2>
+        <p class="list-description">راجع المحتوى بسرعة، وافتح أي مقال للتعديل أو النشر.</p>
+      </div>
+      <div class="list-total"><strong id="list-visible-count">{posts.length}</strong><span>مقال</span></div>
+    </div>
+    <form id="post-search-form" class="list-tools" method="get" action="/admin">
+      <label class="search"><span class="sr-only">بحث</span><span class="search-icon" aria-hidden="true">⌕</span><input id="search" name="q" type="search" value={search} placeholder="ابحث في العناوين والمحتوى" /></label>
+      <label class="filter"><span>الحالة</span><select id="status-filter" name="status"><option value="all" selected={status === 'all'}>كل المقالات</option><option value="published" selected={status === 'published'}>المنشورة</option><option value="draft" selected={status === 'draft'}>المسودات</option></select></label>
+    </form>
+    <div id="post-list" class="post-list" aria-live="polite">
+      {posts.length ? posts.map((post) => {
+        const published = post.status === 'published';
+        return <article class="blog-admin-card" data-status={post.status} data-title={post.title.toLocaleLowerCase('ar')}>
+          <div class="blog-card-media">
+            {post.coverUrl ? <img src={post.coverUrl} alt="" loading="lazy" /> : <span class="blog-card-placeholder" aria-hidden="true">RS</span>}
+            <div class="blog-card-flags">
+              <span class:list={['blog-card-status', { 'is-draft': !published }]}>{published ? 'منشور' : 'مسودة'}</span>
+              {post.featured && <span class="blog-card-featured">★ مميز</span>}
+            </div>
+          </div>
+          <div class="blog-card-body">
+            <p class="blog-card-date">{published ? 'آخر نشر' : 'آخر تحديث'} · {dateLabel(post.updatedAt)}</p>
+            <h3 class="blog-card-title">{post.title || 'بدون عنوان'}</h3>
+            <p class="blog-card-excerpt">{post.excerpt || 'لا توجد مقدمة مختصرة لهذا المقال بعد.'}</p>
+            <p class="blog-card-author">بواسطة {post.author || 'فريق روم سبا'}</p>
+          </div>
+          <footer class="blog-card-actions">
+            <div class="blog-card-actions-main">
+              <a class="blog-card-edit button" href={`/admin/${encodeURIComponent(post.id)}/edit`}>تحرير المقال</a>
+              <a class="blog-card-preview button" href={`/admin/${encodeURIComponent(post.id)}/preview`}>معاينة</a>
+            </div>
+            <div class="blog-card-actions-sub">
+              <button type="button" class={published ? 'blog-card-unpublish' : 'blog-card-publish'} data-action={published ? 'unpublish' : 'publish'} data-id={post.id}>{published ? 'إلغاء النشر' : 'نشر الآن'}</button>
+              <button type="button" class="blog-card-delete" data-action="delete" data-id={post.id}>حذف المقال</button>
+            </div>
+          </footer>
+        </article>;
+      }) : <div class="empty-state"><strong>لا توجد مقالات هنا</strong><span>أنشئ أول مقال من الزر أعلاه.</span></div>}
+    </div>
+  </div>
+</section>
+
+<script>
+  const status = document.querySelector<HTMLElement>('#admin-status');
+  const notify = (message: string, error = false) => {
+    if (!status) return;
+    status.textContent = message;
+    status.hidden = false;
+    status.classList.toggle('error', error);
+    window.setTimeout(() => { status.hidden = true; }, 4000);
+  };
+  const form = document.querySelector<HTMLFormElement>('#post-search-form');
+  const searchInput = document.querySelector<HTMLInputElement>('#search');
+  const statusFilter = document.querySelector<HTMLSelectElement>('#status-filter');
+  let searchTimer: number | undefined;
+  let activeSearchRequest = 0;
+  let searchAbort: AbortController | undefined;
+  const submitSearch = async () => {
+    if (!form) return;
+    window.clearTimeout(searchTimer);
+    const url = new URL(window.location.href);
+    const query = searchInput?.value.trim() || '';
+    const status = statusFilter?.value || 'all';
+    if (query) url.searchParams.set('q', query);
+    else url.searchParams.delete('q');
+    if (status === 'all') url.searchParams.delete('status');
+    else url.searchParams.set('status', status);
+    const nextUrl = `${url.pathname}${url.search}`;
+    if (nextUrl === `${window.location.pathname}${window.location.search}`) return;
+
+    const requestId = ++activeSearchRequest;
+    searchAbort?.abort();
+    searchAbort = new AbortController();
+    const list = document.querySelector<HTMLElement>('#post-list');
+    form.setAttribute('aria-busy', 'true');
+    list?.setAttribute('aria-busy', 'true');
+    try {
+      const response = await fetch(nextUrl, {
+        headers: { 'X-Requested-With': 'fetch' },
+        signal: searchAbort.signal,
+      });
+      if (!response.ok) {
+        if (response.status === 401) {
+          const returnTo = `${window.location.pathname}${window.location.search}`;
+          window.location.assign(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+          return;
+        }
+        throw new Error('تعذر تحديث نتائج البحث');
+      }
+      const html = await response.text();
+      if (requestId !== activeSearchRequest) return;
+      const nextDocument = new DOMParser().parseFromString(html, 'text/html');
+      const nextList = nextDocument.querySelector<HTMLElement>('#post-list');
+      const currentList = document.querySelector<HTMLElement>('#post-list');
+      if (!nextList || !currentList) throw new Error('تعذر عرض نتائج البحث');
+      currentList.replaceWith(nextList);
+      for (const id of ['list-visible-count', 'total-count', 'published-count', 'draft-count']) {
+        const nextValue = nextDocument.querySelector<HTMLElement>(`#${id}`)?.textContent;
+        const currentValue = document.querySelector<HTMLElement>(`#${id}`);
+        if (nextValue !== undefined && currentValue) currentValue.textContent = nextValue;
+      }
+      window.history.replaceState({}, '', nextUrl);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      if (requestId === activeSearchRequest) notify(error instanceof Error ? error.message : 'تعذر تحديث نتائج البحث', true);
+    } finally {
+      if (requestId === activeSearchRequest) {
+        form.removeAttribute('aria-busy');
+        document.querySelector<HTMLElement>('#post-list')?.removeAttribute('aria-busy');
+      }
+    }
+  };
+  form?.addEventListener('submit', (event) => { event.preventDefault(); submitSearch(); });
+  searchInput?.addEventListener('input', () => {
+    window.clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(submitSearch, 450);
+  });
+  statusFilter?.addEventListener('change', submitSearch);
+  document.addEventListener('click', async (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-action]');
+    if (!button) return;
+    const action = button.dataset.action;
+    const id = button.dataset.id;
+    if (!action || !id) return;
+    if (action === 'delete' && !window.confirm('هل تريد حذف هذا المقال نهائياً؟')) return;
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    const originalLabel = button.textContent || '';
+    button.innerHTML = '<span class="action-spinner" aria-hidden="true"></span> جارٍ التنفيذ…';
+    try {
+      const endpoint = action === 'delete' ? `posts/${encodeURIComponent(id)}` : `posts/${encodeURIComponent(id)}/${action}`;
+      const response = await fetch(`/api/admin/blog/${endpoint}`, { method: action === 'delete' ? 'DELETE' : 'POST', headers: { 'Content-Type': 'application/json' } });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        if (response.status === 401) {
+          const returnTo = `${window.location.pathname}${window.location.search}`;
+          window.location.assign(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+          return;
+        }
+        const error = data && typeof data === 'object' ? (data as { error?: unknown }).error : undefined;
+        const message = typeof error === 'string'
+          ? error
+          : error && typeof error === 'object' && typeof (error as { message?: unknown }).message === 'string'
+            ? (error as { message: string }).message
+            : 'تعذر تحديث المقال';
+        throw new Error(message);
+      }
+      notify(action === 'delete' ? 'تم حذف المقال' : action === 'publish' ? 'تم نشر المقال' : 'تم إلغاء النشر');
+      window.setTimeout(() => window.location.reload(), 350);
+    } catch (error) {
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
+      button.textContent = originalLabel;
+      notify(error instanceof Error ? error.message : 'تعذر تحديث المقال', true);
+    }
+  });
+</script>

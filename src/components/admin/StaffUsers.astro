@@ -1,0 +1,267 @@
+<section class="staff-users-view" aria-labelledby="staff-users-heading">
+  <div class="staff-users-grid">
+    <form id="staff-create-form" class="staff-create-card" novalidate>
+      <div>
+        <p class="list-eyebrow">صلاحيات الفريق</p>
+        <h2 id="staff-users-heading">إضافة مستخدم</h2>
+        <p>أدخل البريد الإلكتروني فقط. ستظهر بيانات Google تلقائياً بعد أول تسجيل دخول ناجح.</p>
+      </div>
+      <label for="staff-create-email">البريد الإلكتروني</label>
+      <input id="staff-create-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="name@example.com" />
+      <button class="button button-primary" type="submit">إضافة صلاحية</button>
+    </form>
+
+    <section class="staff-list-card" aria-label="المستخدمون المصرح لهم">
+      <header class="staff-list-header">
+        <div>
+          <p class="list-eyebrow">دليل الوصول</p>
+          <h2>المستخدمون المصرح لهم</h2>
+          <p>يمكن لكل مستخدم مصرح له إدارة حسابات الفريق الأخرى.</p>
+        </div>
+        <span id="staff-user-count" class="staff-user-count" aria-live="polite">—</span>
+      </header>
+      <div id="staff-users-list" class="staff-user-list" aria-busy="true" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <dialog id="staff-edit-dialog" class="staff-edit-dialog" aria-labelledby="staff-edit-title">
+    <form id="staff-edit-form" method="dialog" novalidate>
+      <div class="staff-dialog-header">
+        <div>
+          <p class="list-eyebrow">تعديل المستخدم</p>
+          <h2 id="staff-edit-title">تحديث البريد الإلكتروني</h2>
+        </div>
+        <button type="button" class="staff-dialog-close" data-close-edit aria-label="إغلاق">×</button>
+      </div>
+      <label for="staff-edit-email">البريد الإلكتروني</label>
+      <input id="staff-edit-email" name="email" type="email" autocomplete="email" inputmode="email" required />
+      <p class="staff-dialog-help">سيتم مسح الاسم والصورة المرتبطين بـ Google حتى يسجل المستخدم دخوله بالبريد الجديد.</p>
+      <div class="staff-dialog-actions">
+        <button type="button" class="button button-secondary" data-close-edit>إلغاء</button>
+        <button type="submit" class="button button-primary">حفظ التعديل</button>
+      </div>
+    </form>
+  </dialog>
+
+  <p id="staff-users-status" class="staff-users-status" role="status" aria-live="polite" hidden></p>
+</section>
+
+<script>
+  type StaffUser = {
+    id: string;
+    email: string;
+    name?: string;
+    image?: string;
+    isCurrent: boolean;
+  };
+
+  type ApiError = { error?: { code?: string; message?: string } };
+
+  const list = document.querySelector<HTMLElement>('#staff-users-list');
+  const count = document.querySelector<HTMLElement>('#staff-user-count');
+  const status = document.querySelector<HTMLElement>('#staff-users-status');
+  const createForm = document.querySelector<HTMLFormElement>('#staff-create-form');
+  const editForm = document.querySelector<HTMLFormElement>('#staff-edit-form');
+  const editDialog = document.querySelector<HTMLDialogElement>('#staff-edit-dialog');
+  const createEmail = document.querySelector<HTMLInputElement>('#staff-create-email');
+  const editEmail = document.querySelector<HTMLInputElement>('#staff-edit-email');
+  let users: StaffUser[] = [];
+  let editingId: string | null = null;
+
+  const arabicError = (code: string | undefined, fallback: string | undefined) => {
+    const messages: Record<string, string> = {
+      INVALID_EMAIL: 'أدخل بريداً إلكترونياً صالحاً.',
+      DUPLICATE_EMAIL: 'هذا البريد الإلكتروني لديه صلاحية بالفعل.',
+      CURRENT_USER_PROTECTED: 'لا يمكنك تعديل أو حذف حسابك الحالي.',
+      NOT_FOUND: 'لم يتم العثور على المستخدم.',
+      UNAUTHENTICATED: 'انتهت جلسة تسجيل الدخول. سجّل الدخول مرة أخرى.',
+      FORBIDDEN: 'ليس لديك صلاحية لتنفيذ هذا الإجراء.',
+      STAFF_STORE_UNAVAILABLE: 'خدمة صلاحيات الفريق غير متاحة مؤقتاً. حاول مرة أخرى لاحقاً.',
+    };
+    return messages[code ?? ''] ?? fallback ?? 'تعذر إتمام الطلب. حاول مرة أخرى.';
+  };
+
+  const notify = (message: string, isError = false) => {
+    if (!status) return;
+    status.textContent = message;
+    status.hidden = false;
+    status.classList.toggle('is-error', isError);
+  };
+
+  const request = async <T,>(url: string, init?: RequestInit): Promise<T> => {
+    const response = await fetch(url, {
+      credentials: 'same-origin',
+      ...init,
+      headers: {
+        ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
+        ...init?.headers,
+      },
+    });
+    const data = await response.json().catch(() => ({})) as T & ApiError;
+    if (!response.ok) {
+      throw new Error(arabicError(data.error?.code, data.error?.message));
+    }
+    return data;
+  };
+
+  const initials = (user: StaffUser) => {
+    const source = user.name?.trim() || user.email;
+    return source.slice(0, 1).toLocaleUpperCase('ar');
+  };
+
+  const makeAction = (label: string, className: string, disabled: boolean, onClick: () => void) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = className;
+    button.textContent = label;
+    button.disabled = disabled;
+    button.setAttribute('aria-disabled', String(disabled));
+    if (disabled) button.title = 'لا يمكنك إدارة حسابك الحالي.';
+    button.addEventListener('click', onClick);
+    return button;
+  };
+
+  const openEdit = (user: StaffUser) => {
+    if (user.isCurrent || !editDialog || !editEmail) return;
+    editingId = user.id;
+    editEmail.value = user.email;
+    editDialog.showModal();
+    editEmail.focus();
+  };
+
+  const closeEdit = () => {
+    editingId = null;
+    editDialog?.close();
+  };
+
+  const deleteUser = async (user: StaffUser) => {
+    if (user.isCurrent) return;
+    if (!window.confirm(`هل تريد حذف صلاحية ${user.email} نهائياً؟`)) return;
+    try {
+      await request(`/api/admin/users/${encodeURIComponent(user.id)}`, { method: 'DELETE' });
+      notify('تم حذف صلاحية المستخدم.');
+      await loadUsers();
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'تعذر حذف المستخدم.', true);
+    }
+  };
+
+  const renderUsers = () => {
+    if (!list || !count) return;
+    list.replaceChildren();
+    list.setAttribute('aria-busy', 'false');
+    count.textContent = String(users.length);
+
+    if (users.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'staff-empty-state';
+      empty.textContent = 'لا يوجد مستخدمون مصرح لهم بعد.';
+      list.append(empty);
+      return;
+    }
+
+    for (const user of users) {
+      const item = document.createElement('article');
+      item.className = 'staff-user-row';
+
+      const identity = document.createElement('div');
+      identity.className = 'staff-user-identity';
+      const avatar = document.createElement('span');
+      avatar.className = 'staff-avatar';
+      if (user.image) {
+        const image = document.createElement('img');
+        image.src = user.image;
+        image.alt = '';
+        image.loading = 'lazy';
+        image.referrerPolicy = 'no-referrer';
+        avatar.append(image);
+      } else {
+        avatar.textContent = initials(user);
+      }
+      const details = document.createElement('div');
+      details.className = 'staff-user-details';
+      const email = document.createElement('strong');
+      email.textContent = user.email;
+      const profile = document.createElement('span');
+      profile.textContent = user.name || 'ستظهر بيانات Google بعد تسجيل الدخول';
+      details.append(email, profile);
+      identity.append(avatar, details);
+
+      const actions = document.createElement('div');
+      actions.className = 'staff-user-actions';
+      if (user.isCurrent) {
+        const badge = document.createElement('span');
+        badge.className = 'staff-current-badge';
+        badge.textContent = 'حسابك الحالي';
+        actions.append(badge);
+      }
+      actions.append(
+        makeAction('تعديل', 'text-button staff-edit-button', user.isCurrent, () => openEdit(user)),
+        makeAction('حذف', 'text-button staff-delete-button', user.isCurrent, () => { void deleteUser(user); }),
+      );
+      item.append(identity, actions);
+      list.append(item);
+    }
+  };
+
+  async function loadUsers() {
+    if (!list) return;
+    list.setAttribute('aria-busy', 'true');
+    try {
+      const data = await request<{ users: StaffUser[] }>('/api/admin/users');
+      users = data.users;
+      renderUsers();
+    } catch (error) {
+      list.setAttribute('aria-busy', 'false');
+      notify(error instanceof Error ? error.message : 'تعذر تحميل المستخدمين.', true);
+    }
+  }
+
+  createForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const submit = createForm.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const email = createEmail?.value ?? '';
+    if (submit) submit.disabled = true;
+    try {
+      await request('/api/admin/users', { method: 'POST', body: JSON.stringify({ email }) });
+      if (createEmail) createEmail.value = '';
+      notify('تمت إضافة صلاحية المستخدم.');
+      await loadUsers();
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'تعذر إضافة المستخدم.', true);
+    } finally {
+      if (submit) submit.disabled = false;
+    }
+  });
+
+  editForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!editingId) return;
+    const submit = editForm.querySelector<HTMLButtonElement>('button[type="submit"]');
+    if (submit) submit.disabled = true;
+    try {
+      await request(`/api/admin/users/${encodeURIComponent(editingId)}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ email: editEmail?.value ?? '' }),
+      });
+      closeEdit();
+      notify('تم تحديث البريد الإلكتروني للمستخدم.');
+      await loadUsers();
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'تعذر تحديث المستخدم.', true);
+    } finally {
+      if (submit) submit.disabled = false;
+    }
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-close-edit]').forEach((button) => {
+    button.addEventListener('click', closeEdit);
+  });
+  editDialog?.addEventListener('close', () => { editingId = null; });
+
+  void loadUsers();
+</script>
+
+<style is:global>
+  .staff-users-view{max-width:1120px;margin-top:26px}.staff-users-grid{display:grid;grid-template-columns:minmax(250px,.75fr) minmax(0,1.65fr);gap:20px;align-items:start}.staff-create-card,.staff-list-card{background:var(--color-bg-card);border:1px solid var(--color-border-card);border-radius:18px;box-shadow:0 8px 26px rgb(0 0 0 / 28%)}.staff-create-card{display:grid;gap:12px;padding:24px}.staff-create-card h2,.staff-list-header h2{margin:0;color:var(--color-text-primary);font-size:21px}.staff-create-card p,.staff-list-header p{margin:7px 0 0;color:var(--color-text-muted);font-size:13px;line-height:1.8}.staff-create-card label,.staff-edit-dialog label{color:var(--color-text-nav);font-size:13px;font-weight:800}.staff-create-card input,.staff-edit-dialog input{width:100%;border:1px solid var(--color-border-input);border-radius:10px;background:var(--color-bg-card);padding:12px 13px;color:var(--color-text-primary);font:inherit;direction:ltr;text-align:left}.staff-create-card input:focus,.staff-edit-dialog input:focus{border-color:var(--color-gold);box-shadow:0 0 0 3px color-mix(in srgb, var(--color-gold) 35%, transparent);outline:0}.staff-list-card{overflow:hidden}.staff-list-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:24px 25px;border-bottom:1px solid var(--color-border-card);background:linear-gradient(180deg,var(--color-bg-card) 0%,var(--color-bg-secondary) 100%)}.staff-user-count{display:grid;min-width:42px;height:38px;place-items:center;border:1px solid var(--color-border-card);border-radius:12px;background:var(--color-bg-card);color:var(--color-gold);font-size:19px;font-weight:900}.staff-user-list{display:grid}.staff-user-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px 22px;border-bottom:1px solid var(--color-bg-tertiary)}.staff-user-row:last-child{border-bottom:0}.staff-user-identity{display:flex;min-width:0;align-items:center;gap:12px}.staff-avatar{display:grid;width:42px;height:42px;flex:0 0 42px;place-items:center;overflow:hidden;border-radius:50%;background:var(--color-bg-form);color:var(--color-gold);font-size:15px;font-weight:900}.staff-avatar img{width:100%;height:100%;object-fit:cover}.staff-user-details{display:grid;min-width:0;gap:3px}.staff-user-details strong{overflow:hidden;color:var(--color-text-primary);font-size:14px;text-overflow:ellipsis;white-space:nowrap;direction:ltr;text-align:right}.staff-user-details span{overflow:hidden;color:var(--color-text-muted);font-size:12px;text-overflow:ellipsis;white-space:nowrap}.staff-user-actions{display:flex;flex:0 0 auto;align-items:center;gap:8px}.staff-user-actions .text-button{padding:5px 7px;font-size:12px}.staff-user-actions .text-button:disabled{cursor:not-allowed;opacity:.42}.staff-delete-button{color:var(--color-danger)}.staff-current-badge{padding:5px 8px;border-radius:999px;background:color-mix(in srgb, var(--color-gold) 16%, var(--color-bg-form));color:var(--color-gold-light);font-size:11px;font-weight:800}.staff-empty-state{margin:0;padding:38px 22px;color:var(--color-text-muted);text-align:center;font-size:13px}.staff-users-status{margin:16px 0 0;padding:12px 15px;border-radius:10px;background:color-mix(in srgb, var(--color-success) 22%, var(--color-bg-card));color:var(--color-success)}.staff-users-status.is-error{background:color-mix(in srgb, var(--color-danger) 18%, var(--color-bg-card));color:var(--color-danger)}.staff-edit-dialog{width:min(100% - 32px,480px);border:1px solid var(--color-border-card);border-radius:18px;padding:0;background:var(--color-bg-card);color:var(--color-text-primary);box-shadow:0 22px 70px rgb(0 0 0 / 45%)}.staff-edit-dialog::backdrop{background:color-mix(in srgb, var(--color-bg-hero) 78%, transparent)}.staff-edit-dialog form{display:grid;gap:13px;padding:25px;background:var(--color-bg-card)}.staff-dialog-header{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}.staff-dialog-header h2{margin:0;font-size:21px;color:var(--color-text-primary)}.staff-dialog-close{width:32px;height:32px;border:0;border-radius:9px;background:var(--color-bg-form);color:var(--color-text-primary);font-size:25px;line-height:1;cursor:pointer}.staff-dialog-help{margin:0;color:var(--color-text-muted);font-size:12px;line-height:1.75}.staff-dialog-actions{display:flex;justify-content:flex-start;gap:9px;margin-top:5px}.staff-dialog-actions .button{font-size:13px}@media(max-width:900px){.staff-users-grid{grid-template-columns:1fr}.staff-create-card{max-width:none}}@media(max-width:560px){.staff-list-header,.staff-user-row{padding-inline:16px}.staff-user-row{align-items:flex-start;flex-direction:column}.staff-user-actions{width:100%;justify-content:flex-start}.staff-create-card{padding:19px}.staff-dialog-actions{display:grid;grid-template-columns:1fr 1fr}.staff-dialog-actions .button{padding-inline:8px}}
+</style>

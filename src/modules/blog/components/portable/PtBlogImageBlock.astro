@@ -1,0 +1,40 @@
+---
+import BlogImage from '../BlogImage.astro';
+import type { Props as PortableProps, TypedObject } from 'astro-portabletext/types';
+
+interface BlogImageBlockNode extends TypedObject {
+  _type: 'blogImageBlock';
+  image?: {
+    asset?: { url?: string; metadata?: { dimensions?: { width?: number; height?: number } } };
+    alt?: string;
+    caption?: string;
+    hotspot?: { x?: number; y?: number };
+  };
+}
+
+type Props = PortableProps<BlogImageBlockNode>;
+
+const { node } = Astro.props;
+const image = node.image;
+const src = image?.asset?.url;
+const alt = image?.alt;
+const focalPoint =
+  typeof image?.hotspot?.x === 'number' && typeof image?.hotspot?.y === 'number'
+    ? { x: image.hotspot.x, y: image.hotspot.y }
+    : undefined;
+---
+
+{
+  src && alt ? (
+    <div class="blog-body__image">
+      <BlogImage
+        src={src}
+        alt={alt}
+        width={image.asset?.metadata?.dimensions?.width ?? 1600}
+        height={image.asset?.metadata?.dimensions?.height ?? 1067}
+        caption={image.caption}
+        focalPoint={focalPoint}
+      />
+    </div>
+  ) : null
+}

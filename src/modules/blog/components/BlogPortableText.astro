@@ -1,0 +1,32 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { SomePortableTextComponents, TypedObject } from 'astro-portabletext/types';
+import PtBlogImageBlock from './portable/PtBlogImageBlock.astro';
+import PtEmbedPlaceholder from './portable/PtEmbedPlaceholder.astro';
+import PtHeading2 from './portable/PtHeading2.astro';
+import PtImage from './portable/PtImage.astro';
+import PtTwoColumn from './portable/PtTwoColumn.astro';
+
+export interface Props {
+  value: readonly unknown[];
+}
+
+const { value } = Astro.props;
+const portableValue = [...value] as TypedObject[];
+
+const components: SomePortableTextComponents = {
+  block: {
+    h2: PtHeading2,
+  },
+  type: {
+    image: PtImage,
+    blogImageBlock: PtBlogImageBlock,
+    twoColumn: PtTwoColumn,
+    embedPlaceholder: PtEmbedPlaceholder,
+  },
+};
+---
+
+<div class="blog-body blog-body--portable">
+  <PortableText value={portableValue} components={components} />
+</div>

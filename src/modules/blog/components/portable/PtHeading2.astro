@@ -1,0 +1,10 @@
+---
+import type { BlockProps } from 'astro-portabletext/types';
+
+type Props = BlockProps;
+
+const { node } = Astro.props;
+const id = typeof node._key === 'string' ? node._key : undefined;
+---
+
+<h2 id={id}><slot /></h2>

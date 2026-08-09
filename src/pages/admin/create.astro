@@ -1,0 +1,94 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="مقال جديد | روم سبا" description="تجهيز مقال جديد في لوحة المدونة." locale="ar">
+  <main class="admin-create-shell" dir="rtl">
+    <section class="admin-create-card" aria-live="polite">
+      <p class="admin-kicker">لوحة التحرير</p>
+      <h1>تجهيز مقال جديد</h1>
+      <p id="create-message">نجهز مساحة آمنة للمسودة ثم ننقلك إلى المحرر.</p>
+      <div class="create-loader" aria-hidden="true"></div>
+    </section>
+  </main>
+</AdminLayout>
+
+<style>
+  .admin-create-shell {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    color: var(--color-text-primary);
+  }
+  .admin-create-card {
+    width: min(100%, 460px);
+    padding: 42px 34px;
+    border: 1px solid var(--color-border-card);
+    border-radius: 24px;
+    background: var(--color-bg-card);
+    box-shadow: 0 20px 50px rgb(0 0 0 / 28%);
+    text-align: center;
+  }
+  .admin-create-card h1 {
+    margin: 0;
+    font-size: 28px;
+  }
+  .admin-create-card p:not(.admin-kicker) {
+    margin: 12px 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.8;
+  }
+  .admin-kicker {
+    margin: 0 0 8px;
+    color: var(--color-gold);
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .create-loader {
+    width: 28px;
+    height: 28px;
+    margin: 24px auto 0;
+    border: 3px solid var(--color-border-card);
+    border-top-color: var(--color-gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+
+<script>
+  const message = document.querySelector('#create-message');
+  const storageKey = 'room-spa-admin-pending-draft';
+  const reservationId = sessionStorage.getItem(storageKey) || crypto.randomUUID();
+  sessionStorage.setItem(storageKey, reservationId);
+  fetch('/api/admin/blog/posts/reserve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reservationId }),
+  })
+    .then(async (response) => {
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'تعذر تجهيز المسودة');
+      return data;
+    })
+    .then(() => {
+      sessionStorage.removeItem(storageKey);
+      window.location.replace(`/admin/${encodeURIComponent(reservationId)}/edit`);
+    })
+    .catch((error) => {
+      if (message) {
+        message.textContent =
+          error instanceof Error
+            ? `${error.message}. أعد تحميل الصفحة للمحاولة مرة أخرى.`
+            : 'تعذر تجهيز المسودة. أعد تحميل الصفحة للمحاولة مرة أخرى.';
+      }
+      document.querySelector('.create-loader')?.remove();
+    });
+</script>

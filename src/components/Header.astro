@@ -5,7 +5,7 @@ import Button from './Button.astro';
 import Logo from './Logo.astro';
 
 interface Props {
-  variant?: 'home' | 'gift';
+  variant?: 'home' | 'gift' | 'blogs';
 }
 
 const { variant = 'home' } = Astro.props;
@@ -18,6 +18,7 @@ const homeLinks = [
   { href: '/#offers', label: 'العروض' },
   { href: '/#packages', label: 'الباقات' },
   { href: '/gift', label: 'الإهداءات' },
+  { href: '/blogs/', label: 'المدونة' },
   { href: '/#branches', label: 'موقعنا' },
   { href: '/#testimonials', label: 'آراء العملاء' },
 ];
@@ -27,11 +28,21 @@ const giftLinks = [
   { href: '/gift#recipients', label: 'لمن تُهدين' },
   { href: '/gift#why-gift', label: 'لماذا روم سبا' },
   { href: '/gift#packages', label: 'الباقات' },
+  { href: '/blogs/', label: 'المدونة' },
   { href: '/gift#testimonials', label: 'آراء العملاء' },
   { href: '/gift#branches', label: 'موقعنا' },
 ];
 
-const links = variant === 'gift' ? giftLinks : homeLinks;
+const blogLinks = [
+  { href: '/', label: 'الرئيسية' },
+  { href: '/blogs/', label: 'المدونة' },
+  { href: '/#services', label: 'خدماتنا' },
+  { href: '/#packages', label: 'الباقات' },
+  { href: '/gift', label: 'الإهداءات' },
+  { href: '/#branches', label: 'موقعنا' },
+];
+
+const links = variant === 'gift' ? giftLinks : variant === 'blogs' ? blogLinks : homeLinks;
 ---
 
 <header class="site-header" data-header>

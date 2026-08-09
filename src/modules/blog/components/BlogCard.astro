@@ -1,0 +1,50 @@
+---
+import BlogImage from './BlogImage.astro';
+import BlogMeta from './BlogMeta.astro';
+import { readingTimeForPost } from '../lib/reading-time';
+import type { BlogArticleLabels, BlogListingLabels, BlogPost } from '../model/blog-types';
+import {
+  DEFAULT_BLOG_ARTICLE_LABELS,
+  DEFAULT_BLOG_LISTING_LABELS,
+} from '../model/blog-types';
+
+export interface Props {
+  post: BlogPost;
+  labels?: Pick<BlogListingLabels, 'readArticle'>;
+  metaLabels?: BlogArticleLabels;
+}
+
+const {
+  post,
+  labels = DEFAULT_BLOG_LISTING_LABELS,
+  metaLabels = DEFAULT_BLOG_ARTICLE_LABELS,
+} = Astro.props;
+
+const href = `/blogs/${post.slug}/`;
+const readingTimeMinutes = readingTimeForPost(post);
+---
+
+<article class="blog-card">
+  <div class="blog-card__media">
+    <BlogImage
+      src={post.cover.src}
+      alt={post.cover.alt}
+      width={post.cover.width}
+      height={post.cover.height}
+      focalPoint={post.cover.focalPoint}
+    />
+  </div>
+  <div class="blog-card__body">
+    <BlogMeta
+      post={post}
+      readingTimeMinutes={readingTimeMinutes}
+      labels={metaLabels}
+      showUpdated={false}
+    />
+    <h3 class="blog-card__title">
+      <a class="blog-card__link" href={href}>{post.title}</a>
+    </h3>
+    <p class="blog-card__excerpt">{post.excerpt}</p>
+    <span class="blog-card__read" aria-hidden="true">{labels.readArticle}</span>
+  </div>
+</article>

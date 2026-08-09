@@ -1,0 +1,22 @@
+---
+export const prerender = false;
+
+import AdminShell from '../../components/admin/AdminShell.astro';
+import BlogCardGrid from '../../components/admin/BlogCardGrid.astro';
+import { listAdminPosts, type AdminPostListStatus } from '../../lib/admin/blog-admin.ts';
+
+const search = Astro.url.searchParams.get('q')?.trim().slice(0, 120) ?? '';
+const rawStatus = Astro.url.searchParams.get('status');
+const status: AdminPostListStatus = rawStatus === 'published' || rawStatus === 'draft' ? rawStatus : 'all';
+const posts = await listAdminPosts({ search, status });
+---
+
+<AdminShell
+  title="إدارة المدونة | روم سبا"
+  description="إنشاء مقالات المدونة وتحريرها وحفظها كمسودات أو نشرها."
+  heading="المقالات"
+  subtitle="أنشئ المحتوى، راجعه في المعاينة، ثم احفظه كمسودة أو انشره مباشرة."
+  active="overview"
+>
+  <BlogCardGrid posts={posts} search={search} status={status} />
+</AdminShell>

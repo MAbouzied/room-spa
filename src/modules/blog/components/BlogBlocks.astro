@@ -1,0 +1,87 @@
+---
+import BlogImage from './BlogImage.astro';
+import type { RenderableBlock } from '../content/content-renderers';
+
+export interface Props {
+  blocks: readonly RenderableBlock[];
+}
+
+const { blocks } = Astro.props;
+---
+
+{
+  blocks.map((block) => (
+    <>
+      {block.type === 'paragraph' && <p>{block.text}</p>}
+      {block.type === 'heading' && block.level === 2 && (
+        <h2 id={block.id}>{block.text}</h2>
+      )}
+      {block.type === 'heading' && block.level === 3 && (
+        <h3 id={block.id}>{block.text}</h3>
+      )}
+      {block.type === 'unordered-list' && (
+        <ul>
+          {block.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      )}
+      {block.type === 'ordered-list' && (
+        <ol>
+          {block.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ol>
+      )}
+      {block.type === 'quote' && (
+        <blockquote>
+          <p>{block.text}</p>
+          {block.attribution && (
+            <cite class="blog-body__quote-attribution">{block.attribution}</cite>
+          )}
+        </blockquote>
+      )}
+      {block.type === 'image' && (
+        <div class="blog-body__image">
+          <BlogImage
+            src={block.src}
+            alt={block.alt}
+            width={block.width}
+            height={block.height}
+            caption={block.caption}
+          />
+        </div>
+      )}
+      {block.type === 'link-paragraph' && (
+        <p>
+          {block.parts.map((part) =>
+            part.href ? (
+              <a
+                href={part.href}
+                {...(part.external
+                  ? { target: '_blank', rel: 'noopener noreferrer' }
+                  : {})}
+              >
+                {part.text}
+              </a>
+            ) : (
+              part.text
+            ),
+          )}
+        </p>
+      )}
+      {block.type === 'two-column' && (
+        <div class="blog-body__columns">
+          {block.columns.map((column) => (
+            <div>
+              <Astro.self blocks={column} />
+            </div>
+          ))}
+        </div>
+      )}
+      {block.type === 'embed-placeholder' && (
+        <div class="blog-body__embed" role="note">{block.label}</div>
+      )}
+    </>
+  ))
+}

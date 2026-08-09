@@ -1,0 +1,36 @@
+---
+export const prerender = false;
+
+import AdminShell from '../../../components/admin/AdminShell.astro';
+import BlogEditor from '../../../components/admin/BlogEditor.astro';
+import { getAdminPost, listAdminServices } from '../../../lib/admin/blog-admin.ts';
+
+const id = Astro.params.id;
+const post = id ? await getAdminPost(id) : null;
+if (!post) {
+  Astro.response.status = 404;
+}
+const services = listAdminServices();
+---
+
+{post ? <AdminShell
+  title={`${post.title || 'مقال جديد'} | إدارة المدونة`}
+  description="تحرير مقال المدونة وحفظه كمسودة أو نشره."
+  heading={post.title || 'مقال جديد'}
+  subtitle="حرر المقال، احفظ تقدمك كمسودة، أو افتح المعاينة قبل النشر."
+  active="editor"
+  headerActionHref="/admin"
+  headerActionLabel="كل المقالات"
+>
+  <BlogEditor post={post} services={services} />
+</AdminShell> : <AdminShell
+  title="المقال غير موجود | إدارة المدونة"
+  description="المقال المطلوب غير موجود."
+  heading="المقال غير موجود"
+  subtitle="ربما تم حذف هذا المقال أو أن الرابط غير صحيح."
+  active="editor"
+  headerActionHref="/admin"
+  headerActionLabel="العودة للمقالات"
+>
+  <div class="empty-state"><strong>تعذر العثور على المقال</strong><span>ارجع إلى قائمة المقالات لاختيار مقال آخر.</span></div>
+</AdminShell>}

@@ -1,0 +1,137 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../layouts/AdminLayout.astro';
+import { loginErrorMessage, sanitizeReturnUrl } from '../lib/auth/authorization';
+
+const returnTo = sanitizeReturnUrl(Astro.url.searchParams.get('returnTo'));
+if (Astro.locals.staffAccess) {
+  return Astro.redirect(returnTo);
+}
+
+const title = 'Staff login | Room Spa';
+const description = 'Sign in with an approved Google account to access the staff admin area.';
+const errorMessage = loginErrorMessage(Astro.url.searchParams.get('error'));
+---
+
+<AdminLayout title={title} description={description} locale="en">
+  <section class="login-shell">
+    <div class="login-card">
+      <p class="login-brand">Room Spa</p>
+      <h1>Staff login</h1>
+      <p class="login-copy">
+        Use an approved Google account. Access is limited to staff in the private staff directory.
+      </p>
+
+      {errorMessage && (
+        <p class="login-error" role="alert">
+          {errorMessage}
+        </p>
+      )}
+
+      <button
+        type="button"
+        id="google-sign-in"
+        class="login-button"
+        data-return-to={returnTo}
+      >
+        Continue with Google
+      </button>
+    </div>
+  </section>
+</AdminLayout>
+
+<style>
+  .login-shell {
+    display: flex;
+    min-height: 100dvh;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    background: var(--color-bg-primary, #0e2323);
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 28rem;
+    border: 1px solid var(--color-border-card, rgba(65, 58, 40, 0.33));
+    border-radius: 1.5rem;
+    background: var(--color-bg-card, #132c2b);
+    padding: 2rem;
+    color: var(--color-text-primary, #f4f2ea);
+    box-shadow: 0 12px 32px -16px rgb(0 0 0 / 35%);
+  }
+
+  .login-brand {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #b3aea0);
+  }
+
+  .login-card h1 {
+    margin: 0.75rem 0 0;
+    font-size: 1.875rem;
+    font-weight: 900;
+  }
+
+  .login-copy {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: var(--color-text-muted, #b3aea0);
+  }
+
+  .login-error {
+    margin: 1rem 0 0;
+    border: 1px solid var(--color-border-card, rgba(65, 58, 40, 0.33));
+    border-radius: 0.75rem;
+    background: var(--color-bg-secondary, #102524);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .login-button {
+    margin-top: 2rem;
+    display: inline-flex;
+    min-height: 3rem;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.75rem 1.25rem;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: var(--color-text-btn, #1a2219);
+    cursor: pointer;
+    background: var(--color-gold, #9c8f7c);
+  }
+
+  .login-button:hover {
+    background: var(--color-gold-light, #c0a68c);
+    transform: translateY(-1px);
+  }
+
+  .login-button:focus-visible {
+    outline: 3px solid var(--color-gold-light, #c0a68c);
+    outline-offset: 2px;
+  }
+</style>
+
+<script>
+  import { authClient } from '../lib/auth/client';
+
+  const button = document.getElementById('google-sign-in');
+  button?.addEventListener('click', async () => {
+    const returnTo = button.getAttribute('data-return-to') || '/admin';
+    await authClient.signIn.social({
+      provider: 'google',
+      callbackURL: returnTo,
+      errorCallbackURL: `/login?returnTo=${encodeURIComponent(returnTo)}`,
+    });
+  });
+</script>

@@ -1,0 +1,18 @@
+---
+export const prerender = false;
+
+import AdminShell from '../../components/admin/AdminShell.astro';
+import StaffUsers from '../../components/admin/StaffUsers.astro';
+---
+
+<AdminShell
+  title="إدارة المستخدمين | روم سبا"
+  description="إدارة صلاحيات فريق لوحة التحكم في روم سبا."
+  heading="المستخدمون"
+  subtitle="أدر صلاحيات الوصول إلى لوحة التحكم باستخدام البريد الإلكتروني للمستخدمين الموثوقين."
+  active="users"
+  headerActionHref="#staff-create-email"
+  headerActionLabel="إضافة مستخدم"
+>
+  <StaffUsers />
+</AdminShell>

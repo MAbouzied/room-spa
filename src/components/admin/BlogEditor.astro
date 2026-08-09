@@ -1,0 +1,13 @@
+---
+import BlogEditorApp from './BlogEditorApp.tsx';
+import type { AdminPost } from '../../lib/admin/blog-admin.ts';
+
+interface Props {
+  post: AdminPost;
+  services: Array<{ id: string; title: string }>;
+}
+
+const { post, services } = Astro.props;
+---
+
+<BlogEditorApp client:load post={post} services={services} />

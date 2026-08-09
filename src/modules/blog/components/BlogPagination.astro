@@ -1,0 +1,29 @@
+---
+import { listingPathForPage } from '../lib/blog-selectors';
+import type { BlogListingLabels } from '../model/blog-types';
+import { DEFAULT_BLOG_LISTING_LABELS } from '../model/blog-types';
+
+export interface Props {
+  page: number;
+  totalPages: number;
+  labels?: BlogListingLabels;
+}
+
+const { page, totalPages, labels = DEFAULT_BLOG_LISTING_LABELS } = Astro.props;
+
+if (totalPages <= 1) return;
+---
+
+<nav class="blog-pagination" aria-label={labels.pageLabel(page, totalPages)}>
+  {page > 1 ? (
+    <a href={listingPathForPage(page - 1)}>{labels.previousPage}</a>
+  ) : (
+    <span aria-disabled="true">{labels.previousPage}</span>
+  )}
+  <span>{labels.pageLabel(page, totalPages)}</span>
+  {page < totalPages ? (
+    <a href={listingPathForPage(page + 1)}>{labels.nextPage}</a>
+  ) : (
+    <span aria-disabled="true">{labels.nextPage}</span>
+  )}
+</nav>

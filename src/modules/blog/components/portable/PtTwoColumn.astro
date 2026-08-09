@@ -1,0 +1,25 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { Props as PortableProps, TypedObject } from 'astro-portabletext/types';
+
+interface TwoColumnNode extends TypedObject {
+  _type: 'twoColumn';
+  left?: TypedObject[];
+  right?: TypedObject[];
+}
+
+type Props = PortableProps<TwoColumnNode>;
+
+const { node } = Astro.props;
+const left = Array.isArray(node.left) ? [...node.left] : [];
+const right = Array.isArray(node.right) ? [...node.right] : [];
+---
+
+<div class="blog-body__columns">
+  <div>
+    <PortableText value={left} />
+  </div>
+  <div>
+    <PortableText value={right} />
+  </div>
+</div>

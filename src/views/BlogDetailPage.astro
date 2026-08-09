@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import BlogCta from '../components/BlogCta.astro';
+import BlogArticle from '../modules/blog/components/BlogArticle.astro';
+import {
+  articleSeoDescription,
+  articleSeoTitle,
+  buildBlogDetailBreadcrumbSchema,
+  buildBlogPostingSchema,
+  readingTimeForPost,
+  selectRelatedPosts,
+  type BlogPost,
+} from '../modules/blog';
+
+export interface Props {
+  post: BlogPost;
+  allPosts: BlogPost[];
+}
+
+const { post, allPosts } = Astro.props;
+const relatedPosts = selectRelatedPosts(allPosts, post, 3);
+const siteUrl = Astro.site!;
+const path = `/blogs/${post.slug}/`;
+const title = articleSeoTitle(post);
+const description = articleSeoDescription(post);
+const readingTimeMinutes = readingTimeForPost(post);
+
+const breadcrumbs = [
+  { label: 'الرئيسية', href: '/' },
+  { label: 'المدونة', href: '/blogs/' },
+  { label: post.title },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  path={path}
+  navVariant="blogs"
+  image={post.cover.src}
+  type="article"
+  schemas={[
+    buildBlogDetailBreadcrumbSchema(siteUrl, post.title, path),
+    buildBlogPostingSchema({
+      site: siteUrl,
+      post,
+      path,
+      readingTimeMinutes,
+    }),
+  ]}
+>
+  <div class="blog-shell">
+    <div class="container blog-shell__crumbs">
+      <Breadcrumbs items={breadcrumbs} />
+    </div>
+
+    <section class="blog-shell__section">
+      <div class="container">
+        <BlogArticle post={post} relatedPosts={relatedPosts} />
+      </div>
+    </section>
+
+    <div class="container">
+      <BlogCta />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .blog-shell {
+    padding-block: calc(var(--header-h) + 1.25rem) var(--space-section);
+  }
+
+  .blog-shell__crumbs {
+    margin-bottom: 0.25rem;
+  }
+
+  .blog-shell__section {
+    padding-block: 0.5rem 2rem;
+  }
+</style>

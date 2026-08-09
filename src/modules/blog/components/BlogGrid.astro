@@ -1,0 +1,28 @@
+---
+import BlogCard from './BlogCard.astro';
+import type { BlogListingLabels, BlogPost } from '../model/blog-types';
+import { DEFAULT_BLOG_LISTING_LABELS } from '../model/blog-types';
+
+export interface Props {
+  posts: readonly BlogPost[];
+  labels?: BlogListingLabels;
+  headingId?: string;
+}
+
+const {
+  posts,
+  labels = DEFAULT_BLOG_LISTING_LABELS,
+  headingId = 'blog-recent-heading',
+} = Astro.props;
+---
+
+{posts.length > 0 && (
+  <section class="blog-recent" aria-labelledby={headingId}>
+    <h2 class="blog-section-title" id={headingId}>{labels.recentHeading}</h2>
+    <div class="blog-grid">
+      {posts.map((post) => (
+        <BlogCard post={post} labels={labels} />
+      ))}
+    </div>
+  </section>
+)}

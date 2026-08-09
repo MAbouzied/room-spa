@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import BlogCta from '../components/BlogCta.astro';
+import BlogListing from '../modules/blog/components/BlogListing.astro';
+import {
+  BLOG_PAGE_SIZE,
+  DEFAULT_BLOG_LISTING_LABELS,
+  buildBlogCollectionSchemas,
+  listingPathForPage,
+  paginatePosts,
+  selectListing,
+} from '../modules/blog';
+import { getBlogRepository } from '../modules/blog/repository/get-blog-repository';
+
+export interface Props {
+  page?: number;
+}
+
+const { page = 1 } = Astro.props;
+const repository = getBlogRepository();
+const posts = await repository.getPublishedPosts();
+const listing = selectListing(posts);
+const recentPage = paginatePosts(listing.recent, page, BLOG_PAGE_SIZE);
+
+if (!recentPage || page < 1) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const siteUrl = Astro.site!;
+const path = listingPathForPage(page);
+const title =
+  page <= 1
+    ? 'مدونة روم سبا | مقالات عن المساج والاسترخاء في حفر الباطن'
+    : `مدونة روم سبا — صفحة ${page} | مقالات المساج والاسترخاء`;
+const description =
+  page <= 1
+    ? 'مقالات عربية من روم سبا عن أنواع المساج، الحمام المغربي، الاسترخاء والعناية الشخصية في حفر الباطن.'
+    : 'المزيد من المقالات العربية عن المساج والاسترخاء والعناية الشخصية من روم سبا في حفر الباطن.';
+
+const breadcrumbs = [
+  { label: 'الرئيسية', href: '/' },
+  { label: 'المدونة', href: '/blogs/' },
+  ...(page > 1 ? [{ label: `صفحة ${page}` }] : []),
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  path={path}
+  navVariant="blogs"
+  image="/images/offers/wellness.jpg"
+  schemas={buildBlogCollectionSchemas({
+    site: siteUrl,
+    path,
+    name: title,
+    description,
+    posts: page <= 1 ? listing.allPublished : recentPage.items,
+  })}
+>
+  <div class="blog-shell">
+    <div class="container blog-shell__crumbs">
+      <Breadcrumbs items={breadcrumbs} />
+    </div>
+
+    <section class="blog-shell__section">
+      <BlogListing
+        featured={page <= 1 ? listing.featured : null}
+        recent={recentPage.items}
+        totalPublished={listing.allPublished.length}
+        page={page}
+        totalPages={recentPage.totalPages}
+        labels={DEFAULT_BLOG_LISTING_LABELS}
+      >
+        <BlogCta slot="cta" />
+      </BlogListing>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .blog-shell {
+    padding-block: calc(var(--header-h) + 1.25rem) var(--space-section);
+  }
+
+  .blog-shell__crumbs {
+    margin-bottom: 0.25rem;
+  }
+
+  .blog-shell__section {
+    padding-block: 0.5rem 0;
+  }
+</style>

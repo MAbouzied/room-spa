@@ -1,0 +1,44 @@
+---
+import type { AdminPost } from '../../lib/admin/blog-admin.ts';
+
+interface Props {
+  post: AdminPost;
+}
+
+const { post } = Astro.props;
+---
+
+<section class="preview-view">
+  <div class="preview-bar">
+    <a class="text-button" href={`/admin/${encodeURIComponent(post.id)}/edit`}>← العودة للتحرير</a>
+    <span>معاينة المقال</span>
+    <button type="button" class="button button-primary" id="preview-publish">نشر المقال</button>
+  </div>
+  <article class="preview-article">
+    <p class="admin-kicker">{post.category || 'مدونة روم سبا'}</p>
+    <h1>{post.title || 'بدون عنوان'}</h1>
+    <p>{post.excerpt || 'لا توجد مقدمة مختصرة لهذا المقال بعد.'}</p>
+    {post.coverUrl && <img class="preview-cover" src={post.coverUrl} alt={post.coverAlt || post.title} />}
+    <hr />
+    <div class="preview-body" set:html={post.contentHtml || '<p>لا يوجد محتوى بعد.</p>'}></div>
+  </article>
+</section>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('#preview-publish');
+  const status = document.querySelector<HTMLElement>('#admin-status');
+  const id = window.location.pathname.split('/').filter(Boolean).at(-2);
+  button?.addEventListener('click', async () => {
+    if (!id) return;
+    button.disabled = true;
+    try {
+      const response = await fetch(`/api/admin/blog/posts/${encodeURIComponent(id)}/publish`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'تعذر نشر المقال');
+      window.location.assign('/admin');
+    } catch (error) {
+      button.disabled = false;
+      if (status) { status.textContent = error instanceof Error ? error.message : 'تعذر نشر المقال'; status.hidden = false; status.classList.add('error'); }
+    }
+  });
+</script>

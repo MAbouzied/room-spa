@@ -1,0 +1,34 @@
+---
+import BlogImage from '../BlogImage.astro';
+import type { Props as PortableProps, TypedObject } from 'astro-portabletext/types';
+
+interface ImageNode extends TypedObject {
+  _type: 'image';
+  alt?: string;
+  caption?: string;
+  asset?: {
+    url?: string;
+    metadata?: { dimensions?: { width?: number; height?: number } };
+  };
+}
+
+type Props = PortableProps<ImageNode>;
+
+const { node } = Astro.props;
+const alt = typeof node.alt === 'string' ? node.alt : '';
+const src = typeof node.asset?.url === 'string' ? node.asset.url : '';
+---
+
+{
+  src && alt ? (
+    <div class="blog-body__image">
+      <BlogImage
+        src={src}
+        alt={alt}
+        width={node.asset?.metadata?.dimensions?.width ?? 1600}
+        height={node.asset?.metadata?.dimensions?.height ?? 1067}
+        caption={typeof node.caption === 'string' ? node.caption : undefined}
+      />
+    </div>
+  ) : null
+}

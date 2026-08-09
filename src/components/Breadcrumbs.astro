@@ -1,0 +1,91 @@
+---
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  class?: string;
+}
+
+const { items, class: className = '' } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <nav class:list={['breadcrumbs', className]} aria-label="مسار التنقل">
+      <ol class="breadcrumbs__list">
+        {items.map((item, index) => {
+          const isLast = index === items.length - 1;
+
+          return (
+            <li class="breadcrumbs__item">
+              {index > 0 && (
+                <span class="breadcrumbs__sep" aria-hidden="true">
+                  /
+                </span>
+              )}
+              {isLast || !item.href ? (
+                <span class="breadcrumbs__current" aria-current="page">
+                  {item.label}
+                </span>
+              ) : (
+                <a class="breadcrumbs__link" href={item.href}>
+                  {item.label}
+                </a>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  )
+}
+
+<style>
+  .breadcrumbs {
+    margin-block: 0 1.5rem;
+  }
+
+  .breadcrumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .breadcrumbs__item {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .breadcrumbs__sep {
+    flex-shrink: 0;
+    opacity: 0.5;
+    color: var(--color-accent);
+  }
+
+  .breadcrumbs__link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 160ms var(--ease-out);
+  }
+
+  .breadcrumbs__link:hover {
+    color: var(--color-accent-soft);
+  }
+
+  .breadcrumbs__current {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+</style>

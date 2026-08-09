@@ -1,0 +1,16 @@
+---
+import BlogDetailPage from '../../views/BlogDetailPage.astro';
+import { getBlogRepository } from '../../modules/blog/repository/get-blog-repository';
+
+export async function getStaticPaths() {
+  const posts = await getBlogRepository().getPublishedPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post, allPosts: posts },
+  }));
+}
+
+const { post, allPosts } = Astro.props;
+---
+
+<BlogDetailPage post={post} allPosts={allPosts} />

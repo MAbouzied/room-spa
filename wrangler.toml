@@ -1,8 +1,11 @@
 name = "room-spa"
 account_id = "c7df347268e6c5bda755bdb802428ca8"
+main = "@astrojs/cloudflare/entrypoints/server"
 compatibility_date = "2026-07-25"
+compatibility_flags = ["nodejs_compat"]
 
 [assets]
-directory = "./dist"
+directory = "./dist/client"
+binding = "ASSETS"
 html_handling = "auto-trailing-slash"
 not_found_handling = "404-page"

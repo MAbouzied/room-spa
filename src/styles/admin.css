@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  /* Softer Room Spa olive — muted, less saturated than the public hero green */
+  --color-bg-primary: #2c342a;
+  --color-bg-hero: #262e24;
+  --color-bg-secondary: #333b31;
+  --color-bg-tertiary: #2f372d;
+  --color-bg-footer: #262e24;
+  --color-bg-card: #3a4238;
+  --color-bg-form: #363e34;
+  --color-bg-stat: rgba(44, 52, 42, 0.55);
+  --color-bg-cta-edge: #2c342a;
+  --color-bg-cta-center: #262e24;
+  --color-bg-input: rgba(44, 52, 42, 0.65);
+  --color-bg-badge: rgba(38, 46, 36, 0.55);
+
+  /* Room Spa taupe accent (not Nagm bright gold) */
+  --color-gold: #9c8f7c;
+  --color-gold-dark: #7a6f60;
+  --color-gold-light: #c0a68c;
+
+  --color-text-muted: rgba(226, 225, 223, 0.68);
+  --color-text-primary: #ebeae8;
+  --color-text-nav: #ddd9d2;
+  --color-text-placeholder: rgba(226, 225, 223, 0.45);
+  --color-text-btn: #1a2219;
+  --color-danger: #e85d5d;
+  --color-success: #7dcea0;
+
+  --color-border-input: rgba(156, 143, 124, 0.4);
+  --color-border-badge: rgba(156, 143, 124, 0.35);
+  --color-border-card: rgba(156, 143, 124, 0.22);
+
+  --color-bg-social: rgba(44, 52, 42, 0.5);
+}
+
+/* Solid Room Spa accent — matches public .btn--accent */
+@utility bg-gold-gradient {
+  background: var(--color-gold);
+}
+
+@utility text-gold-gradient {
+  color: var(--color-gold-light);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+@utility gold-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 9999px;
+  padding: 12px 28px;
+  background: var(--color-gold);
+  color: var(--color-text-btn);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  box-shadow: none;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+@utility outline-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(156, 143, 124, 0.55);
+  border-radius: 9999px;
+  padding: 12px 32px;
+  color: var(--color-gold-light);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  transition: background-color 180ms ease;
+}
+
+@media (hover: hover) {
+  .gold-button:hover {
+    background: var(--color-gold-light);
+  }
+
+  .outline-button:hover {
+    background-color: rgba(156, 143, 124, 0.12);
+  }
+}

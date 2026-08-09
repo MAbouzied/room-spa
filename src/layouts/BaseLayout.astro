@@ -12,8 +12,9 @@ interface Props {
   title: string;
   description?: string;
   path?: string;
-  navVariant?: 'home' | 'gift';
+  navVariant?: 'home' | 'gift' | 'blogs';
   image?: string;
+  type?: 'website' | 'article';
   schemas?: Record<string, unknown>[];
   keywords?: string[];
 }
@@ -24,6 +25,7 @@ const {
   path = '/',
   navVariant = 'home',
   image,
+  type = 'website',
   schemas = [],
   keywords,
 } = Astro.props;
@@ -37,6 +39,7 @@ const {
       description={description}
       path={path}
       image={image}
+      type={type}
       schemas={schemas}
       keywords={keywords}
     />

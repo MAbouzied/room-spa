@@ -1,0 +1,15 @@
+---
+import type { BlogListingLabels } from '../model/blog-types';
+import { DEFAULT_BLOG_LISTING_LABELS } from '../model/blog-types';
+
+export interface Props {
+  labels?: BlogListingLabels;
+}
+
+const { labels = DEFAULT_BLOG_LISTING_LABELS } = Astro.props;
+---
+
+<div class="blog-empty" role="status">
+  <h2 class="blog-empty__title">{labels.emptyTitle}</h2>
+  <p class="blog-empty__text">{labels.emptyDescription}</p>
+</div>

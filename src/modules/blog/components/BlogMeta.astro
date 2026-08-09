@@ -1,0 +1,84 @@
+---
+import { formatBlogDateAr, isMeaningfullyUpdated, toDateTimeAttribute } from '../lib/date-format';
+import type { BlogArticleLabels, BlogPost } from '../model/blog-types';
+import { DEFAULT_BLOG_ARTICLE_LABELS } from '../model/blog-types';
+
+export interface Props {
+  post: BlogPost;
+  readingTimeMinutes: number;
+  labels?: BlogArticleLabels;
+  showUpdated?: boolean;
+  /** Article pages use a centered, author-forward meta row. */
+  variant?: 'inline' | 'article';
+}
+
+const {
+  post,
+  readingTimeMinutes,
+  labels = DEFAULT_BLOG_ARTICLE_LABELS,
+  showUpdated = true,
+  variant = 'inline',
+} = Astro.props;
+
+const showUpdate =
+  showUpdated && isMeaningfullyUpdated(post.publishedAt, post.updatedAt);
+const isArticle = variant === 'article';
+---
+
+{
+  isArticle ? (
+    <div class="blog-meta blog-meta--article">
+      <time datetime={toDateTimeAttribute(post.publishedAt)}>
+        {formatBlogDateAr(post.publishedAt)}
+      </time>
+      <span class="blog-meta__sep" aria-hidden="true">|</span>
+      <span>{labels.minutesToRead(readingTimeMinutes)}</span>
+      {showUpdate && post.updatedAt && (
+        <>
+          <span class="blog-meta__sep" aria-hidden="true">|</span>
+          <span>
+            {labels.updatedPrefix}{' '}
+            <time datetime={toDateTimeAttribute(post.updatedAt)}>
+              {formatBlogDateAr(post.updatedAt)}
+            </time>
+          </span>
+        </>
+      )}
+      <span class="blog-meta__sep" aria-hidden="true">|</span>
+      <span class="blog-meta__author">
+        {post.author.image ? (
+          <img
+            src={post.author.image.src}
+            alt=""
+            width={post.author.image.width}
+            height={post.author.image.height}
+            class="blog-meta__avatar"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <span class="blog-meta__avatar blog-meta__avatar--fallback" aria-hidden="true">
+            {post.author.name.slice(0, 1)}
+          </span>
+        )}
+        <span>{post.author.name}</span>
+      </span>
+    </div>
+  ) : (
+    <div class="blog-meta">
+      <span class="blog-meta__category">{post.category.label}</span>
+      <time datetime={toDateTimeAttribute(post.publishedAt)}>
+        {formatBlogDateAr(post.publishedAt)}
+      </time>
+      {showUpdate && post.updatedAt && (
+        <span>
+          {labels.updatedPrefix}{' '}
+          <time datetime={toDateTimeAttribute(post.updatedAt)}>
+            {formatBlogDateAr(post.updatedAt)}
+          </time>
+        </span>
+      )}
+      <span>{labels.minutesToRead(readingTimeMinutes)}</span>
+    </div>
+  )
+}

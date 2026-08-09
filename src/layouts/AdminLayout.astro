@@ -1,0 +1,51 @@
+---
+/**
+ * Chrome-less layout for /admin and /login — no public nav, footer, analytics, or SEO graph.
+ */
+import '../styles/admin.css';
+
+export interface Props {
+  title: string;
+  description: string;
+  locale?: 'ar' | 'en';
+}
+
+const { title, description, locale = 'ar' } = Astro.props;
+const htmlLang = locale === 'en' ? 'en' : 'ar';
+const htmlDir = locale === 'en' ? 'ltr' : 'rtl';
+---
+
+<!doctype html>
+<html lang={htmlLang} dir={htmlDir}>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
+    />
+    <title>{title}</title>
+  </head>
+  <body class="admin-layout-body">
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  .admin-layout-body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: 'Cairo', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+</style>

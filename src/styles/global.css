@@ -16,6 +16,18 @@
   --color-whatsapp: #25d366;
   --color-whatsapp-dark: #1ebe57;
   --color-hero-wa: #2d3e2f;
+  /* Blog module token aliases (maps nagm/beauty --blog-* fallbacks) */
+  --color-bg-card: var(--color-bg-elevated);
+  --color-bg-tertiary: var(--color-bg-deep);
+  --color-bg-secondary: #223323;
+  --color-text-primary: var(--color-text);
+  --color-gold: var(--color-accent-soft);
+  --color-gold-light: #e8d5b5;
+  --color-gold-dark: var(--color-accent-dark);
+  --color-border-card: var(--color-border-soft);
+  --radius-card: var(--radius-lg);
+  --radius-section: var(--radius-lg);
+  --shadow-card: var(--shadow-soft);
   --font-sans: 'Cairo', 'Tajawal', 'Expo Arabic', Tahoma, sans-serif;
   --font-display: 'Cormorant Garamond', Georgia, serif;
   --radius-sm: 0.5rem;
@@ -111,13 +123,15 @@ h3 {
   outline-offset: 3px;
 }
 
-.container {
+.container,
+.page-container {
   width: min(100% - 1.5rem, var(--container));
   margin-inline: auto;
 }
 
 @media (min-width: 768px) {
-  .container {
+  .container,
+  .page-container {
     width: min(100% - 2.5rem, var(--container));
   }
 }

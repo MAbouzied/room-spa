@@ -1,0 +1,82 @@
+---
+import { Icon } from 'astro-icon/components';
+import Button from './Button.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'جاهز لتجربة الاسترخاء؟',
+  description = 'احجز موعدك الآن عبر واتساب، أو تواصل معنا للاستشارة واختيار الجلسة المناسبة.',
+} = Astro.props;
+---
+
+<section class="section blog-page-cta" aria-labelledby="blog-page-cta-title">
+  <div class="container blog-page-cta__inner reveal">
+    <h2 id="blog-page-cta-title">{title}</h2>
+    <p>{description}</p>
+    <div class="blog-page-cta__actions">
+      <Button href={site.whatsappBookUrl} variant="accent" shape="xl" external>
+        <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
+        احجز الآن
+      </Button>
+      <Button href={`tel:${site.phoneTel}`} variant="outline" shape="xl">
+        <Icon name="mdi:phone" class="icon icon--md" aria-hidden="true" />
+        اتصل الآن
+      </Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .blog-page-cta__inner {
+    display: grid;
+    gap: 0.85rem;
+    justify-items: center;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    text-align: center;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-soft);
+    background:
+      radial-gradient(circle at 50% 0%, rgba(156, 143, 124, 0.16), transparent 55%),
+      rgba(0, 0, 0, 0.12);
+  }
+
+  .blog-page-cta h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 2.6rem);
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .blog-page-cta p {
+    margin: 0;
+    max-width: 38rem;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .blog-page-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.85rem;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 479px) {
+    .blog-page-cta h2 {
+      font-size: clamp(1.45rem, 7vw, 1.85rem);
+    }
+
+    .blog-page-cta__actions {
+      flex-direction: column;
+      align-items: stretch;
+      width: min(100%, 20rem);
+    }
+  }
+</style>

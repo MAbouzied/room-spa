@@ -1,0 +1,59 @@
+---
+import BlogEmptyState from './BlogEmptyState.astro';
+import BlogGrid from './BlogGrid.astro';
+import BlogPagination from './BlogPagination.astro';
+import FeaturedBlog from './FeaturedBlog.astro';
+import type { BlogListingLabels, BlogPost } from '../model/blog-types';
+import { DEFAULT_BLOG_LISTING_LABELS } from '../model/blog-types';
+import '../styles/blog.css';
+
+export interface Props {
+  featured: BlogPost | null;
+  recent: readonly BlogPost[];
+  totalPublished: number;
+  page?: number;
+  totalPages?: number;
+  labels?: BlogListingLabels;
+  /** When true, page heading uses H1 (listing). Featured title stays H2. */
+  showPageHeading?: boolean;
+}
+
+const {
+  featured,
+  recent,
+  totalPublished,
+  page = 1,
+  totalPages = 1,
+  labels = DEFAULT_BLOG_LISTING_LABELS,
+  showPageHeading = true,
+} = Astro.props;
+
+const isEmpty = totalPublished === 0;
+const showRecent = recent.length > 0;
+---
+
+<div class="blog-root">
+  <div class="page-container">
+    {showPageHeading && (
+      <header class="blog-page-intro">
+        <h1 class="blog-page-intro__title">{labels.pageTitle}</h1>
+        <p class="blog-page-intro__text">{labels.pageIntro}</p>
+        {!isEmpty && (
+          <p class="blog-page-intro__count">{labels.articleCount(totalPublished)}</p>
+        )}
+      </header>
+    )}
+
+    {isEmpty ? (
+      <BlogEmptyState labels={labels} />
+    ) : (
+      <>
+        {featured && page === 1 && <FeaturedBlog post={featured} labels={labels} />}
+        {showRecent && <BlogGrid posts={recent} labels={labels} />}
+        <BlogPagination page={page} totalPages={totalPages} labels={labels} />
+      </>
+    )}
+  </div>
+
+  <slot name="cta" />
+</div>

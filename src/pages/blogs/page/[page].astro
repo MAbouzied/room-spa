@@ -1,0 +1,27 @@
+---
+import BlogsPage from '../../../views/BlogsPage.astro';
+import {
+  BLOG_PAGE_SIZE,
+  paginatePosts,
+  selectListing,
+} from '../../../modules/blog';
+import { getBlogRepository } from '../../../modules/blog/repository/get-blog-repository';
+
+export async function getStaticPaths() {
+  const posts = await getBlogRepository().getPublishedPosts();
+  const listing = selectListing(posts);
+  const firstPage = paginatePosts(listing.recent, 1, BLOG_PAGE_SIZE);
+  const totalPages = firstPage?.totalPages ?? 1;
+
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => ({
+    params: { page: String(index + 2) },
+  }));
+}
+
+const pageNumber = Number.parseInt(Astro.params.page ?? '', 10);
+if (!Number.isInteger(pageNumber) || pageNumber < 2) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+---
+
+<BlogsPage page={pageNumber} />
