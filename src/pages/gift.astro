@@ -7,7 +7,7 @@ import WhyGift from '../components/WhyGift.astro';
 import Testimonials from '../components/Testimonials.astro';
 import Branches from '../components/Branches.astro';
 import CTA from '../components/CTA.astro';
-import { giftTestimonials } from '../data/testimonials';
+import { homeTestimonials } from '../data/testimonials';
 import { site } from '../data/site';
 import {
   buildGraph,
@@ -86,11 +86,10 @@ const schemas = [
   />
   <WhyGift />
   <Testimonials
-    items={giftTestimonials}
-    showGoogleRating={false}
-    eyebrow="تجارب مُلهِمة"
-    title="ذكريات جميلة"
-    highlight="جميلة"
+    items={homeTestimonials}
+    eyebrow="آراء العملاء"
+    title="ماذا يقول عملاؤنا"
+    highlight="عملاؤنا"
   />
   <Branches
     variant="gift"
