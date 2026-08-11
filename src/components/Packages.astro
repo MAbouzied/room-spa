@@ -47,7 +47,10 @@ const featuredId = isGift ? 'royal' : packages.find((pkg) => pkg.featured)?.id;
     <div class="packages__grid">
       {
         packages.map((pkg) => (
-          <article class:list={['packages__card', 'reveal', pkg.id === featuredId && 'is-featured']}>
+          <article
+            class:list={['packages__card', 'reveal', pkg.id === featuredId && 'is-featured']}
+            id={`package-${pkg.id}`}
+          >
             {pkg.id === featuredId && !isGift && <p class="packages__badge">الأكثر مبيعاً</p>}
             {pkg.id === featuredId && isGift && <p class="packages__badge">الأكثر إهداءً</p>}
             <div class="packages__head">
@@ -154,6 +157,7 @@ const featuredId = isGift ? 'royal' : packages.find((pkg) => pkg.featured)?.id;
     border: 1px solid var(--color-border);
     background: rgba(0, 0, 0, 0.14);
     padding: 1.5rem;
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
     display: flex;
     flex-direction: column;
     gap: 1.15rem;

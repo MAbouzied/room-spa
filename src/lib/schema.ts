@@ -1,5 +1,5 @@
 import { site } from '../data/site';
-import { serviceCategories } from '../data/services';
+import { serviceAnchorId, serviceCategories } from '../data/services';
 import { packages } from '../data/packages';
 import { faqItems } from '../data/faq';
 
@@ -178,6 +178,7 @@ export function servicesItemListSchema(): JsonLd {
       position: index + 1,
       item: {
         '@type': 'Service',
+        '@id': `${absoluteUrl('/')}#${serviceAnchorId(service.id)}`,
         name: service.name,
         description: service.description,
         provider: { '@id': `${absoluteUrl('/')}#localbusiness` },
@@ -188,7 +189,7 @@ export function servicesItemListSchema(): JsonLd {
           price: service.price,
           priceCurrency: site.priceCurrency,
           availability: 'https://schema.org/InStock',
-          url: absoluteUrl('/#services'),
+          url: absoluteUrl(`/#${serviceAnchorId(service.id)}`),
         },
       },
     })),

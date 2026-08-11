@@ -1,7 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { site } from '../data/site';
-import { serviceCategories } from '../data/services';
+import { serviceAnchorId, serviceCategories } from '../data/services';
 import SectionHeading from './SectionHeading.astro';
 
 const categoryIcons: Record<string, string> = {
@@ -35,7 +35,7 @@ const categoryIcons: Record<string, string> = {
             </h3>
             <div class="services__items">
               {category.items.map((item) => (
-                <div class="services__item">
+                <div class="services__item" id={serviceAnchorId(item.id)}>
                   <div class="services__item-top">
                     <p class="services__name">{item.name}</p>
                     <div class="services__meta">
@@ -93,6 +93,7 @@ const categoryIcons: Record<string, string> = {
   .services__item {
     padding: 1rem 0;
     border-top: 1px solid var(--color-border);
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
   }
 
   .services__item:first-child {

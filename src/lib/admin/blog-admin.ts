@@ -1,6 +1,5 @@
 import { createClient, type IdentifiedSanityDocumentStub, type SanityClient } from '@sanity/client';
 import { BLOG_PROVIDER, SANITY_API_VERSION, SANITY_DATASET, SANITY_PROJECT_ID, SANITY_WRITE_TOKEN } from 'astro:env/server';
-import { serviceCategories } from '../../data/services.ts';
 import { calculateReadingTimeMinutes } from '../../modules/blog/lib/reading-time.ts';
 import type { BlogPost } from '../../modules/blog/model/blog-types.ts';
 import { sanitizeBlogHtml, htmlToPlainText, lexicalJsonToHtml, lexicalJsonToPlainText, normalizeLexicalJson } from './blog-content.ts';
@@ -12,7 +11,10 @@ import {
   resolveAdminPublishedAt,
   resolveSanityAdminStatus,
 } from './blog-admin-helpers.ts';
+import { listAdminServices } from './blog-admin-services.ts';
 import { createBlogSlug, isValidBlogSlug } from '../../modules/blog/lib/slug.ts';
+
+export { listAdminServices };
 
 const DEFAULT_AUTHOR = 'فريق روم سبا';
 
@@ -381,15 +383,6 @@ export async function deleteAdminPost(id: string): Promise<void> {
     .delete(id)
     .delete(`drafts.${id}`)
     .commit();
-}
-
-export function listAdminServices(): Array<{ id: string; title: string }> {
-  return serviceCategories.flatMap((category) =>
-    category.items.map((item, index) => ({
-      id: `${category.id}-${index + 1}`,
-      title: `${category.title} — ${item.name}`,
-    })),
-  );
 }
 
 export async function uploadAdminImage(file: File): Promise<{ assetId: string; url: string; width: number | null; height: number | null }> {

@@ -18,13 +18,24 @@ const isGift = variant === 'gift';
         <div class="hero__media" aria-hidden="true">
           <img
             class="hero__image"
-            src="/images/gallery/spa-pool1.jpg"
+            src="/images/hero-poster.webp"
             alt=""
-            width="2000"
-            height="1333"
+            width="1280"
+            height="720"
             decoding="async"
             fetchpriority="high"
           />
+          <video
+            class="hero__video"
+            muted
+            loop
+            playsinline
+            preload="none"
+            data-hero-video
+          >
+            <source data-src="/videos/room-spa-hero.webm" type="video/webm" />
+            <source data-src="/videos/room-spa-hero.mp4" type="video/mp4" />
+          </video>
         </div>
         <div class="hero__overlay" aria-hidden="true" />
       </>
@@ -78,6 +89,85 @@ const isGift = variant === 'gift';
   </div>
 </section>
 
+<script>
+  type NetworkInformation = {
+    saveData?: boolean;
+  };
+
+  type PendingHeroLoad = {
+    id: number;
+    kind: 'idle' | 'timeout';
+  };
+
+  let pendingHeroLoad: PendingHeroLoad | null = null;
+
+  const cancelPendingHeroLoad = () => {
+    if (!pendingHeroLoad) return;
+
+    if (pendingHeroLoad.kind === 'idle') {
+      window.cancelIdleCallback(pendingHeroLoad.id);
+    } else {
+      window.clearTimeout(pendingHeroLoad.id);
+    }
+
+    pendingHeroLoad = null;
+  };
+
+  const cleanupHeroVideo = () => {
+    cancelPendingHeroLoad();
+
+    document.querySelectorAll('[data-hero-video]').forEach((element) => {
+      if (!(element instanceof HTMLVideoElement)) return;
+      element.pause();
+      element.classList.remove('is-ready');
+    });
+  };
+
+  const initHeroVideo = () => {
+    const video = document.querySelector('[data-hero-video]');
+    if (!(video instanceof HTMLVideoElement) || video.dataset.initialized) return;
+
+    const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || connection?.saveData) return;
+
+    video.dataset.initialized = 'true';
+
+    const loadVideo = async () => {
+      pendingHeroLoad = null;
+      if (!video.isConnected) return;
+
+      video.querySelectorAll('source[data-src]').forEach((source) => {
+        if (!(source instanceof HTMLSourceElement) || !source.dataset.src) return;
+        source.src = source.dataset.src;
+      });
+
+      video.load();
+      try {
+        await video.play();
+        if (video.isConnected) video.classList.add('is-ready');
+      } catch {
+        video.pause();
+      }
+    };
+
+    const scheduleLoad = () => {
+      if ('requestIdleCallback' in window) {
+        const id = window.requestIdleCallback(() => void loadVideo(), { timeout: 1500 });
+        pendingHeroLoad = { id, kind: 'idle' };
+      } else {
+        const id = window.setTimeout(() => void loadVideo(), 500);
+        pendingHeroLoad = { id, kind: 'timeout' };
+      }
+    };
+
+    scheduleLoad();
+  };
+
+  document.addEventListener('astro:page-load', initHeroVideo);
+  document.addEventListener('astro:before-swap', cleanupHeroVideo);
+</script>
+
 <style>
   .hero {
     position: relative;
@@ -101,13 +191,25 @@ const isGift = variant === 'gift';
     inset: 0;
   }
 
-  .hero__image {
+  .hero__image,
+  .hero__video {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
     pointer-events: none;
     filter: brightness(0.55) saturate(0.85);
+  }
+
+  .hero__video {
+    opacity: 0;
+    transition: opacity 0.5s var(--ease-out);
+  }
+
+  .hero__video.is-ready {
+    opacity: 1;
   }
 
   .hero__overlay {
@@ -195,6 +297,12 @@ const isGift = variant === 'gift';
     to {
       opacity: 1;
       transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__video {
+      display: none;
     }
   }
 </style>

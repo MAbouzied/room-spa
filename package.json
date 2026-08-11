@@ -8,10 +8,14 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "generate:redirects": "node --experimental-strip-types scripts/generate-legacy-redirects.mjs",
+    "build": "npm run generate:redirects && astro build",
     "preview": "astro preview",
     "preview:cf": "npm run build && wrangler dev --config dist/server/wrangler.json",
     "deploy": "npm run build && wrangler deploy --config dist/server/wrangler.json",
+    "test": "node --test --experimental-strip-types \"src/**/*.test.ts\"",
+    "test:redirects": "node --test --experimental-strip-types src/lib/legacy-redirects.test.ts",
+    "verify:redirects": "node --experimental-strip-types scripts/verify-legacy-redirects.mjs",
     "astro": "astro",
     "studio:dev": "npm --prefix studio run dev",
     "studio:deploy": "npm --prefix studio run deploy"

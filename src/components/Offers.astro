@@ -19,7 +19,7 @@ import Button from './Button.astro';
     <div class="offers__grid">
       {
         offers.map((offer) => (
-          <article class="offers__card reveal" data-offer-card>
+          <article class="offers__card reveal" id={`offer-${offer.id}`} data-offer-card>
             <div class="offers__media">
               <img
                 src={offer.image}
@@ -80,6 +80,7 @@ import Button from './Button.astro';
     background: rgba(0, 0, 0, 0.14);
     display: flex;
     flex-direction: column;
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
   }
 
   .offers__media {

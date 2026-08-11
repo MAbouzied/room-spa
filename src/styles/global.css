@@ -138,6 +138,7 @@ h3 {
 
 .section {
   padding-block: var(--space-section);
+  scroll-margin-top: calc(var(--header-h) + 1.5rem);
 }
 
 .section--alt {
