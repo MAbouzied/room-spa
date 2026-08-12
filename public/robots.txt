@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://roomspa.sa/sitemap-index.xml
+Sitemap: https://roomspa-sa.com/sitemap-index.xml

@@ -1,7 +1,7 @@
 /** Room Spa business details. */
 export const site = {
   /** REPLACE: production domain (used for canonical, OG, sitemap, schema) */
-  siteUrl: 'https://roomspa.sa',
+  siteUrl: 'https://roomspa-sa.com',
   nameAr: 'روم سبا',
   nameEn: 'Room Spa',
   legalName: 'Room Spa',

@@ -7,7 +7,7 @@ import icon from 'astro-icon';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
-const site = 'https://roomspa.sa';
+const site = 'https://roomspa-sa.com';
 
 // astro-icon pulls CJS into the Cloudflare Workers runner and crashes `astro dev`
 // with "module is not defined". Use Node SSR for local dev; Cloudflare for build/deploy.
