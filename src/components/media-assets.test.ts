@@ -38,4 +38,14 @@ describe('site media assets', () => {
     assert.match(footer, /width="354"/);
     assert.match(footer, /height="472"/);
   });
+
+  it('gives testimonial star groups an img role so aria-label is permitted', async () => {
+    const testimonials = await readFile(
+      new URL('src/components/Testimonials.astro', projectRoot),
+      'utf8',
+    );
+
+    assert.match(testimonials, /testimonials__stars"[^>]*role="img"/);
+    assert.match(testimonials, /testimonials__google-score"[^>]*role="img"/);
+  });
 });
