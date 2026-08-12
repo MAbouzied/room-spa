@@ -33,9 +33,9 @@ describe('site media assets', () => {
     const logo = await readFile(new URL('src/components/Logo.astro', projectRoot), 'utf8');
     const footer = await readFile(new URL('src/components/Footer.astro', projectRoot), 'utf8');
 
-    assert.match(logo, /width="256"/);
-    assert.match(logo, /height="308"/);
-    assert.match(footer, /width="256"/);
-    assert.match(footer, /height="308"/);
+    assert.match(logo, /width="354"/);
+    assert.match(logo, /height="472"/);
+    assert.match(footer, /width="354"/);
+    assert.match(footer, /height="472"/);
   });
 });

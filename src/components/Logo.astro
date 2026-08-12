@@ -20,8 +20,10 @@ const heights = {
     class="logo__image"
     src="/images/logo-full.png"
     alt={`${site.nameAr} — ${site.nameEn}`}
-    width="256"
-    height="308"
+    width="354"
+    height="472"
+    decoding="async"
+    fetchpriority={size === 'md' ? 'high' : 'auto'}
     style={`height: ${heights[size]}; width: auto;`}
   />
 </span>
