@@ -20,7 +20,8 @@ Implementation notes:
 
 - Anchors use stable IDs: `/#service-*`, `/#offer-*`, `/#package-*`
 - Rules ship as Cloudflare Workers Assets `_redirects` (not Astro middleware)
-- Each old path is covered with trailing-slash, no-slash, and percent-encoded variants
+- Each old path is covered with trailing-slash, no-slash variants
+- **Percent-encoded fix:** non-ASCII (Arabic) paths are emitted twice — once as UTF-8 and once percent-encoded (`/حول/` and `/%D8%AD%D9%88%D9%84/`). Browsers/Google send encoded requests, and Cloudflare just matches rules literally, so explicit encoded rules are required for Arabic URLs to resolve instead of 404.
 - Edit mappings only in `src/lib/legacy-redirects.ts`, then regenerate (or build)
 - Query strings on old URLs are allowed; Cloudflare may preserve them on the `Location` header while the path/fragment stay correct
 
@@ -70,6 +71,7 @@ Implementation notes:
 | `/product/مساج-الإسترخاء/` | `/#service-relaxation-massage` |
 | `/product/مساج-الشياتسو/` | `/#service-shiatsu-massage` |
 | `/product/مساج-رفلكسولوجي/` | `/#service-reflexology-massage` |
+| `/product/مساج-الريفلكسولوجي/` | `/#service-reflexology-massage` |
 | `/product/مساح-الأحجار-الساخنة/` | `/#service-hot-stone-massage` |
 | `/product/حمام-مغربي-كلاسيك/` | `/#service-classic-hammam` |
 | `/product/حمام-بطين-البحر-الميت-أو-الأعشاب-العطر/` | `/#service-dead-sea-hammam` |
@@ -124,12 +126,17 @@ Implementation notes:
 | `/tag/*` |
 | `/category/*` |
 | `/author/*` |
+| `/product/*` |
+| `/product-category/*` |
+| `/page/*` |
+| `/feed/*` |
 
 Audited examples under those patterns (all → `/`):
 
 - `/author/mahmoud/`, `/author/ttb7741012/`
 - `/category/uncategorized/`, `/category/تصدير/`, `/category/تكنولوجيا/`, `/category/حديث/`, `/category/روبوت/`, `/category/مستورد/`
 - All archived `/tag/*` demo tags (`مستعمل`, `روبوت`, `تكنولوجيا`, …)
+- Any indexed product/product-category not mapped individually, WordPress pagination (`/page/2/`), and RSS feeds (`/feed/`, `/feed/atom/`)
 
 ### Theme demo / widget pages
 
@@ -162,9 +169,9 @@ Audited examples under those patterns (all → `/`):
 
 | Bucket | Count |
 |---|---|
-| Exact / section mappings | 24 |
+| Exact / section mappings | 25 |
 | Home fallback (audited explicit paths) | 43 |
-| Taxonomy splat catch-alls | 3 patterns |
+| Taxonomy/remaining-WP splat catch-alls | 7 patterns |
 | Protected current routes (no redirect source) | `/`, `/gift`, `/blogs/*`, `/login` |
 
 ---

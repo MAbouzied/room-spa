@@ -45,6 +45,7 @@ export const LEGACY_REDIRECTS: readonly LegacyRedirect[] = [
   { from: '/product/مساج-الإسترخاء/', to: '/#service-relaxation-massage', reason: 'exact' },
   { from: '/product/مساج-الشياتسو/', to: '/#service-shiatsu-massage', reason: 'exact' },
   { from: '/product/مساج-رفلكسولوجي/', to: '/#service-reflexology-massage', reason: 'exact' },
+  { from: '/product/مساج-الريفلكسولوجي/', to: '/#service-reflexology-massage', reason: 'exact' },
   { from: '/product/مساح-الأحجار-الساخنة/', to: '/#service-hot-stone-massage', reason: 'exact' },
   { from: '/product/حمام-مغربي-كلاسيك/', to: '/#service-classic-hammam', reason: 'exact' },
   {
@@ -131,6 +132,10 @@ export const LEGACY_SPLAT_REDIRECTS: readonly LegacyRedirect[] = [
   { from: '/tag/*', to: '/', reason: 'home-fallback' },
   { from: '/category/*', to: '/', reason: 'home-fallback' },
   { from: '/author/*', to: '/', reason: 'home-fallback' },
+  { from: '/product/*', to: '/', reason: 'home-fallback' },
+  { from: '/product-category/*', to: '/', reason: 'home-fallback' },
+  { from: '/feed/*', to: '/', reason: 'home-fallback' },
+  { from: '/page/*', to: '/', reason: 'home-fallback' },
 ] as const;
 
 /** Expected unique DOM fragment targets used by exact redirects (without leading `#`). */
@@ -174,9 +179,8 @@ export function encodePathSegments(path: string): string {
 }
 
 /**
- * Expand one redirect into the concrete `_redirects` source variants we ship.
- * Cloudflare Workers Assets normalize Unicode and percent-encoded paths to the
- * same rule, so we only emit Unicode trailing-slash / no-slash variants.
+ * Expand one redirect into the trailing-slash and no-slash source variants we
+ * ship. Percent-encoded variants are added separately in `buildRedirectsFile`.
  */
 export function expandRedirectSources(from: string): string[] {
   if (from.includes('*')) return [from];
@@ -207,6 +211,14 @@ export function buildRedirectsFile(
       if (seen.has(source)) continue;
       seen.add(source);
       lines.push(`${source} ${rule.to} 301`);
+      // Browsers/search engines percent-encode non-ASCII paths (e.g. Arabic).
+      // Cloudflare _redirects does NOT normalize encoded requests to Unicode
+      // rules, so ship an explicit percent-encoded variant too.
+      const encoded = encodePathSegments(source);
+      if (encoded !== source && !seen.has(encoded)) {
+        seen.add(encoded);
+        lines.push(`${encoded} ${rule.to} 301`);
+      }
     }
   }
 
@@ -235,14 +247,16 @@ export function findRedirect(pathname: string): LegacyRedirect | undefined {
   const exact = LEGACY_REDIRECTS.find((rule) => rule.from === decoded || rule.from === normalized);
   if (exact) return exact;
 
-  if (decoded.startsWith('/tag/') || normalized.startsWith('/tag/')) {
-    return LEGACY_SPLAT_REDIRECTS.find((rule) => rule.from === '/tag/*');
-  }
-  if (decoded.startsWith('/category/') || normalized.startsWith('/category/')) {
-    return LEGACY_SPLAT_REDIRECTS.find((rule) => rule.from === '/category/*');
-  }
-  if (decoded.startsWith('/author/') || normalized.startsWith('/author/')) {
-    return LEGACY_SPLAT_REDIRECTS.find((rule) => rule.from === '/author/*');
+  // Derive splat prefixes from the same definitions we ship, most specific
+  // (longest) first so `/product-category/` is matched before `/product/`.
+  const splatPrefixes = [...LEGACY_SPLAT_REDIRECTS]
+    .map((rule) => ({ prefix: rule.from.replace('/*', '/'), rule }))
+    .sort((a, b) => b.prefix.length - a.prefix.length);
+
+  for (const { prefix, rule } of splatPrefixes) {
+    if (decoded.startsWith(prefix) || normalized.startsWith(prefix)) {
+      return rule;
+    }
   }
 
   return undefined;
