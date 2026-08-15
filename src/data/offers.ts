@@ -8,6 +8,14 @@ export type SpaOffer = {
   whatsappText: string;
 };
 
+const royalFeatures = [
+  'حمام مغربي ملكي + جلسة بخار',
+  'روم سبا مساج 3 بلس',
+  'بدكير يدين وقدمين',
+  'الكاسات الصينية',
+  'مساج الأحجار الساخنة',
+];
+
 export const offers: SpaOffer[] = [
   {
     id: 'majestic',
@@ -51,13 +59,7 @@ export const offers: SpaOffer[] = [
     image: '/images/offers/royal.jpg',
     price: 449,
     originalPrice: 562,
-    features: [
-      'حمام مغربي ملكي + جلسة بخار',
-      'روم سبا مساج 3 بلس',
-      'بدكير يدين وقدمين',
-      'الكاسات الصينية',
-      'مساج الأحجار الساخنة',
-    ],
+    features: [...royalFeatures],
     whatsappText: 'مرحبا، أرغب بحجز العرض الملكي',
   },
   {
@@ -86,5 +88,32 @@ export const offers: SpaOffer[] = [
     originalPrice: 312,
     features: ['مساج تايلندي', 'مساج سويدي', 'بدكير يدين وقدمين'],
     whatsappText: 'مرحبا، أرغب بحجز عرض كير',
+  },
+  {
+    id: 'groom',
+    name: 'عرض المعرس',
+    image: '/images/offers/groom.jpg',
+    price: 399,
+    originalPrice: 499,
+    features: royalFeatures.slice(0, 4),
+    whatsappText: 'مرحبا، أرغب بحجز عرض المعرس',
+  },
+  {
+    id: 'luxury',
+    name: 'عرض الرفاهية',
+    image: '/images/offers/luxury.jpg',
+    price: 549,
+    originalPrice: 685,
+    features: [...royalFeatures, 'كوب قهوة', 'حلا'],
+    whatsappText: 'مرحبا، أرغب بحجز عرض الرفاهية',
+  },
+  {
+    id: 'gift',
+    name: 'عرض الهدية',
+    image: '/images/offers/gift.jpg',
+    price: 590,
+    originalPrice: 735,
+    features: [...royalFeatures, 'حلا', 'باقة ورد'],
+    whatsappText: 'مرحبا، أرغب بحجز عرض الهدية',
   },
 ];
