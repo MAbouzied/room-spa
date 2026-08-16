@@ -1,12 +1,12 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import FormLandingPage from '../components/FormLandingPage.astro';
-import { breadcrumbSchema, buildGraph, webPageSchema } from '../lib/schema';
-import { formCopy } from '../lib/form-copy';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormLandingPage from '../../components/FormLandingPage.astro';
+import { breadcrumbSchema, buildGraph, webPageSchema } from '../../lib/schema';
+import { formCopy } from '../../lib/form-copy';
 
-const locale = 'ar' as const;
+const locale = 'en' as const;
 const copy = formCopy[locale];
-const path = '/form';
+const path = '/en/form';
 ---
 
 <BaseLayout

@@ -23,6 +23,8 @@ export const PROTECTED_PUBLIC_ROUTES = [
   '/login/',
   '/form',
   '/form/',
+  '/en/form',
+  '/en/form/',
 ] as const;
 
 /**
@@ -71,7 +73,7 @@ export const LEGACY_REDIRECTS: readonly LegacyRedirect[] = [
   { from: '/product/عرض-كير/', to: '/#offer-care', reason: 'exact' },
 
   // Exact package product → package anchor
-  { from: '/product/عرض-إليت/', to: '/#package-elite', reason: 'exact' },
+  { from: '/product/عرض-إليت/', to: '/#packages', reason: 'exact' },
 
   // Soft / non-1:1 products → home (per product request)
   { from: '/product/مساج-تايلندي/', to: '/#service-thai-massage', reason: 'exact' },
@@ -161,7 +163,7 @@ export const EXPECTED_FRAGMENT_TARGETS = [
   'offer-deep-room',
   'offer-breathe',
   'offer-care',
-  'package-elite',
+  'packages',
 ] as const;
 
 function stripTrailingSlash(path: string): string {

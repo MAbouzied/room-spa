@@ -18,11 +18,13 @@ test('embeds Snap Pixel in the public layout head', () => {
   assert.match(snapPixel, /https:\/\/sc-static\.net\/scevent\.min\.js/);
   assert.match(snapPixel, /window\.snaptr\('init', snapPixelId/);
   assert.match(snapPixel, /window\.snaptr\('track', 'PAGE_VIEW'/);
-  assert.match(snapPixel, /window\.snaptr\('track', 'VIEW_CONTENT'/);
+  assert.doesNotMatch(snapPixel, /user_email:\s*['"]?__INSERT/);
+  assert.doesNotMatch(snapPixel, /INSERT_PRICE|INSERT_CURRENCY|INSERT_ITEM/);
   assert.match(snapLib, new RegExp(`DEFAULT_SNAP_PIXEL_ID = '${PIXEL_ID}'`));
 });
 
-test('fires ADD_CART and PURCHASE from the contact form', () => {
+test('fires priced VIEW_CONTENT, ADD_CART, and PURCHASE from the contact form', () => {
+  assert.match(contactForm, /trackSnapViewContent/);
   assert.match(contactForm, /trackSnapAddCart/);
   assert.match(contactForm, /trackSnapPurchase/);
 });

@@ -22,6 +22,7 @@ interface Props {
   noindex?: boolean;
   robotsFollow?: boolean;
   hideChrome?: boolean;
+  locale?: 'ar' | 'en';
 }
 
 const {
@@ -36,11 +37,14 @@ const {
   noindex = false,
   robotsFollow = false,
   hideChrome = false,
+  locale = 'ar',
 } = Astro.props;
+const htmlLang = locale === 'en' ? 'en' : 'ar';
+const htmlDir = locale === 'en' ? 'ltr' : 'rtl';
 ---
 
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang={htmlLang} dir={htmlDir}>
   <head>
     <SeoHead
       title={title}

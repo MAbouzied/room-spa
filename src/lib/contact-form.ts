@@ -2,6 +2,7 @@ import { offers } from '../data/offers.ts';
 import { packages } from '../data/packages.ts';
 import { serviceCategories } from '../data/services.ts';
 import { site } from '../data/site.ts';
+import { formCopy, type FormLocale } from './form-copy.ts';
 
 export type ContactBookingGroupId = 'service' | 'package' | 'offer';
 
@@ -22,11 +23,12 @@ export function isSaudiMobile(value: string): boolean {
   return SAUDI_MOBILE.test(value.trim());
 }
 
-export function getContactBookingGroups(): ContactBookingGroup[] {
+export function getContactBookingGroups(locale: FormLocale = 'ar'): ContactBookingGroup[] {
+  const copy = formCopy[locale];
   return [
     {
       id: 'service',
-      label: 'الخدمات',
+      label: copy.servicesGroup,
       options: serviceCategories.flatMap((category) =>
         category.items.map((item) => ({
           value: `service:${item.id}`,
@@ -36,7 +38,7 @@ export function getContactBookingGroups(): ContactBookingGroup[] {
     },
     {
       id: 'package',
-      label: 'الباقات',
+      label: copy.packagesGroup,
       options: packages.map((item) => ({
         value: `package:${item.id}`,
         label: item.name,
@@ -44,7 +46,7 @@ export function getContactBookingGroups(): ContactBookingGroup[] {
     },
     {
       id: 'offer',
-      label: 'العروض',
+      label: copy.offersGroup,
       options: offers.map((item) => ({
         value: `offer:${item.id}`,
         label: item.name,
@@ -58,14 +60,15 @@ export function buildContactWhatsAppMessage(fields: {
   phone: string;
   bookingLabel: string;
   note?: string;
+  locale?: FormLocale;
 }): string {
-  const lines = [
-    `*الاسم:* ${fields.name}`,
-    `*الجوال:* ${fields.phone}`,
-    `*الحجز:* ${fields.bookingLabel}`,
-  ];
+  const locale = fields.locale === 'en' ? 'en' : 'ar';
+  const lines =
+    locale === 'en'
+      ? [`*Name:* ${fields.name}`, `*Phone:* ${fields.phone}`, `*Booking:* ${fields.bookingLabel}`]
+      : [`*الاسم:* ${fields.name}`, `*الجوال:* ${fields.phone}`, `*الحجز:* ${fields.bookingLabel}`];
   const note = fields.note?.trim();
-  if (note) lines.push(`*ملاحظات:* ${note}`);
+  if (note) lines.push(locale === 'en' ? `*Notes:* ${note}` : `*ملاحظات:* ${note}`);
   return lines.join('\n');
 }
 

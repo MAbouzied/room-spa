@@ -1,20 +1,28 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { getContactBookingGroups } from '../lib/contact-form';
+import { formCopy, type FormLocale } from '../lib/form-copy';
 
-const groups = getContactBookingGroups();
+interface Props {
+  locale?: FormLocale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const copy = formCopy[locale];
+const groups = getContactBookingGroups(locale);
 ---
 
-<article class="contact-form-card" aria-label="نموذج التواصل">
+<article class="contact-form-card" aria-label={copy.formAria}>
   <form
     id="contact-form"
     class="contact-form"
-    data-redirecting="جاري فتح واتساب..."
-    data-invalid="يرجى التأكد من الاسم ورقم الجوال السعودي واختيار الخدمة."
+    data-locale={locale}
+    data-redirecting={copy.redirecting}
+    data-invalid={copy.invalid}
   >
     <div class="contact-form__row">
       <label class="contact-form__field">
-        <span>رقم الجوال</span>
+        <span>{copy.phoneLabel}</span>
         <input
           class="contact-form__control"
           name="phone"
@@ -28,7 +36,7 @@ const groups = getContactBookingGroups();
         />
       </label>
       <label class="contact-form__field">
-        <span>الاسم الكامل</span>
+        <span>{copy.nameLabel}</span>
         <input
           class="contact-form__control"
           name="name"
@@ -36,16 +44,16 @@ const groups = getContactBookingGroups();
           autocomplete="name"
           minlength="2"
           maxlength="80"
-          placeholder="اكتب اسمك"
+          placeholder={copy.namePlaceholder}
           required
         />
       </label>
     </div>
 
     <label class="contact-form__field">
-      <span>الخدمة المطلوبة</span>
+      <span>{copy.serviceLabel}</span>
       <select class="contact-form__control" name="service" required>
-        <option value="">اختر ما ترغب في حجزه</option>
+        <option value="">{copy.servicePlaceholder}</option>
         {
           groups.map((group) => (
             <optgroup label={group.label}>
@@ -59,13 +67,13 @@ const groups = getContactBookingGroups();
     </label>
 
     <label class="contact-form__field">
-      <span>رسالتك (اختياري)</span>
+      <span>{copy.messageLabel}</span>
       <textarea
         class="contact-form__control"
         name="message"
         rows="5"
         maxlength="500"
-        placeholder="اكتب تفاصيل طلبك هنا..."
+        placeholder={copy.messagePlaceholder}
       ></textarea>
     </label>
 
@@ -76,7 +84,7 @@ const groups = getContactBookingGroups();
 
     <button type="submit" class="contact-form__submit">
       <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
-      إرسال عبر واتساب
+      {copy.submit}
     </button>
     <p data-form-status class="contact-form__status" role="status" aria-live="polite"></p>
   </form>
@@ -84,20 +92,26 @@ const groups = getContactBookingGroups();
 
 <script>
   import { buildContactWhatsAppMessage, buildContactWhatsAppUrl } from '../lib/contact-form';
-  import { snapParamsFromBookingValue, trackSnapAddCart, trackSnapPurchase } from '../lib/snap-pixel';
+  import {
+    snapParamsFromBookingValue,
+    trackSnapAddCart,
+    trackSnapPurchase,
+    trackSnapViewContent,
+  } from '../lib/snap-pixel';
 
   const form = document.getElementById('contact-form');
   if (form instanceof HTMLFormElement && form.dataset.bound !== 'true') {
     form.dataset.bound = 'true';
     const serviceSelect = form.elements.namedItem('service');
     if (serviceSelect instanceof HTMLSelectElement) {
-      if (serviceSelect.value) {
-        trackSnapAddCart(snapParamsFromBookingValue(serviceSelect.value));
-      }
-      serviceSelect.addEventListener('change', () => {
+      const trackSelectedItem = () => {
         if (!serviceSelect.value) return;
-        trackSnapAddCart(snapParamsFromBookingValue(serviceSelect.value));
-      });
+        const params = snapParamsFromBookingValue(serviceSelect.value);
+        trackSnapViewContent(params);
+        trackSnapAddCart(params);
+      };
+      if (serviceSelect.value) trackSelectedItem();
+      serviceSelect.addEventListener('change', trackSelectedItem);
     }
     form.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -113,7 +127,6 @@ const groups = getContactBookingGroups();
       const name = String(data.get('name') ?? '').trim();
       const phone = String(data.get('phone') ?? '').trim();
       const note = String(data.get('message') ?? '').trim();
-      const serviceSelect = form.elements.namedItem('service');
       const bookingLabel =
         serviceSelect instanceof HTMLSelectElement
           ? serviceSelect.selectedOptions[0]?.textContent?.trim() ?? ''
@@ -123,8 +136,9 @@ const groups = getContactBookingGroups();
       if (whatsappWindow) whatsappWindow.opener = null;
 
       if (submit) submit.disabled = true;
+      const locale = form.dataset.locale === 'en' ? 'en' : 'ar';
       const url = buildContactWhatsAppUrl(
-        buildContactWhatsAppMessage({ name, phone, bookingLabel, note }),
+        buildContactWhatsAppMessage({ name, phone, bookingLabel, note, locale }),
       );
       const bookingValue =
         serviceSelect instanceof HTMLSelectElement ? serviceSelect.value : '';

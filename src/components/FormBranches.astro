@@ -1,11 +1,19 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { site } from '../data/site';
+import { formCopy, type FormLocale } from '../lib/form-copy';
+
+interface Props {
+  locale?: FormLocale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const copy = formCopy[locale];
 ---
 
 <article id="branches" class="form-branches">
-  <span class="form-branches__eyebrow">موقعنا</span>
-  <h2 class="form-branches__title text-gradient-gold">زُرنا في أقرب فرع</h2>
+  <span class="form-branches__eyebrow">{copy.locationEyebrow}</span>
+  <h2 class="form-branches__title text-gradient-gold">{copy.locationTitle}</h2>
 
   <div class="form-branches__list">
     {
@@ -14,21 +22,21 @@ import { site } from '../data/site';
           <h3>{branch.name}</h3>
           <dl>
             <div>
-              <dt class="visually-hidden">العنوان</dt>
+              <dt class="visually-hidden">{copy.address}</dt>
               <dd>
                 <Icon name="mdi:map-marker-outline" class="icon icon--sm" aria-hidden="true" />
                 <span>{branch.address}</span>
               </dd>
             </div>
             <div>
-              <dt class="visually-hidden">ساعات العمل</dt>
+              <dt class="visually-hidden">{copy.hours}</dt>
               <dd>
                 <Icon name="mdi:clock-outline" class="icon icon--sm" aria-hidden="true" />
                 <span>{branch.hours}</span>
               </dd>
             </div>
             <div>
-              <dt class="visually-hidden">الهاتف</dt>
+              <dt class="visually-hidden">{copy.phone}</dt>
               <dd>
                 <Icon name="mdi:phone-outline" class="icon icon--sm" aria-hidden="true" />
                 <span class="phone" dir="ltr">{site.phoneDisplay}</span>
@@ -41,7 +49,7 @@ import { site } from '../data/site';
   </div>
 
   <div class="form-branches__social">
-    <span>تابعنا:</span>
+    <span>{copy.follow}</span>
     <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
       <Icon name="mdi:instagram" class="icon icon--md" aria-hidden="true" />
     </a>

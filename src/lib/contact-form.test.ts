@@ -23,12 +23,25 @@ describe('contact form booking groups', () => {
     assert.equal(groups[1]?.options.length, packages.length);
     assert.equal(groups[2]?.options.length, offers.length);
     assert.ok(groups[0]?.options.some((option) => option.value === 'service:relaxation-massage'));
-    assert.ok(groups[1]?.options.some((option) => option.value === 'package:royal'));
+    assert.ok(groups[1]?.options.some((option) => option.value === 'package:bisht'));
+    assert.equal(groups[1]?.options.some((option) => option.value === 'package:royal'), false);
     assert.ok(groups[2]?.options.some((option) => option.value === 'offer:majestic'));
   });
 });
 
 describe('contact form WhatsApp payload', () => {
+  it('builds an English booking message when the form is in English', () => {
+    assert.equal(
+      buildContactWhatsAppMessage({
+        name: 'Ziad',
+        phone: '0538770710',
+        bookingLabel: 'باقة البشت',
+        locale: 'en',
+      }),
+      ['*Name:* Ziad', '*Phone:* 0538770710', '*Booking:* باقة البشت'].join('\n'),
+    );
+  });
+
   it('builds an Arabic booking message and skips empty notes', () => {
     assert.equal(
       buildContactWhatsAppMessage({

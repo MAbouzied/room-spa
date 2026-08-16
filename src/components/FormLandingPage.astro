@@ -2,35 +2,46 @@
 import Logo from './Logo.astro';
 import FormBranches from './FormBranches.astro';
 import ContactForm from './ContactForm.astro';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { formCopy, type FormLocale } from '../lib/form-copy';
+
+interface Props {
+  locale?: FormLocale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const copy = formCopy[locale];
+const brandHref = '/';
 ---
 
 <section class="form-landing">
   <div class="container form-landing__inner">
     <div class="form-landing__brand">
-      <a href="/" aria-label="العودة للصفحة الرئيسية — روم سبا">
+      <a href={brandHref} aria-label={copy.homeAria}>
         <Logo size="sm" />
       </a>
+      <LanguageSwitcher locale={locale} />
     </div>
 
-    <nav class="form-landing__crumb" aria-label="مسار التنقل" data-form-landing-crumb>
+    <nav class="form-landing__crumb" aria-label={copy.crumbsAria} data-form-landing-crumb>
       <ol>
         <li>
-          <a href="/">الرئيسية</a>
+          <a href={brandHref}>{copy.home}</a>
         </li>
         <li>
           <span aria-hidden="true">/</span>
-          <h1>تواصل معنا</h1>
+          <h1>{copy.contact}</h1>
         </li>
       </ol>
     </nav>
 
     <div class="form-landing__grid">
-      <FormBranches />
-      <ContactForm />
+      <FormBranches locale={locale} />
+      <ContactForm locale={locale} />
     </div>
 
     <p class="form-landing__full">
-      <a href="/">الموقع الكامل</a>
+      <a href={brandHref}>{copy.fullSite}</a>
     </p>
   </div>
 </section>
@@ -53,6 +64,7 @@ import ContactForm from './ContactForm.astro';
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
   }
 
   .form-landing__crumb {

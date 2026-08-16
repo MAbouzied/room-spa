@@ -24,7 +24,7 @@ const {
 } = Astro.props;
 
 const isGift = mode === 'gift';
-const featuredId = isGift ? 'royal' : packages.find((pkg) => pkg.featured)?.id;
+const featuredId = isGift ? 'ihdaa' : packages.find((pkg) => pkg.featured)?.id;
 ---
 
 <section class:list={['section', 'packages', isGift ? 'section--gradient' : 'section--alt']} id="packages">
@@ -320,7 +320,7 @@ const featuredId = isGift ? 'royal' : packages.find((pkg) => pkg.featured)?.id;
 
   @media (min-width: 1100px) {
     .packages__grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 </style>

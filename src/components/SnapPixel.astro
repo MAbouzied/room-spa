@@ -1,12 +1,9 @@
 ---
-import { contentFromPathname } from '../lib/snap-pixel';
-
 interface Props {
   pixelId: string;
 }
 
 const { pixelId } = Astro.props;
-const firstContent = contentFromPathname(Astro.url.pathname);
 ---
 
 <meta name="snap-pixel-id" content={pixelId} />
@@ -15,8 +12,6 @@ const firstContent = contentFromPathname(Astro.url.pathname);
   is:inline
   define:vars={{
     snapPixelId: pixelId,
-    firstItemIds: firstContent?.item_ids ?? [],
-    firstItemCategory: firstContent?.item_category ?? '',
   }}
 >
   (function (e, t, n) {
@@ -32,35 +27,20 @@ const firstContent = contentFromPathname(Astro.url.pathname);
     u.parentNode.insertBefore(s, u);
   })(window, document, 'https://sc-static.net/scevent.min.js');
 
-  var pageParams = firstItemCategory
-    ? { item_ids: firstItemIds, item_category: firstItemCategory }
-    : {};
-  window.snaptr('init', snapPixelId, {});
-  window.snaptr('track', 'PAGE_VIEW', pageParams);
-  if (firstItemCategory) {
-    window.snaptr('track', 'VIEW_CONTENT', {
-      item_ids: firstItemIds,
-      item_category: firstItemCategory,
-      currency: 'SAR',
-    });
-  }
+  window.snaptr('init', snapPixelId);
+  window.snaptr('track', 'PAGE_VIEW');
 </script>
 
 <script>
   import {
     contentFromBookingHref,
-    contentFromPathname,
+    snapParamsFromBookingValue,
     trackSnapAddCart,
     trackSnapPageView,
-    trackSnapViewContent,
   } from '../lib/snap-pixel';
 
-  function trackRoute(pathname: string) {
-    const content = contentFromPathname(pathname);
-    trackSnapPageView(content ?? {});
-    if (content) {
-      trackSnapViewContent({ ...content, currency: 'SAR' });
-    }
+  function trackRoute() {
+    trackSnapPageView();
   }
 
   function onClick(event: Event) {
@@ -79,7 +59,9 @@ const firstContent = contentFromPathname(Astro.url.pathname);
       return;
     }
 
-    trackSnapAddCart(content);
+    trackSnapAddCart(
+      snapParamsFromBookingValue(`${content.item_category}:${content.item_ids[0] ?? ''}`),
+    );
   }
 
   if (!window.__roomSnapBound) {
@@ -89,7 +71,7 @@ const firstContent = contentFromPathname(Astro.url.pathname);
         skipFirstPageLoad = false;
         return;
       }
-      trackRoute(window.location.pathname);
+      trackRoute();
     });
     document.addEventListener('click', onClick, true);
     window.__roomSnapBound = true;

@@ -63,19 +63,10 @@ test('compacts Snap params and drops placeholders', () => {
   );
 });
 
-test('reads catalog content from public detail paths', () => {
-  assert.deepEqual(contentFromPathname('/gift/'), {
-    item_ids: ['gift'],
-    item_category: 'gift',
-  });
-  assert.deepEqual(contentFromPathname('/form/'), {
-    item_ids: ['contact-form'],
-    item_category: 'form',
-  });
-  assert.deepEqual(contentFromPathname('/blogs/massage-guide/'), {
-    item_ids: ['massage-guide'],
-    item_category: 'blog',
-  });
+test('does not invent VIEW_CONTENT items for pages without a priced catalog item', () => {
+  assert.equal(contentFromPathname('/gift/'), null);
+  assert.equal(contentFromPathname('/form/'), null);
+  assert.equal(contentFromPathname('/blogs/massage-guide/'), null);
   assert.equal(contentFromPathname('/blogs/'), null);
   assert.equal(contentFromPathname('/'), null);
 });
@@ -86,9 +77,9 @@ test('reads booking intent from WhatsApp and form links', () => {
     item_category: 'service',
   });
   assert.deepEqual(
-    contentFromBookingHref('https://roomspa-sa.com/form/?item=royal&department=package'),
+    contentFromBookingHref('https://roomspa-sa.com/form/?item=bisht&department=package'),
     {
-      item_ids: ['royal'],
+      item_ids: ['bisht'],
       item_category: 'package',
     },
   );
@@ -98,12 +89,13 @@ test('reads booking intent from WhatsApp and form links', () => {
 
 test('builds purchase params from a booking select value', () => {
   assert.deepEqual(
-    snapParamsFromBookingValue('package:royal', { phone: '0538770710' }),
+    snapParamsFromBookingValue('package:bisht', { phone: '0538770710' }),
     {
-      item_ids: ['royal'],
+      item_ids: ['bisht'],
       item_category: 'package',
       number_items: 1,
       currency: 'SAR',
+      price: 399,
       user_phone_number: '+966538770710',
     },
   );
@@ -111,6 +103,7 @@ test('builds purchase params from a booking select value', () => {
     snapParamsFromBookingValue('', { phone: '966538770710' }).user_phone_number,
     '+966538770710',
   );
+  assert.equal(snapParamsFromBookingValue('service:relaxation-massage').price, 150);
 });
 
 test('trackSnapEvent sends named events with cleaned params', () => {

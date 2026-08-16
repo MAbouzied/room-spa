@@ -1,3 +1,7 @@
+import { offers } from '../data/offers.ts';
+import { packages } from '../data/packages.ts';
+import { serviceCategories } from '../data/services.ts';
+
 const SNAP_PIXEL_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const PLACEHOLDER = /insert|__insert/i;
 const ARABIC_INDIC_DIGITS = '٠١٢٣٤٥٦٧٨٩';
@@ -117,31 +121,27 @@ function localeNeutralPath(pathname: string): string {
   return path.endsWith('/') || path === '/' ? path : `${path}/`;
 }
 
-export function contentFromPathname(pathname: string): SnapContent | null {
-  const path = localeNeutralPath(pathname);
+export function contentFromPathname(_pathname: string): SnapContent | null {
+  return null;
+}
 
-  if (path === '/gift/') {
-    return { item_ids: ['gift'], item_category: 'gift' };
+export function catalogPrice(category: string, itemId: string): number | undefined {
+  if (category === 'service') {
+    for (const group of serviceCategories) {
+      const item = group.items.find((entry) => entry.id === itemId);
+      if (item) return item.price;
+    }
   }
 
-  if (path === '/form/') {
-    return { item_ids: ['contact-form'], item_category: 'form' };
+  if (category === 'package') {
+    return packages.find((entry) => entry.id === itemId)?.price;
   }
 
-  const blogMatch = path.match(/^\/blogs\/([^/]+)\/?$/);
-  if (!blogMatch) {
-    return null;
+  if (category === 'offer') {
+    return offers.find((entry) => entry.id === itemId)?.price;
   }
 
-  const slug = decodeURIComponent(blogMatch[1]).trim();
-  if (!slug || slug === 'page') {
-    return null;
-  }
-
-  return {
-    item_ids: [slug],
-    item_category: 'blog',
-  };
+  return undefined;
 }
 
 export function contentFromBookingHref(href: string): SnapContent | null {
@@ -196,7 +196,7 @@ export function snapParamsFromBookingValue(
     number_items: 1,
     currency: 'SAR',
     user_phone_number: extras.phone ? toE164Saudi(extras.phone) : undefined,
-    price: extras.price,
+    price: extras.price ?? (item_category && itemId ? catalogPrice(item_category, itemId) : undefined),
     transaction_id: extras.transactionId,
   }) as SnapEventParams;
 }

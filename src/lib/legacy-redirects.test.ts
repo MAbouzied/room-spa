@@ -73,7 +73,7 @@ describe('legacy WordPress redirects', () => {
       assert.ok(known, `missing data/DOM target for #${fragment}`);
     }
 
-    const servicesAstro = await readFile(new URL('src/components/Services.astro', projectRoot), 'utf8');
+    const servicesAstro = await readFile(new URL('src/components/ServiceCategoryCard.astro', projectRoot), 'utf8');
     const offersAstro = await readFile(new URL('src/components/Offers.astro', projectRoot), 'utf8');
     const packagesAstro = await readFile(new URL('src/components/Packages.astro', projectRoot), 'utf8');
 

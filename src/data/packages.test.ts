@@ -51,10 +51,26 @@ const quotePackages = [
   },
 ] as const;
 
+const retiredPackageIds = ['royal', 'majestic', 'elite', 'classic'] as const;
+
 describe('packages catalog', () => {
   it('has unique package ids', () => {
     const ids = packages.map((pkg) => pkg.id);
     assert.equal(new Set(ids).size, ids.length, 'duplicate package id found');
+  });
+
+  it('keeps only Bisht, Naeem Room, and Ihdaa', () => {
+    assert.deepEqual(
+      packages.map((pkg) => pkg.id),
+      ['bisht', 'naeem-room', 'ihdaa'],
+    );
+    for (const retiredId of retiredPackageIds) {
+      assert.equal(
+        packages.some((pkg) => pkg.id === retiredId),
+        false,
+        `retired package still listed: ${retiredId}`,
+      );
+    }
   });
 
   it('includes the quote flyers moved out of offers', () => {
