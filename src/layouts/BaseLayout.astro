@@ -6,7 +6,9 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import WhatsAppFloat from '../components/WhatsAppFloat.astro';
 import SeoHead from '../components/SeoHead.astro';
+import SnapPixel from '../components/SnapPixel.astro';
 import { site } from '../data/site';
+import { DEFAULT_SNAP_PIXEL_ID } from '../lib/snap-pixel';
 
 interface Props {
   title: string;
@@ -52,6 +54,7 @@ const {
       robotsFollow={robotsFollow}
     />
     <meta name="generator" content={Astro.generator} />
+    <SnapPixel pixelId={DEFAULT_SNAP_PIXEL_ID} />
     <ClientRouter />
   </head>
   <body>

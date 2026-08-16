@@ -84,10 +84,21 @@ const groups = getContactBookingGroups();
 
 <script>
   import { buildContactWhatsAppMessage, buildContactWhatsAppUrl } from '../lib/contact-form';
+  import { snapParamsFromBookingValue, trackSnapAddCart, trackSnapPurchase } from '../lib/snap-pixel';
 
   const form = document.getElementById('contact-form');
   if (form instanceof HTMLFormElement && form.dataset.bound !== 'true') {
     form.dataset.bound = 'true';
+    const serviceSelect = form.elements.namedItem('service');
+    if (serviceSelect instanceof HTMLSelectElement) {
+      if (serviceSelect.value) {
+        trackSnapAddCart(snapParamsFromBookingValue(serviceSelect.value));
+      }
+      serviceSelect.addEventListener('change', () => {
+        if (!serviceSelect.value) return;
+        trackSnapAddCart(snapParamsFromBookingValue(serviceSelect.value));
+      });
+    }
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       const status = form.querySelector<HTMLElement>('[data-form-status]');
@@ -115,6 +126,12 @@ const groups = getContactBookingGroups();
       const url = buildContactWhatsAppUrl(
         buildContactWhatsAppMessage({ name, phone, bookingLabel, note }),
       );
+      const bookingValue =
+        serviceSelect instanceof HTMLSelectElement ? serviceSelect.value : '';
+      trackSnapPurchase(snapParamsFromBookingValue(bookingValue, {
+        phone,
+        transactionId: `contact-${Date.now()}`,
+      }));
       if (status) status.textContent = form.dataset.redirecting ?? '';
       if (whatsappWindow) whatsappWindow.location.href = url;
       else window.location.href = url;
