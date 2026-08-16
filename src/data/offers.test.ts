@@ -6,7 +6,7 @@ import { offers } from './offers.ts';
 
 const projectRoot = new URL('../../', import.meta.url);
 
-/** Price-quote catalog from عرض السعر.pdf — every flyer must appear on the offers section. */
+/** Remaining price-quote flyers that stay on the offers section. */
 const quoteOffers = [
   {
     id: 'wellness',
@@ -70,49 +70,9 @@ const quoteOffers = [
       'مساج الأحجار الساخنة',
     ],
   },
-  {
-    id: 'groom',
-    name: 'عرض المعرس',
-    price: 399,
-    originalPrice: 499,
-    features: [
-      'حمام مغربي ملكي + جلسة بخار',
-      'روم سبا مساج 3 بلس',
-      'بدكير يدين وقدمين',
-      'الكاسات الصينية',
-    ],
-  },
-  {
-    id: 'luxury',
-    name: 'عرض الرفاهية',
-    price: 549,
-    originalPrice: 685,
-    features: [
-      'حمام مغربي ملكي + جلسة بخار',
-      'روم سبا مساج 3 بلس',
-      'بدكير يدين وقدمين',
-      'الكاسات الصينية',
-      'مساج الأحجار الساخنة',
-      'كوب قهوة',
-      'حلا',
-    ],
-  },
-  {
-    id: 'gift',
-    name: 'عرض الهدية',
-    price: 590,
-    originalPrice: 735,
-    features: [
-      'حمام مغربي ملكي + جلسة بخار',
-      'روم سبا مساج 3 بلس',
-      'بدكير يدين وقدمين',
-      'الكاسات الصينية',
-      'مساج الأحجار الساخنة',
-      'حلا',
-      'باقة ورد',
-    ],
-  },
 ] as const;
+
+const retiredOfferIds = ['groom', 'luxury', 'gift'] as const;
 
 describe('offers catalog', () => {
   it('has unique offer ids', () => {
@@ -132,6 +92,13 @@ describe('offers catalog', () => {
       assert.ok(actual.price < actual.originalPrice, `${expected.id} sale price must be below original`);
       assert.deepEqual(actual.features, [...expected.features]);
       assert.ok(actual.whatsappText.includes(expected.name));
+    }
+  });
+
+  it('drops quote flyers that now live in packages', () => {
+    const ids = offers.map((offer) => offer.id);
+    for (const retiredId of retiredOfferIds) {
+      assert.equal(ids.includes(retiredId), false, `retired offer still listed: ${retiredId}`);
     }
   });
 

@@ -8,7 +8,6 @@ const categoryIcons: Record<string, string> = {
   massage: 'mdi:hand-heart',
   hammam: 'mdi:shower',
   pedicure: 'ph:hand',
-  skin: 'mdi:face-man-shimmer-outline',
 };
 ---
 
@@ -40,6 +39,9 @@ const categoryIcons: Record<string, string> = {
                     <p class="services__name">{item.name}</p>
                     <div class="services__meta">
                       <span class="services__price">{item.price} ريال</span>
+                      {item.durationMinutes ? (
+                        <span class="services__duration">{item.durationMinutes} دقيقة</span>
+                      ) : null}
                       <a
                         class="services__book"
                         href={site.whatsappBookUrl}
@@ -127,13 +129,19 @@ const categoryIcons: Record<string, string> = {
     color: var(--color-accent-soft);
   }
 
+  .services__duration {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
   .services__book {
     min-height: 2.75rem;
     min-width: 4.5rem;
     padding: 0.5rem 1rem;
     border-radius: var(--radius-pill);
     background: var(--color-accent);
-    color: #1a2219;
+    color: var(--color-bg-deep);
     font-weight: 700;
     font-size: 0.9rem;
     display: inline-flex;

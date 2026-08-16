@@ -184,6 +184,9 @@ export function servicesItemListSchema(): JsonLd {
         provider: { '@id': `${absoluteUrl('/')}#localbusiness` },
         areaServed: site.city,
         category: service.category,
+        ...(service.durationMinutes
+          ? { duration: `PT${service.durationMinutes}M` }
+          : {}),
         offers: {
           '@type': 'Offer',
           price: service.price,
@@ -211,7 +214,7 @@ export function packagesItemListSchema(pagePath = '/'): JsonLd {
       item: {
         '@type': 'Product',
         '@id': `${pageUrl}#package-${pkg.id}`,
-        name: `باقة ${pkg.name}`,
+        name: pkg.name.startsWith('باقة') ? pkg.name : `باقة ${pkg.name}`,
         description: pkg.description,
         brand: {
           '@type': 'Brand',

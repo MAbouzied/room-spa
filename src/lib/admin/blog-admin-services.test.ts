@@ -6,14 +6,19 @@ import { listAdminServices } from './blog-admin-services.ts';
 describe('listAdminServices', () => {
   it('keeps persisted relatedServiceId values compatible with existing posts', () => {
     const services = listAdminServices();
+    const byTitle = (part: string) => services.find((service) => service.title.includes(part));
 
-    assert.equal(services[0]?.id, 'massage-1');
-    assert.equal(services[1]?.id, 'massage-2');
-    assert.ok(services.some((service) => service.id === 'hammam-1'));
-    assert.ok(services.some((service) => service.id === 'pedicure-1'));
-    assert.ok(services.some((service) => service.id === 'skin-1'));
+    assert.equal(byTitle('مساج روم سبا')?.id, 'massage-1');
+    assert.equal(byTitle('مساج الشياتسو')?.id, 'massage-3');
+    assert.equal(byTitle('مساج الإسترخاء')?.id, 'massage-4');
+    assert.equal(byTitle('مساج رفلكسولوجي')?.id, 'massage-6');
+    assert.equal(byTitle('حمام مغربي كلاسيك')?.id, 'hammam-3');
+    assert.equal(byTitle('قص الأظافر')?.id, 'pedicure-1');
 
-    // Public ServiceItem.id values must not replace the admin option IDs.
+    assert.equal(
+      services.some((service) => service.id === 'skin-1'),
+      false,
+    );
     assert.equal(
       services.some((service) => service.id === 'room-spa-massage'),
       false,
@@ -25,6 +30,10 @@ describe('listAdminServices', () => {
     const expectedCount = serviceCategories.reduce((total, category) => total + category.items.length, 0);
 
     assert.equal(services.length, expectedCount);
-    assert.equal(services[0]?.title, 'المساج — مساج روم سبا');
+    assert.equal(services[0]?.title, 'المساج — مساج الإسترخاء');
+    assert.equal(
+      services.every((service) => /^(massage|hammam|pedicure)-\d+$/.test(service.id)),
+      true,
+    );
   });
 });

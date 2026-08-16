@@ -48,7 +48,7 @@ export const LEGACY_REDIRECTS: readonly LegacyRedirect[] = [
   { from: '/product/مساج-الشياتسو/', to: '/#service-shiatsu-massage', reason: 'exact' },
   { from: '/product/مساج-رفلكسولوجي/', to: '/#service-reflexology-massage', reason: 'exact' },
   { from: '/product/مساج-الريفلكسولوجي/', to: '/#service-reflexology-massage', reason: 'exact' },
-  { from: '/product/مساح-الأحجار-الساخنة/', to: '/#service-hot-stone-massage', reason: 'exact' },
+  { from: '/product/مساح-الأحجار-الساخنة/', to: '/#services', reason: 'section' },
   { from: '/product/حمام-مغربي-كلاسيك/', to: '/#service-classic-hammam', reason: 'exact' },
   {
     from: '/product/حمام-بطين-البحر-الميت-أو-الأعشاب-العطر/',
@@ -74,8 +74,8 @@ export const LEGACY_REDIRECTS: readonly LegacyRedirect[] = [
   { from: '/product/عرض-إليت/', to: '/#package-elite', reason: 'exact' },
 
   // Soft / non-1:1 products → home (per product request)
-  { from: '/product/مساج-تايلندي/', to: '/', reason: 'home-fallback' },
-  { from: '/product/مساج-الزيت-الحار/', to: '/', reason: 'home-fallback' },
+  { from: '/product/مساج-تايلندي/', to: '/#service-thai-massage', reason: 'exact' },
+  { from: '/product/مساج-الزيت-الحار/', to: '/#service-hot-oil-massage', reason: 'exact' },
   { from: '/product/مساح-الكاسات-الصينية/', to: '/', reason: 'home-fallback' },
   { from: '/product/خدمات-الحلاقه-الرجاليه/', to: '/', reason: 'home-fallback' },
   { from: '/product/خدمات-المشي-على-سير-القدام/', to: '/', reason: 'home-fallback' },
@@ -149,7 +149,8 @@ export const EXPECTED_FRAGMENT_TARGETS = [
   'service-relaxation-massage',
   'service-shiatsu-massage',
   'service-reflexology-massage',
-  'service-hot-stone-massage',
+  'service-thai-massage',
+  'service-hot-oil-massage',
   'service-classic-hammam',
   'service-dead-sea-hammam',
   'service-hands-feet-pedicure',
