@@ -78,9 +78,9 @@ export default defineConfig({
       filter: (page) => {
         try {
           const path = new URL(page).pathname;
-          return !/\/(api|admin|login)(\/|$)/.test(path);
+          return !/\/(api|admin|login|form)(\/|$)/.test(path);
         } catch {
-          return !/\/(api|admin|login)(\/|$)/.test(page);
+          return !/\/(api|admin|login|form)(\/|$)/.test(page);
         }
       },
       serialize(item) {

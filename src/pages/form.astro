@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FormLandingPage from '../components/FormLandingPage.astro';
+import { breadcrumbSchema, buildGraph, webPageSchema } from '../lib/schema';
+
+const title = 'تواصل معنا - روم سبا';
+const description =
+  'أرسل اسمك ورقم جوالك واختر الخدمة، ثم أكمل التواصل عبر واتساب. روم سبا في حفر الباطن.';
+const path = '/form';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  path={path}
+  noindex
+  robotsFollow
+  hideChrome
+  schemas={[
+    buildGraph([
+      webPageSchema({
+        title,
+        description,
+        path,
+        type: 'ContactPage',
+      }),
+      breadcrumbSchema([
+        { name: 'الرئيسية', path: '/' },
+        { name: 'تواصل معنا', path },
+      ]),
+    ]),
+  ]}
+>
+  <FormLandingPage />
+</BaseLayout>

@@ -1,0 +1,202 @@
+---
+import { Icon } from 'astro-icon/components';
+import { getContactBookingGroups } from '../lib/contact-form';
+
+const groups = getContactBookingGroups();
+---
+
+<article class="contact-form-card" aria-label="نموذج التواصل">
+  <form
+    id="contact-form"
+    class="contact-form"
+    data-redirecting="جاري فتح واتساب..."
+    data-invalid="يرجى التأكد من الاسم ورقم الجوال السعودي واختيار الخدمة."
+  >
+    <div class="contact-form__row">
+      <label class="contact-form__field">
+        <span>رقم الجوال</span>
+        <input
+          class="contact-form__control"
+          name="phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          pattern="(?:\+?966|0)?5[0-9]{8}"
+          placeholder="05xxxxxxxx"
+          required
+          dir="ltr"
+        />
+      </label>
+      <label class="contact-form__field">
+        <span>الاسم الكامل</span>
+        <input
+          class="contact-form__control"
+          name="name"
+          type="text"
+          autocomplete="name"
+          minlength="2"
+          maxlength="80"
+          placeholder="اكتب اسمك"
+          required
+        />
+      </label>
+    </div>
+
+    <label class="contact-form__field">
+      <span>الخدمة المطلوبة</span>
+      <select class="contact-form__control" name="service" required>
+        <option value="">اختر ما ترغب في حجزه</option>
+        {
+          groups.map((group) => (
+            <optgroup label={group.label}>
+              {group.options.map((option) => (
+                <option value={option.value}>{option.label}</option>
+              ))}
+            </optgroup>
+          ))
+        }
+      </select>
+    </label>
+
+    <label class="contact-form__field">
+      <span>رسالتك (اختياري)</span>
+      <textarea
+        class="contact-form__control"
+        name="message"
+        rows="5"
+        maxlength="500"
+        placeholder="اكتب تفاصيل طلبك هنا..."
+      ></textarea>
+    </label>
+
+    <label class="visually-hidden" aria-hidden="true">
+      Company
+      <input name="company" type="text" tabindex="-1" autocomplete="off" />
+    </label>
+
+    <button type="submit" class="contact-form__submit">
+      <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
+      إرسال عبر واتساب
+    </button>
+    <p data-form-status class="contact-form__status" role="status" aria-live="polite"></p>
+  </form>
+</article>
+
+<script>
+  import { buildContactWhatsAppMessage, buildContactWhatsAppUrl } from '../lib/contact-form';
+
+  const form = document.getElementById('contact-form');
+  if (form instanceof HTMLFormElement && form.dataset.bound !== 'true') {
+    form.dataset.bound = 'true';
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const status = form.querySelector<HTMLElement>('[data-form-status]');
+      if (!form.reportValidity()) {
+        if (status) status.textContent = form.dataset.invalid ?? '';
+        return;
+      }
+
+      const data = new FormData(form);
+      if (String(data.get('company') ?? '').trim()) return;
+
+      const name = String(data.get('name') ?? '').trim();
+      const phone = String(data.get('phone') ?? '').trim();
+      const note = String(data.get('message') ?? '').trim();
+      const serviceSelect = form.elements.namedItem('service');
+      const bookingLabel =
+        serviceSelect instanceof HTMLSelectElement
+          ? serviceSelect.selectedOptions[0]?.textContent?.trim() ?? ''
+          : '';
+      const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      const whatsappWindow = window.open('about:blank', '_blank');
+      if (whatsappWindow) whatsappWindow.opener = null;
+
+      if (submit) submit.disabled = true;
+      const url = buildContactWhatsAppUrl(
+        buildContactWhatsAppMessage({ name, phone, bookingLabel, note }),
+      );
+      if (status) status.textContent = form.dataset.redirecting ?? '';
+      if (whatsappWindow) whatsappWindow.location.href = url;
+      else window.location.href = url;
+      if (submit) submit.disabled = false;
+    });
+  }
+</script>
+
+<style>
+  .contact-form-card {
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-card);
+    background: var(--color-bg-card);
+  }
+
+  .contact-form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .contact-form__row {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .contact-form__field {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .contact-form__control {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+  }
+
+  textarea.contact-form__control {
+    min-height: 8rem;
+    resize: vertical;
+  }
+
+  .contact-form__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-height: 3rem;
+    width: 100%;
+    padding: 0.75rem 1.4rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: var(--color-bg-deep);
+    font-weight: 700;
+  }
+
+  .contact-form__submit:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+
+  .contact-form__status {
+    min-height: 1.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  @media (min-width: 640px) {
+    .contact-form-card {
+      padding: 1.5rem;
+    }
+
+    .contact-form__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

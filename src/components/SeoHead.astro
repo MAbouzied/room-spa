@@ -9,6 +9,7 @@ interface Props {
   image?: string;
   type?: 'website' | 'article';
   noindex?: boolean;
+  robotsFollow?: boolean;
   schemas?: Record<string, unknown>[];
   keywords?: string[];
 }
@@ -20,6 +21,7 @@ const {
   image = '/images/logo-full.png',
   type = 'website',
   noindex = false,
+  robotsFollow = false,
   schemas = [],
   keywords = [
     'سبا رجالي',
@@ -34,7 +36,11 @@ const {
 
 const canonical = absoluteUrl(path);
 const ogImage = image.startsWith('http') ? image : absoluteUrl(image);
-const robots = noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large';
+const robots = noindex
+  ? robotsFollow
+    ? 'noindex, follow'
+    : 'noindex, nofollow'
+  : 'index, follow, max-image-preview:large';
 ---
 
 <meta charset="utf-8" />

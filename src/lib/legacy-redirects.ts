@@ -21,6 +21,8 @@ export const PROTECTED_PUBLIC_ROUTES = [
   '/blogs/',
   '/login',
   '/login/',
+  '/form',
+  '/form/',
 ] as const;
 
 /**

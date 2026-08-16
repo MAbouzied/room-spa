@@ -1,0 +1,129 @@
+---
+import { Icon } from 'astro-icon/components';
+import { site } from '../data/site';
+---
+
+<article id="branches" class="form-branches">
+  <span class="form-branches__eyebrow">موقعنا</span>
+  <h2 class="form-branches__title text-gradient-gold">زُرنا في أقرب فرع</h2>
+
+  <div class="form-branches__list">
+    {
+      site.branches.map((branch) => (
+        <div class="form-branches__card">
+          <h3>{branch.name}</h3>
+          <dl>
+            <div>
+              <dt class="visually-hidden">العنوان</dt>
+              <dd>
+                <Icon name="mdi:map-marker-outline" class="icon icon--sm" aria-hidden="true" />
+                <span>{branch.address}</span>
+              </dd>
+            </div>
+            <div>
+              <dt class="visually-hidden">ساعات العمل</dt>
+              <dd>
+                <Icon name="mdi:clock-outline" class="icon icon--sm" aria-hidden="true" />
+                <span>{branch.hours}</span>
+              </dd>
+            </div>
+            <div>
+              <dt class="visually-hidden">الهاتف</dt>
+              <dd>
+                <Icon name="mdi:phone-outline" class="icon icon--sm" aria-hidden="true" />
+                <span class="phone" dir="ltr">{site.phoneDisplay}</span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="form-branches__social">
+    <span>تابعنا:</span>
+    <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+      <Icon name="mdi:instagram" class="icon icon--md" aria-hidden="true" />
+    </a>
+  </div>
+</article>
+
+<style>
+  .form-branches {
+    min-width: 0;
+  }
+
+  .form-branches__eyebrow {
+    color: var(--color-gold);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .form-branches__title {
+    margin-top: 0.5rem;
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .form-branches__list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .form-branches__card {
+    padding: 1.5rem;
+    border: 1px solid var(--color-border-card);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .form-branches__card h3 {
+    color: var(--color-gold);
+    font-size: 1.125rem;
+  }
+
+  .form-branches__card dl {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .form-branches__card dd {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .form-branches__card .icon {
+    color: var(--color-gold);
+    margin-top: 0.15rem;
+  }
+
+  .form-branches__social {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .form-branches__social a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-gold);
+  }
+
+  .form-branches__social a:hover {
+    background: var(--color-surface-hover);
+  }
+</style>

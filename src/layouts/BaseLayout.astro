@@ -17,6 +17,9 @@ interface Props {
   type?: 'website' | 'article';
   schemas?: Record<string, unknown>[];
   keywords?: string[];
+  noindex?: boolean;
+  robotsFollow?: boolean;
+  hideChrome?: boolean;
 }
 
 const {
@@ -28,6 +31,9 @@ const {
   type = 'website',
   schemas = [],
   keywords,
+  noindex = false,
+  robotsFollow = false,
+  hideChrome = false,
 } = Astro.props;
 ---
 
@@ -42,17 +48,19 @@ const {
       type={type}
       schemas={schemas}
       keywords={keywords}
+      noindex={noindex}
+      robotsFollow={robotsFollow}
     />
     <meta name="generator" content={Astro.generator} />
     <ClientRouter />
   </head>
   <body>
-    <Header variant={navVariant} transition:animate="fade" />
+    {!hideChrome && <Header variant={navVariant} transition:animate="fade" />}
     <main id="main-content" transition:animate="fade">
       <slot />
     </main>
-    <Footer transition:animate="fade" />
-    <WhatsAppFloat transition:persist="whatsapp-float" />
+    {!hideChrome && <Footer transition:animate="fade" />}
+    {!hideChrome && <WhatsAppFloat transition:persist="whatsapp-float" />}
     <script>
       const initReveals = () => {
         const reveals = document.querySelectorAll('.reveal:not(.is-visible)');

@@ -1,0 +1,125 @@
+---
+import Logo from './Logo.astro';
+import FormBranches from './FormBranches.astro';
+import ContactForm from './ContactForm.astro';
+---
+
+<section class="form-landing">
+  <div class="container form-landing__inner">
+    <div class="form-landing__brand">
+      <a href="/" aria-label="العودة للصفحة الرئيسية — روم سبا">
+        <Logo size="sm" />
+      </a>
+    </div>
+
+    <nav class="form-landing__crumb" aria-label="مسار التنقل" data-form-landing-crumb>
+      <ol>
+        <li>
+          <a href="/">الرئيسية</a>
+        </li>
+        <li>
+          <span aria-hidden="true">/</span>
+          <h1>تواصل معنا</h1>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="form-landing__grid">
+      <FormBranches />
+      <ContactForm />
+    </div>
+
+    <p class="form-landing__full">
+      <a href="/">الموقع الكامل</a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .form-landing {
+    min-height: 100dvh;
+    background: var(--color-bg);
+  }
+
+  .form-landing__inner {
+    display: flex;
+    min-height: 100dvh;
+    min-width: 0;
+    flex-direction: column;
+    padding-block: 2rem;
+  }
+
+  .form-landing__brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .form-landing__crumb {
+    margin-top: 1.5rem;
+  }
+
+  .form-landing__crumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .form-landing__crumb li {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-landing__crumb a:hover {
+    color: var(--color-gold);
+  }
+
+  .form-landing__crumb h1 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .form-landing__crumb span {
+    color: var(--color-gold);
+    opacity: 0.5;
+  }
+
+  .form-landing__grid {
+    display: grid;
+    flex: 1;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+    margin-top: 1.5rem;
+  }
+
+  .form-landing__full {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .form-landing__full a {
+    color: var(--color-gold);
+  }
+
+  .form-landing__full a:hover {
+    color: var(--color-gold-light);
+  }
+
+  @media (min-width: 1024px) {
+    .form-landing__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 4rem;
+    }
+  }
+</style>
