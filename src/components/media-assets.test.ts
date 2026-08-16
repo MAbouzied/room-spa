@@ -9,13 +9,21 @@ describe('site media assets', () => {
     const hero = await readFile(new URL('src/components/Hero.astro', projectRoot), 'utf8');
 
     assert.match(hero, /data-hero-video/);
-    assert.match(hero, /data-src="\/videos\/room-spa-hero\.webm"/);
+    assert.match(hero, /playsinline/);
+    assert.match(hero, /webkit-playsinline/);
+    assert.match(hero, /\bloop\b/);
     assert.match(hero, /data-src="\/videos\/room-spa-hero\.mp4"/);
+    assert.match(hero, /data-src="\/videos\/room-spa-hero\.webm"/);
+    assert.ok(
+      hero.indexOf('room-spa-hero.mp4') < hero.indexOf('room-spa-hero.webm'),
+      'MP4 must be listed before WebM so iPhone Safari can play it',
+    );
     assert.match(hero, /src="\/images\/hero-poster\.webp"/);
     assert.match(hero, /prefers-reduced-motion/);
     assert.match(hero, /saveData/);
     assert.match(hero, /astro:before-swap/);
-    assert.match(hero, /cancelIdleCallback/);
+    assert.match(hero, /iPhone|iPad|iPod/);
+    assert.match(hero, /ended/);
     assert.match(hero, /await video\.play\(\)/);
   });
 

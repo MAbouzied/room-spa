@@ -20,21 +20,24 @@ const isGift = variant === 'gift';
             class="hero__image"
             src="/images/hero-poster.webp"
             alt=""
-            width="1280"
-            height="720"
+            width="720"
+            height="1280"
             decoding="async"
             fetchpriority="high"
           />
           <video
             class="hero__video"
             muted
+            autoplay
             loop
             playsinline
-            preload="none"
+            webkit-playsinline
+            preload="metadata"
+            poster="/images/hero-poster.webp"
             data-hero-video
           >
-            <source data-src="/videos/room-spa-hero.webm" type="video/webm" />
             <source data-src="/videos/room-spa-hero.mp4" type="video/mp4" />
+            <source data-src="/videos/room-spa-hero.webm" type="video/webm" />
           </video>
         </div>
         <div class="hero__overlay" aria-hidden="true" />
@@ -100,6 +103,7 @@ const isGift = variant === 'gift';
   };
 
   let pendingHeroLoad: PendingHeroLoad | null = null;
+  let resumeHeroPlayback: (() => void) | null = null;
 
   const cancelPendingHeroLoad = () => {
     if (!pendingHeroLoad) return;
@@ -116,11 +120,23 @@ const isGift = variant === 'gift';
   const cleanupHeroVideo = () => {
     cancelPendingHeroLoad();
 
+    if (resumeHeroPlayback) {
+      document.removeEventListener('visibilitychange', resumeHeroPlayback);
+      window.removeEventListener('pageshow', resumeHeroPlayback);
+      resumeHeroPlayback = null;
+    }
+
     document.querySelectorAll('[data-hero-video]').forEach((element) => {
       if (!(element instanceof HTMLVideoElement)) return;
       element.pause();
       element.classList.remove('is-ready');
     });
+  };
+
+  const isAppleTouchDevice = () => {
+    const platform = navigator.platform;
+    const userAgent = navigator.userAgent;
+    return /iPhone|iPad|iPod/.test(userAgent) || (platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   };
 
   const initHeroVideo = () => {
@@ -132,18 +148,17 @@ const isGift = variant === 'gift';
     if (reduceMotion || connection?.saveData) return;
 
     video.dataset.initialized = 'true';
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.loop = true;
 
-    const loadVideo = async () => {
-      pendingHeroLoad = null;
+    const playHero = async () => {
       if (!video.isConnected) return;
-
-      video.querySelectorAll('source[data-src]').forEach((source) => {
-        if (!(source instanceof HTMLSourceElement) || !source.dataset.src) return;
-        source.src = source.dataset.src;
-      });
-
-      video.load();
       try {
+        video.muted = true;
         await video.play();
         if (video.isConnected) video.classList.add('is-ready');
       } catch {
@@ -151,7 +166,36 @@ const isGift = variant === 'gift';
       }
     };
 
+    const loadVideo = async () => {
+      pendingHeroLoad = null;
+      if (!video.isConnected) return;
+
+      const skipWebm = isAppleTouchDevice();
+      video.querySelectorAll('source[data-src]').forEach((source) => {
+        if (!(source instanceof HTMLSourceElement) || !source.dataset.src) return;
+        if (skipWebm && source.type.includes('webm')) {
+          source.remove();
+          return;
+        }
+        source.src = source.dataset.src;
+      });
+
+      video.addEventListener('ended', () => {
+        video.currentTime = 0;
+        void playHero();
+      });
+
+      video.load();
+      await playHero();
+    };
+
     const scheduleLoad = () => {
+      if (isAppleTouchDevice()) {
+        const id = window.setTimeout(() => void loadVideo(), 0);
+        pendingHeroLoad = { id, kind: 'timeout' };
+        return;
+      }
+
       if ('requestIdleCallback' in window) {
         const id = window.requestIdleCallback(() => void loadVideo(), { timeout: 1500 });
         pendingHeroLoad = { id, kind: 'idle' };
@@ -160,6 +204,13 @@ const isGift = variant === 'gift';
         pendingHeroLoad = { id, kind: 'timeout' };
       }
     };
+
+    resumeHeroPlayback = () => {
+      if (document.hidden || video.paused === false) return;
+      void playHero();
+    };
+    document.addEventListener('visibilitychange', resumeHeroPlayback);
+    window.addEventListener('pageshow', resumeHeroPlayback);
 
     scheduleLoad();
   };
