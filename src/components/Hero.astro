@@ -156,13 +156,12 @@ const isGift = variant === 'gift';
     video.loop = true;
 
     const playHero = async () => {
-      if (!video.isConnected) return;
+      if (!video.isConnected || !video.paused) return;
       try {
         video.muted = true;
         await video.play();
-        if (video.isConnected) video.classList.add('is-ready');
       } catch {
-        video.pause();
+        // Autoplay can fail before the file is ready. canplay retries below.
       }
     };
 
@@ -180,6 +179,12 @@ const isGift = variant === 'gift';
         source.src = source.dataset.src;
       });
 
+      video.addEventListener('playing', () => {
+        if (video.isConnected) video.classList.add('is-ready');
+      });
+      video.addEventListener('canplay', () => {
+        void playHero();
+      });
       video.addEventListener('ended', () => {
         video.currentTime = 0;
         void playHero();

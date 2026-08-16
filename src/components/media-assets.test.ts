@@ -24,6 +24,8 @@ describe('site media assets', () => {
     assert.match(hero, /astro:before-swap/);
     assert.match(hero, /iPhone|iPad|iPod/);
     assert.match(hero, /ended/);
+    assert.match(hero, /canplay/);
+    assert.match(hero, /playing/);
     assert.match(hero, /await video\.play\(\)/);
   });
 

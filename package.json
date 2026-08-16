@@ -9,10 +9,11 @@
   "scripts": {
     "dev": "astro dev",
     "generate:redirects": "node --experimental-strip-types scripts/generate-legacy-redirects.mjs",
-    "build": "npm run generate:redirects && astro build",
+    "build": "npm run generate:redirects && astro build && node scripts/prune-worker-bundle.mjs",
     "preview": "astro preview",
     "preview:cf": "npm run build && wrangler dev --config dist/server/wrangler.json",
     "deploy": "npm run build && wrangler deploy --config dist/server/wrangler.json",
+    "prune:worker": "node scripts/prune-worker-bundle.mjs",
     "test": "node --test --experimental-strip-types \"src/**/*.test.ts\"",
     "test:redirects": "node --test --experimental-strip-types src/lib/legacy-redirects.test.ts",
     "verify:redirects": "node --experimental-strip-types scripts/verify-legacy-redirects.mjs",
