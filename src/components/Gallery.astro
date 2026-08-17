@@ -22,7 +22,7 @@ import SectionHeading from './SectionHeading.astro';
       <div class="gallery__track" data-gallery-track>
         {
           galleryImages.map((image, index) => (
-            <figure class="gallery__slide">
+            <figure class:list={['gallery__slide', index === 0 && 'is-active']}>
               <img
                 src={image.src}
                 alt={image.alt}
@@ -74,7 +74,9 @@ import SectionHeading from './SectionHeading.astro';
 
     const goTo = (next: number) => {
       index = (next + slides.length) % slides.length;
-      track.style.transform = `translateX(-${index * 100}%)`;
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle('is-active', slideIndex === index);
+      });
       dots.forEach((dot, dotIndex) => {
         dot.classList.toggle('is-active', dotIndex === index);
       });
@@ -129,19 +131,26 @@ import SectionHeading from './SectionHeading.astro';
   .gallery__track {
     position: absolute;
     inset: 0;
-    display: flex;
-    height: 100%;
-    direction: ltr;
-    transition: transform 0.55s var(--ease-out);
   }
 
   .gallery__slide {
-    flex: 0 0 100%;
-    width: 100%;
-    height: 100%;
-    min-width: 0;
+    position: absolute;
+    inset: 0;
     margin: 0;
     overflow: hidden;
+    opacity: 0;
+    transform: scale(1.04);
+    transition:
+      opacity 1s ease-in-out,
+      transform 1.15s ease-in-out;
+    pointer-events: none;
+  }
+
+  .gallery__slide.is-active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    z-index: 1;
   }
 
   .gallery__slide img {
@@ -154,6 +163,7 @@ import SectionHeading from './SectionHeading.astro';
 
   .gallery__nav {
     position: absolute;
+    z-index: 2;
     top: 50%;
     transform: translateY(-50%);
     width: 2.75rem;
@@ -184,11 +194,14 @@ import SectionHeading from './SectionHeading.astro';
 
   .gallery__dots {
     position: absolute;
+    z-index: 2;
     inset-inline: 0;
-    bottom: 0.85rem;
+    bottom: 0;
     display: flex;
     justify-content: center;
-    gap: 0.4rem;
+    gap: 0.15rem;
+    padding: 1.6rem 0 0.85rem;
+    background: linear-gradient(to top, var(--color-bg-deep), transparent);
   }
 
   .gallery__dot {
@@ -204,19 +217,24 @@ import SectionHeading from './SectionHeading.astro';
 
   .gallery__dot::after {
     content: '';
-    width: 0.55rem;
-    height: 0.55rem;
+    width: 0.7rem;
+    height: 0.7rem;
     border-radius: var(--radius-pill);
-    background: var(--color-border-soft);
+    background: var(--color-text);
+    box-shadow: 0 0 0 1px var(--color-bg-deep);
+    transition:
+      width 0.35s var(--ease-out),
+      background 0.35s var(--ease-out);
   }
 
   .gallery__dot.is-active::after {
-    background: var(--color-accent);
-    transform: scale(1.25);
+    width: 1.65rem;
+    background: var(--color-accent-soft);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .gallery__track {
+    .gallery__slide,
+    .gallery__dot::after {
       transition: none;
     }
   }

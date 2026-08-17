@@ -47,6 +47,10 @@ describe('gallery photos', () => {
     assert.match(galleryAstro, /data-gallery-next/);
     assert.doesNotMatch(galleryAstro, /gallery__grid/);
     assert.match(galleryAstro, /object-fit:\s*cover/);
+    assert.match(galleryAstro, /opacity:\s*0/);
+    assert.match(galleryAstro, /transition:[^;]*opacity/);
+    assert.match(galleryAstro, /\.gallery__dots\s*\{[^}]*linear-gradient/);
+    assert.match(galleryAstro, /\.gallery__dot::after\s*\{[^}]*var\(--color-text\)/);
     assert.match(
       galleryAstro,
       new RegExp(`aspect-ratio:\\s*${galleryImageSize.width}\\s*/\\s*${galleryImageSize.height}`),
