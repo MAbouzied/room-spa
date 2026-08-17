@@ -1,0 +1,50 @@
+---
+import { Icon } from 'astro-icon/components';
+import Button from './Button.astro';
+import { site } from '../data/site';
+import { formCopy, type FormLocale } from '../lib/form-copy';
+
+interface Props {
+  locale?: FormLocale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const copy = formCopy[locale];
+---
+
+<article class="form-actions" aria-label={copy.actionsAria} data-form-actions>
+  <Button href={site.whatsappBookUrl} variant="whatsapp" shape="xl" external full>
+    <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
+    {copy.whatsappAction}
+  </Button>
+  <Button href={`tel:${site.phoneTel}`} variant="outline" shape="xl" full>
+    <Icon name="mdi:phone" class="icon icon--md" aria-hidden="true" />
+    {copy.callAction}
+  </Button>
+  <Button href={site.google.mapsUrl} variant="outline" shape="xl" external full>
+    <Icon name="mdi:map-marker-outline" class="icon icon--md" aria-hidden="true" />
+    {copy.locationAction}
+  </Button>
+  <Button href="/#offers" variant="accent" shape="xl" full>
+    <Icon name="mdi:star-four-points-outline" class="icon icon--md" aria-hidden="true" />
+    {copy.offersAction}
+  </Button>
+</article>
+
+<style>
+  .form-actions {
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-card);
+    background: var(--color-bg-card);
+  }
+
+  @media (min-width: 640px) {
+    .form-actions {
+      padding: 1.5rem;
+    }
+  }
+</style>

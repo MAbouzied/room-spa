@@ -4,7 +4,7 @@ export const formCopy = {
   ar: {
     pageTitle: 'تواصل معنا - روم سبا',
     pageDescription:
-      'أرسل اسمك ورقم جوالك واختر الخدمة، ثم أكمل التواصل عبر واتساب. روم سبا في حفر الباطن.',
+      'تواصل مع روم سبا عبر واتساب، اعرف موقعنا، أو اسأل عن العروض مباشرة. روم سبا في حفر الباطن.',
     home: 'الرئيسية',
     contact: 'تواصل معنا',
     fullSite: 'الموقع الكامل',
@@ -30,6 +30,11 @@ export const formCopy = {
     servicesGroup: 'الخدمات',
     packagesGroup: 'الباقات',
     offersGroup: 'العروض',
+    actionsAria: 'خيارات التواصل',
+    whatsappAction: 'تواصل واتساب',
+    callAction: 'اتصال',
+    locationAction: 'الموقع',
+    offersAction: 'العروض',
     submit: 'إرسال عبر واتساب',
     redirecting: 'جاري فتح واتساب...',
     invalid: 'يرجى التأكد من الاسم ورقم الجوال السعودي واختيار الخدمة.',
@@ -37,7 +42,7 @@ export const formCopy = {
   en: {
     pageTitle: 'Contact us - Room Spa',
     pageDescription:
-      'Send your name, Saudi mobile number, and the service you want, then continue on WhatsApp. Room Spa in Hafr Al Batin.',
+      'Contact Room Spa on WhatsApp, see our location, or ask about offers. Room Spa in Hafr Al Batin.',
     home: 'Home',
     contact: 'Contact us',
     fullSite: 'Full website',
@@ -63,6 +68,11 @@ export const formCopy = {
     servicesGroup: 'Services',
     packagesGroup: 'Packages',
     offersGroup: 'Offers',
+    actionsAria: 'Contact options',
+    whatsappAction: 'WhatsApp',
+    callAction: 'Call',
+    locationAction: 'Location',
+    offersAction: 'Offers',
     submit: 'Send on WhatsApp',
     redirecting: 'Opening WhatsApp...',
     invalid: 'Please check your name, Saudi mobile number, and selected service.',

@@ -25,7 +25,7 @@ const copy = formCopy[locale];
               <dt class="visually-hidden">{copy.address}</dt>
               <dd>
                 <Icon name="mdi:map-marker-outline" class="icon icon--sm" aria-hidden="true" />
-                <span>{branch.address}</span>
+                <a href={branch.mapsUrl} target="_blank" rel="noopener noreferrer">{branch.address}</a>
               </dd>
             </div>
             <div>
@@ -39,7 +39,7 @@ const copy = formCopy[locale];
               <dt class="visually-hidden">{copy.phone}</dt>
               <dd>
                 <Icon name="mdi:phone-outline" class="icon icon--sm" aria-hidden="true" />
-                <span class="phone" dir="ltr">{site.phoneDisplay}</span>
+                <a class="phone" href={`tel:${site.phoneTel}`} dir="ltr">{site.phoneDisplay}</a>
               </dd>
             </div>
           </dl>
@@ -109,6 +109,10 @@ const copy = formCopy[locale];
   .form-branches__card .icon {
     color: var(--color-gold);
     margin-top: 0.15rem;
+  }
+
+  .form-branches__card a:hover {
+    color: var(--color-gold);
   }
 
   .form-branches__social {

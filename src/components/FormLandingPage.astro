@@ -1,7 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import FormBranches from './FormBranches.astro';
-import ContactForm from './ContactForm.astro';
+import FormActions from './FormActions.astro';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { formCopy, type FormLocale } from '../lib/form-copy';
 
@@ -37,7 +37,7 @@ const brandHref = '/';
 
     <div class="form-landing__grid">
       <FormBranches locale={locale} />
-      <ContactForm locale={locale} />
+      <FormActions locale={locale} />
     </div>
 
     <p class="form-landing__full">

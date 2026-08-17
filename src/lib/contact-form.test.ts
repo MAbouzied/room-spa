@@ -6,6 +6,7 @@ import { serviceCategories } from '../data/services.ts';
 import {
   buildContactWhatsAppMessage,
   buildContactWhatsAppUrl,
+  buildOffersWhatsAppUrl,
   getContactBookingGroups,
   isSaudiMobile,
 } from './contact-form.ts';
@@ -65,6 +66,17 @@ describe('contact form WhatsApp payload', () => {
   it('opens WhatsApp with the Room Spa number', () => {
     const url = buildContactWhatsAppUrl('مرحبا');
     assert.equal(url, `https://wa.me/966538770710?text=${encodeURIComponent('مرحبا')}`);
+  });
+
+  it('opens WhatsApp directly for the offers action', () => {
+    assert.equal(
+      buildOffersWhatsAppUrl('ar'),
+      `https://wa.me/966538770710?text=${encodeURIComponent('مرحبا، أرغب بالاطلاع على عروض روم سبا')}`,
+    );
+    assert.equal(
+      buildOffersWhatsAppUrl('en'),
+      `https://wa.me/966538770710?text=${encodeURIComponent('Hello, I would like to see Room Spa offers')}`,
+    );
   });
 });
 

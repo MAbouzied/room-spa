@@ -75,3 +75,13 @@ export function buildContactWhatsAppMessage(fields: {
 export function buildContactWhatsAppUrl(message: string): string {
   return `https://wa.me/${site.whatsappNumber}?text=${encodeURIComponent(message)}`;
 }
+
+export function buildOffersWhatsAppMessage(locale: FormLocale = 'ar'): string {
+  return locale === 'en'
+    ? 'Hello, I would like to see Room Spa offers'
+    : 'مرحبا، أرغب بالاطلاع على عروض روم سبا';
+}
+
+export function buildOffersWhatsAppUrl(locale: FormLocale = 'ar'): string {
+  return buildContactWhatsAppUrl(buildOffersWhatsAppMessage(locale));
+}

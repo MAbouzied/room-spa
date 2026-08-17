@@ -5,6 +5,7 @@ interface Props {
   shape?: 'pill' | 'xl';
   class?: string;
   external?: boolean;
+  full?: boolean;
 }
 
 const {
@@ -13,6 +14,7 @@ const {
   shape = 'pill',
   class: className = '',
   external = false,
+  full = false,
 } = Astro.props;
 
 const rel = external ? 'noopener noreferrer' : undefined;
@@ -20,7 +22,7 @@ const target = external ? '_blank' : undefined;
 ---
 
 <a
-  class:list={['btn', `btn--${variant}`, `btn--shape-${shape}`, className]}
+  class:list={['btn', `btn--${variant}`, `btn--shape-${shape}`, full && 'btn--full', className]}
   href={href}
   rel={rel}
   target={target}
@@ -110,5 +112,10 @@ const target = external ? '_blank' : undefined;
       width: 100%;
       max-width: 20rem;
     }
+  }
+
+  .btn--full {
+    width: 100%;
+    max-width: none;
   }
 </style>
