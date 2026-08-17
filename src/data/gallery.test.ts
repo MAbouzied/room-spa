@@ -1,7 +1,25 @@
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import { describe, it } from 'node:test';
-import { galleryImages } from './gallery.ts';
+import { galleryImages, galleryImageSize } from './gallery.ts';
+
+function readJpegSize(bytes: Buffer) {
+  let offset = 2;
+  while (offset < bytes.length - 8) {
+    if (bytes[offset] !== 0xff) break;
+    const marker = bytes[offset + 1];
+    if (marker === undefined) break;
+    if (marker >= 0xc0 && marker <= 0xc3) {
+      return {
+        height: bytes.readUInt16BE(offset + 5),
+        width: bytes.readUInt16BE(offset + 7),
+      };
+    }
+    const length = bytes.readUInt16BE(offset + 2);
+    offset += 2 + length;
+  }
+  throw new Error('JPEG size not found');
+}
 
 const projectRoot = new URL('../../', import.meta.url);
 const maxImageBytes = 350 * 1024;
@@ -24,9 +42,16 @@ describe('gallery photos', () => {
     const galleryAstro = await readFile(new URL('src/components/Gallery.astro', projectRoot), 'utf8');
 
     assert.match(galleryAstro, /galleryImages/);
-    assert.match(galleryAstro, /gallery__grid/);
+    assert.match(galleryAstro, /data-gallery-track/);
+    assert.match(galleryAstro, /data-gallery-prev/);
+    assert.match(galleryAstro, /data-gallery-next/);
+    assert.doesNotMatch(galleryAstro, /gallery__grid/);
     assert.match(galleryAstro, /object-fit:\s*cover/);
-    assert.match(galleryAstro, /@media \(min-width:/);
+    assert.match(
+      galleryAstro,
+      new RegExp(`aspect-ratio:\\s*${galleryImageSize.width}\\s*/\\s*${galleryImageSize.height}`),
+    );
+    assert.doesNotMatch(galleryAstro, /aspect-ratio:\s*16\s*\/\s*9/);
 
     for (const image of galleryImages) {
       const relative = `public${image.src}`;
@@ -35,6 +60,14 @@ describe('gallery photos', () => {
       assert.ok(
         file.size <= maxImageBytes,
         `${image.src} is ${file.size} bytes; keep gallery photos under 350KB`,
+      );
+
+      const bytes = await readFile(new URL(relative, projectRoot));
+      const size = readJpegSize(bytes);
+      assert.deepEqual(
+        size,
+        { width: galleryImageSize.width, height: galleryImageSize.height },
+        `${image.src} must be ${galleryImageSize.width}x${galleryImageSize.height}`,
       );
     }
   });

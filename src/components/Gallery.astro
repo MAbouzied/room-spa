@@ -1,9 +1,7 @@
 ---
-import { galleryImages } from '../data/gallery';
+import { Icon } from 'astro-icon/components';
+import { galleryImages, galleryImageSize } from '../data/gallery';
 import SectionHeading from './SectionHeading.astro';
-
-const featured = galleryImages.find((image) => image.featured) ?? galleryImages[0];
-const tiles = galleryImages.filter((image) => image !== featured);
 ---
 
 <section class="section gallery" id="photos">
@@ -14,59 +12,139 @@ const tiles = galleryImages.filter((image) => image !== featured);
       highlight="روم سبا"
       lead="أجواء راقية وتفاصيل مدروسة لتجربة لا تُنسى"
     />
-    <div class="gallery__grid reveal">
-      {
-        featured && (
-          <figure class="gallery__item gallery__item--featured">
-            <img
-              src={featured.src}
-              alt={featured.alt}
-              width="1600"
-              height="900"
-              decoding="async"
+    <div
+      class="gallery__shell reveal"
+      data-gallery
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="صور روم سبا"
+    >
+      <div class="gallery__track" data-gallery-track>
+        {
+          galleryImages.map((image, index) => (
+            <figure class="gallery__slide">
+              <img
+                src={image.src}
+                alt={image.alt}
+                width={galleryImageSize.width}
+                height={galleryImageSize.height}
+                loading={index === 0 ? undefined : 'lazy'}
+                decoding="async"
+              />
+            </figure>
+          ))
+        }
+      </div>
+      <button class="gallery__nav gallery__nav--prev" type="button" data-gallery-prev aria-label="السابق">
+        <Icon name="mdi:chevron-right" class="icon icon--lg" aria-hidden="true" />
+      </button>
+      <button class="gallery__nav gallery__nav--next" type="button" data-gallery-next aria-label="التالي">
+        <Icon name="mdi:chevron-left" class="icon icon--lg" aria-hidden="true" />
+      </button>
+      <div class="gallery__dots" data-gallery-dots>
+        {
+          galleryImages.map((image, index) => (
+            <button
+              class:list={['gallery__dot', index === 0 && 'is-active']}
+              type="button"
+              data-gallery-dot
+              data-index={index}
+              aria-label={`الصورة ${index + 1} من ${galleryImages.length}`}
             />
-          </figure>
-        )
-      }
-      {
-        tiles.map((image) => (
-          <figure class="gallery__item">
-            <img
-              src={image.src}
-              alt={image.alt}
-              width="800"
-              height="600"
-              loading="lazy"
-              decoding="async"
-            />
-          </figure>
-        ))
-      }
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>
 
-<style>
-  .gallery__grid {
-    display: grid;
-    gap: 0.75rem;
-    grid-template-columns: 1fr;
-  }
+<script>
+  const initGallery = () => {
+    const root = document.querySelector('[data-gallery]');
+    if (!(root instanceof HTMLElement) || root.dataset.bound) return;
+    root.dataset.bound = 'true';
 
-  .gallery__item {
-    margin: 0;
+    const track = root.querySelector('[data-gallery-track]');
+    if (!(track instanceof HTMLElement)) return;
+
+    const slides = Array.from(track.children);
+    const dots = Array.from(root.querySelectorAll('[data-gallery-dot]'));
+    let index = 0;
+    let startX = 0;
+
+    const goTo = (next: number) => {
+      index = (next + slides.length) % slides.length;
+      track.style.transform = `translateX(-${index * 100}%)`;
+      dots.forEach((dot, dotIndex) => {
+        dot.classList.toggle('is-active', dotIndex === index);
+      });
+    };
+
+    root.querySelector('[data-gallery-prev]')?.addEventListener('click', () => goTo(index - 1));
+    root.querySelector('[data-gallery-next]')?.addEventListener('click', () => goTo(index + 1));
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const next = Number(dot.getAttribute('data-index'));
+        if (Number.isInteger(next)) goTo(next);
+      });
+    });
+
+    root.addEventListener(
+      'touchstart',
+      (event) => {
+        startX = event.changedTouches[0]?.clientX ?? 0;
+      },
+      { passive: true },
+    );
+    root.addEventListener(
+      'touchend',
+      (event) => {
+        const endX = event.changedTouches[0]?.clientX ?? startX;
+        const delta = endX - startX;
+        if (Math.abs(delta) < 40) return;
+        goTo(delta > 0 ? index - 1 : index + 1);
+      },
+      { passive: true },
+    );
+
+    goTo(0);
+  };
+
+  document.addEventListener('astro:page-load', initGallery);
+</script>
+
+<style>
+  .gallery__shell {
+    position: relative;
     overflow: hidden;
-    border-radius: var(--radius-md);
+    width: 100%;
+    max-width: 64rem;
+    margin-inline: auto;
+    aspect-ratio: 1400 / 933;
+    border-radius: var(--radius-lg);
     border: 1px solid var(--color-border-soft);
     background: var(--color-bg-deep);
-    aspect-ratio: 4 / 3;
   }
 
-  .gallery__item--featured {
-    aspect-ratio: 16 / 10;
+  .gallery__track {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    height: 100%;
+    direction: ltr;
+    transition: transform 0.55s var(--ease-out);
   }
 
-  .gallery__item img {
+  .gallery__slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .gallery__slide img {
     display: block;
     width: 100%;
     height: 100%;
@@ -74,21 +152,72 @@ const tiles = galleryImages.filter((image) => image !== featured);
     object-position: center;
   }
 
-  @media (min-width: 700px) {
-    .gallery__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1rem;
-    }
-
-    .gallery__item--featured {
-      grid-column: 1 / -1;
-      aspect-ratio: 16 / 9;
-    }
+  .gallery__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--color-bg-deep);
+    border: 1px solid var(--color-border-soft);
+    color: var(--color-text);
+    backdrop-filter: blur(6px);
   }
 
-  @media (min-width: 1100px) {
-    .gallery__grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+  .gallery__nav--prev {
+    inset-inline-start: 0.85rem;
+  }
+
+  .gallery__nav--next {
+    inset-inline-end: 0.85rem;
+  }
+
+  .gallery__nav:hover,
+  .gallery__nav:focus-visible,
+  .gallery__dot:hover,
+  .gallery__dot:focus-visible {
+    background: var(--color-bg-elevated);
+  }
+
+  .gallery__dots {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0.85rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .gallery__dot {
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    display: grid;
+    place-items: center;
+  }
+
+  .gallery__dot::after {
+    content: '';
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-border-soft);
+  }
+
+  .gallery__dot.is-active::after {
+    background: var(--color-accent);
+    transform: scale(1.25);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gallery__track {
+      transition: none;
     }
   }
 </style>

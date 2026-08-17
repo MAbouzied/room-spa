@@ -4,6 +4,11 @@ export interface GalleryImage {
   featured?: boolean;
 }
 
+export const galleryImageSize = {
+  width: 1400,
+  height: 933,
+} as const;
+
 export const galleryImages: GalleryImage[] = [
   {
     src: '/images/gallery/front-night.jpg',
