@@ -2,6 +2,7 @@
 import Logo from './Logo.astro';
 import FormBranches from './FormBranches.astro';
 import FormActions from './FormActions.astro';
+import ContactForm from './ContactForm.astro';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { formCopy, type FormLocale } from '../lib/form-copy';
 
@@ -36,8 +37,13 @@ const brandHref = '/';
     </nav>
 
     <div class="form-landing__grid">
-      <FormBranches locale={locale} />
-      <FormActions locale={locale} />
+      <div class="form-landing__info">
+        <FormBranches locale={locale} />
+        <FormActions locale={locale} />
+      </div>
+      <div class="form-landing__form">
+        <ContactForm locale={locale} />
+      </div>
     </div>
 
     <p class="form-landing__full">
@@ -113,6 +119,17 @@ const brandHref = '/';
     margin-top: 1.5rem;
   }
 
+  .form-landing__info {
+    display: grid;
+    min-width: 0;
+    gap: 0;
+  }
+
+  .form-landing__form {
+    order: -1;
+    min-width: 0;
+  }
+
   .form-landing__full {
     margin-top: 2rem;
     text-align: center;
@@ -132,6 +149,10 @@ const brandHref = '/';
     .form-landing__grid {
       grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
       gap: 4rem;
+    }
+
+    .form-landing__form {
+      order: 0;
     }
   }
 </style>

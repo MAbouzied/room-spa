@@ -28,8 +28,10 @@ test('exposes Arabic and English chrome for the form landing', () => {
 test('places a language switch and quick actions on the form landing', async () => {
   const html = await readFile(new URL('../components/FormLandingPage.astro', import.meta.url), 'utf8');
   assert.match(html, /LanguageSwitcher/);
+  assert.match(html, /ContactForm/);
   assert.match(html, /FormActions/);
-  assert.doesNotMatch(html, /ContactForm/);
+  assert.ok(html.indexOf('FormBranches') < html.indexOf('<FormActions'));
+  assert.ok(html.indexOf('<FormActions') < html.indexOf('<ContactForm'));
 });
 
 test('form actions link to WhatsApp, call, maps, and the offers section', async () => {
