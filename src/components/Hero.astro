@@ -104,6 +104,7 @@ const isGift = variant === 'gift';
 
   let pendingHeroLoad: PendingHeroLoad | null = null;
   let resumeHeroPlayback: (() => void) | null = null;
+  let unlockHeroPlayback: (() => void) | null = null;
 
   const cancelPendingHeroLoad = () => {
     if (!pendingHeroLoad) return;
@@ -124,6 +125,11 @@ const isGift = variant === 'gift';
       document.removeEventListener('visibilitychange', resumeHeroPlayback);
       window.removeEventListener('pageshow', resumeHeroPlayback);
       resumeHeroPlayback = null;
+    }
+
+    if (unlockHeroPlayback) {
+      unlockHeroPlayback();
+      unlockHeroPlayback = null;
     }
 
     document.querySelectorAll('[data-hero-video]').forEach((element) => {
@@ -155,33 +161,56 @@ const isGift = variant === 'gift';
     video.setAttribute('webkit-playsinline', '');
     video.loop = true;
 
+    let autoplayBlocked = false;
+
+    const canPlayWebm = () =>
+      video.canPlayType('video/webm; codecs="vp9"') !== '' ||
+      video.canPlayType('video/webm; codecs="vp8"') !== '';
+
     const playHero = async () => {
       if (!video.isConnected || !video.paused) return;
       try {
         video.muted = true;
         await video.play();
+        autoplayBlocked = false;
       } catch {
-        // Autoplay can fail before the file is ready. canplay retries below.
+        autoplayBlocked = true;
       }
+    };
+
+    const retryPlayFromGesture = () => {
+      if (!autoplayBlocked) return;
+      void playHero();
     };
 
     const loadVideo = async () => {
       pendingHeroLoad = null;
       if (!video.isConnected) return;
 
-      const skipWebm = isAppleTouchDevice();
-      video.querySelectorAll('source[data-src]').forEach((source) => {
-        if (!(source instanceof HTMLSourceElement) || !source.dataset.src) return;
-        if (skipWebm && source.type.includes('webm')) {
-          source.remove();
-          return;
-        }
-        source.src = source.dataset.src;
-      });
+      const mp4Source = video.querySelector('source[data-src][type="video/mp4"]');
+      const sources = [...video.querySelectorAll('source[data-src]')];
+      const useSingleMp4 = isAppleTouchDevice() || !canPlayWebm();
 
-      video.addEventListener('playing', () => {
+      if (useSingleMp4 && mp4Source instanceof HTMLSourceElement && mp4Source.dataset.src) {
+        video.src = mp4Source.dataset.src;
+        sources.forEach((source) => source.remove());
+      } else {
+        sources.forEach((source) => {
+          if (!(source instanceof HTMLSourceElement) || !source.dataset.src) return;
+          if (!canPlayWebm() && source.type.includes('webm')) {
+            source.remove();
+            return;
+          }
+          source.src = source.dataset.src;
+        });
+      }
+
+      const markReady = () => {
         if (video.isConnected) video.classList.add('is-ready');
-      });
+      };
+
+      video.addEventListener('play', markReady);
+      video.addEventListener('playing', markReady);
       video.addEventListener('canplay', () => {
         void playHero();
       });
@@ -216,6 +245,15 @@ const isGift = variant === 'gift';
     };
     document.addEventListener('visibilitychange', resumeHeroPlayback);
     window.addEventListener('pageshow', resumeHeroPlayback);
+
+    document.addEventListener('pointerdown', retryPlayFromGesture);
+    document.addEventListener('touchstart', retryPlayFromGesture, { passive: true });
+    document.addEventListener('scroll', retryPlayFromGesture, { passive: true });
+    unlockHeroPlayback = () => {
+      document.removeEventListener('pointerdown', retryPlayFromGesture);
+      document.removeEventListener('touchstart', retryPlayFromGesture);
+      document.removeEventListener('scroll', retryPlayFromGesture);
+    };
 
     scheduleLoad();
   };

@@ -1,6 +1,7 @@
 import { defineMiddleware } from 'astro:middleware';
 import { ADMIN_AUTH_DISABLED } from 'astro:env/server';
 import { assertStaffAccess, sanitizeReturnUrl } from './lib/auth/authorization.ts';
+import { maybeServeVideoAsset } from './lib/http-range.ts';
 import { adminApiError } from './lib/staff-access/http.ts';
 
 function isAdminPage(pathname: string): boolean {
@@ -54,6 +55,9 @@ function forbiddenResponse(isApi: boolean): Response {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const pathname = context.url.pathname.replace(/\/$/, '') || '/';
+  const rangedVideo = await maybeServeVideoAsset(pathname, context.request, context.locals);
+  if (rangedVideo) return rangedVideo;
+
   const adminPage = isAdminPage(pathname);
   const adminApi = isAdminApi(pathname);
   const protectedSurface = adminPage || adminApi;

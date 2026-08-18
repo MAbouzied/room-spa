@@ -26,7 +26,27 @@ describe('site media assets', () => {
     assert.match(hero, /ended/);
     assert.match(hero, /canplay/);
     assert.match(hero, /playing/);
+    assert.match(hero, /addEventListener\('play'/);
+    assert.match(hero, /canPlayType/);
+    assert.match(hero, /pointerdown/);
+    assert.match(hero, /touchstart/);
+    assert.match(hero, /video\.src\s*=/);
     assert.match(hero, /await video\.play\(\)/);
+  });
+
+  it('routes video files through the Worker with HTTP Range support', async () => {
+    const wrangler = await readFile(new URL('wrangler.toml', projectRoot), 'utf8');
+    const middleware = await readFile(new URL('src/middleware.ts', projectRoot), 'utf8');
+
+    assert.match(wrangler, /run_worker_first\s*=\s*\[\s*"\/videos\/\*"/);
+    assert.match(middleware, /maybeServeVideoAsset/);
+  });
+
+  it('keeps the hero MP4 fast-start friendly for Safari', async () => {
+    const mp4 = await readFile(new URL('public/videos/room-spa-hero.mp4', projectRoot));
+    const head = mp4.subarray(0, 64 * 1024);
+    assert.ok(head.includes(Buffer.from('moov')), 'MP4 moov atom must be near the start');
+    assert.ok(mp4.includes(Buffer.from('mp4a')), 'MP4 must include a silent AAC track for iOS');
   });
 
   it('keeps optimized hero files within their performance budgets', async () => {

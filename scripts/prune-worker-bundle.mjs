@@ -9,12 +9,54 @@
  *   node scripts/prune-worker-bundle.mjs
  */
 
-import { readdir, readFile, rm, stat } from 'node:fs/promises';
+import { readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const SPECIFIER_RE =
   /(?:from|import)\s*\(?\s*['"](\.[^'"]+)['"]|new URL\(\s*['"](\.[^'"]+)['"]\s*,\s*import\.meta\.url\s*\)/g;
+
+export const VIDEO_RANGE_WORKER_FIRST = ['/videos/*'];
+export const VIDEO_RANGE_ENTRY = 'range-entry.mjs';
+
+export function ensureVideoRangeRouting(wrangler) {
+  const assets = wrangler?.assets && typeof wrangler.assets === 'object' ? wrangler.assets : {};
+  return {
+    ...wrangler,
+    main: VIDEO_RANGE_ENTRY,
+    assets: {
+      ...assets,
+      run_worker_first: VIDEO_RANGE_WORKER_FIRST,
+    },
+  };
+}
+
+const RANGE_ENTRY_SOURCE = `import astro from './entry.mjs';
+import { serveVideoAssetFromEnv } from './http-range.mjs';
+
+export default {
+  async fetch(request, env, ctx) {
+    const ranged = await serveVideoAssetFromEnv(request, env);
+    if (ranged) return ranged;
+    const handler = astro?.default ?? astro;
+    return handler.fetch(request, env, ctx);
+  },
+};
+`;
+
+export async function installVideoRangeWorker(serverDir) {
+  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+  const httpRangeTs = path.join(scriptDir, '../src/lib/http-range.ts');
+  const { build } = await import('esbuild');
+  await build({
+    entryPoints: [httpRangeTs],
+    outfile: path.join(serverDir, 'http-range.mjs'),
+    format: 'esm',
+    platform: 'neutral',
+    logLevel: 'silent',
+  });
+  await writeFile(path.join(serverDir, VIDEO_RANGE_ENTRY), RANGE_ENTRY_SOURCE);
+}
 
 export function findRelativeSpecifiers(source) {
   const specs = [];
@@ -34,6 +76,7 @@ async function collectFiles(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
   const files = [];
   for (const entry of entries) {
+    if (entry.name === '.wrangler' || entry.name === 'node_modules') continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) files.push(...(await collectFiles(full)));
     else files.push(full);
@@ -42,8 +85,10 @@ async function collectFiles(dir) {
 }
 
 export async function pruneWorkerBundle(serverDir) {
+  await installVideoRangeWorker(serverDir);
   const wranglerPath = path.join(serverDir, 'wrangler.json');
-  const wrangler = JSON.parse(await readFile(wranglerPath, 'utf8'));
+  const wrangler = ensureVideoRangeRouting(JSON.parse(await readFile(wranglerPath, 'utf8')));
+  await writeFile(wranglerPath, `${JSON.stringify(wrangler, null, 2)}\n`);
   const entry = path.resolve(serverDir, wrangler.main);
 
   const reachable = new Set([wranglerPath]);

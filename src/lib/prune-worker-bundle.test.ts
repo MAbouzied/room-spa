@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, it } from 'node:test';
-import { findRelativeSpecifiers, pruneWorkerBundle } from '../../scripts/prune-worker-bundle.mjs';
+import { findRelativeSpecifiers, pruneWorkerBundle, VIDEO_RANGE_ENTRY, VIDEO_RANGE_WORKER_FIRST } from '../../scripts/prune-worker-bundle.mjs';
 
 const projectRoot = new URL('../../', import.meta.url);
 
@@ -35,6 +35,11 @@ describe('prune Worker bundle', () => {
 
       assert.equal(result.removed.length, 1);
       assert.match(result.removed[0].file, /BaseLayout\.mjs$/);
+      const wrangler = JSON.parse(await readFile(path.join(dir, 'wrangler.json'), 'utf8'));
+      assert.equal(wrangler.main, VIDEO_RANGE_ENTRY);
+      assert.deepEqual(wrangler.assets.run_worker_first, VIDEO_RANGE_WORKER_FIRST);
+      await readFile(path.join(dir, VIDEO_RANGE_ENTRY));
+      await readFile(path.join(dir, 'http-range.mjs'));
       await readFile(path.join(dir, 'entry.mjs'));
       await readFile(path.join(dir, 'chunks', 'keep.mjs'));
       await assert.rejects(readFile(path.join(dir, '.prerender', 'chunks', 'BaseLayout.mjs')));
