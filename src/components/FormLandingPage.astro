@@ -12,29 +12,16 @@ interface Props {
 
 const { locale = 'ar' } = Astro.props;
 const copy = formCopy[locale];
-const brandHref = '/';
 ---
 
 <section class="form-landing">
   <div class="container form-landing__inner">
     <div class="form-landing__brand">
-      <a href={brandHref} aria-label={copy.homeAria}>
-        <Logo size="sm" />
-      </a>
+      <Logo size="sm" />
       <LanguageSwitcher locale={locale} />
     </div>
 
-    <nav class="form-landing__crumb" aria-label={copy.crumbsAria} data-form-landing-crumb>
-      <ol>
-        <li>
-          <a href={brandHref}>{copy.home}</a>
-        </li>
-        <li>
-          <span aria-hidden="true">/</span>
-          <h1>{copy.contact}</h1>
-        </li>
-      </ol>
-    </nav>
+    <h1 class="form-landing__title">{copy.contact}</h1>
 
     <div class="form-landing__grid">
       <div class="form-landing__info">
@@ -45,10 +32,6 @@ const brandHref = '/';
         <ContactForm locale={locale} />
       </div>
     </div>
-
-    <p class="form-landing__full">
-      <a href={brandHref}>{copy.fullSite}</a>
-    </p>
   </div>
 </section>
 
@@ -73,39 +56,12 @@ const brandHref = '/';
     gap: 1rem;
   }
 
-  .form-landing__crumb {
+  .form-landing__title {
     margin-top: 1.5rem;
-  }
-
-  .form-landing__crumb ol {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 0.5rem;
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-  }
-
-  .form-landing__crumb li {
-    display: inline-flex;
     min-width: 0;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .form-landing__crumb a:hover {
-    color: var(--color-gold);
-  }
-
-  .form-landing__crumb h1 {
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--color-text);
-  }
-
-  .form-landing__crumb span {
-    color: var(--color-gold);
-    opacity: 0.5;
   }
 
   .form-landing__grid {
@@ -128,21 +84,6 @@ const brandHref = '/';
   .form-landing__form {
     order: -1;
     min-width: 0;
-  }
-
-  .form-landing__full {
-    margin-top: 2rem;
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
-  }
-
-  .form-landing__full a {
-    color: var(--color-gold);
-  }
-
-  .form-landing__full a:hover {
-    color: var(--color-gold-light);
   }
 
   @media (min-width: 1024px) {

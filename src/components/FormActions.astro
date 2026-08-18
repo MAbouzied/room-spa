@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import Button from './Button.astro';
 import { site } from '../data/site';
+import { buildOffersWhatsAppUrl } from '../lib/contact-form';
 import { formCopy, type FormLocale } from '../lib/form-copy';
 
 interface Props {
@@ -25,8 +26,8 @@ const copy = formCopy[locale];
     <Icon name="mdi:map-marker-outline" class="icon icon--md" aria-hidden="true" />
     {copy.locationAction}
   </Button>
-  <Button href="/#offers" variant="accent" shape="xl" full>
-    <Icon name="mdi:star-four-points-outline" class="icon icon--md" aria-hidden="true" />
+  <Button href={buildOffersWhatsAppUrl(locale)} variant="accent" shape="xl" external full>
+    <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
     {copy.offersAction}
   </Button>
 </nav>

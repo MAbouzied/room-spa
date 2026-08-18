@@ -34,10 +34,18 @@ test('places a language switch and quick actions on the form landing', async () 
   assert.ok(html.indexOf('<FormActions') < html.indexOf('<ContactForm'));
 });
 
-test('form actions link to WhatsApp, call, maps, and the offers section', async () => {
+test('form actions link to WhatsApp, call, maps, and WhatsApp offers', async () => {
   const html = await readFile(new URL('../components/FormActions.astro', import.meta.url), 'utf8');
   assert.match(html, /whatsappBookUrl/);
   assert.match(html, /tel:\$\{site\.phoneTel\}/);
   assert.match(html, /mapsUrl/);
-  assert.match(html, /href="\/#offers"/);
+  assert.match(html, /buildOffersWhatsAppUrl/);
+  assert.doesNotMatch(html, /\/#offers/);
+});
+
+test('form landing keeps the logo static and drops home chrome', async () => {
+  const html = await readFile(new URL('../components/FormLandingPage.astro', import.meta.url), 'utf8');
+  assert.doesNotMatch(html, /href=\{brandHref\}/);
+  assert.doesNotMatch(html, /data-form-landing-crumb/);
+  assert.doesNotMatch(html, /fullSite/);
 });
