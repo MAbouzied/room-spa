@@ -25,16 +25,18 @@ const projectRoot = new URL('../../', import.meta.url);
 const maxImageBytes = 350 * 1024;
 
 describe('gallery photos', () => {
-  it('keeps a short front-and-entrance set of 5 or 6 photos', () => {
-    assert.ok(galleryImages.length >= 5 && galleryImages.length <= 6);
+  it('keeps the front photos first and then the interior set', () => {
+    assert.equal(galleryImages.length, 22);
     assert.equal(galleryImages.filter((image) => image.featured).length, 1);
     assert.equal(galleryImages[0]?.src, '/images/gallery/front-night.jpg');
     assert.match(galleryImages[0]?.alt ?? '', /واجهة|مدخل/);
+    assert.equal(galleryImages[6]?.src, '/images/gallery/interior-01.jpg');
 
     const paths = galleryImages.map((image) => image.src);
     assert.equal(new Set(paths).size, paths.length);
     assert.ok(paths.some((src) => src.includes('front')));
     assert.ok(paths.some((src) => src.includes('entrance')));
+    assert.equal(paths.filter((src) => src.includes('interior-')).length, 16);
     assert.ok(paths.every((src) => !src.includes('spa-pool') && !src.includes('spa-reception')));
   });
 
