@@ -1,5 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
+import { heroImages, heroImageSize } from '../data/hero';
 import { site } from '../data/site';
 import Button from './Button.astro';
 
@@ -15,30 +16,29 @@ const isGift = variant === 'gift';
   {
     !isGift && (
       <>
-        <div class="hero__media" aria-hidden="true">
-          <img
-            class="hero__image"
-            src="/images/hero-poster.webp"
-            alt=""
-            width="720"
-            height="1280"
-            decoding="async"
-            fetchpriority="high"
-          />
-          <video
-            class="hero__video"
-            muted
-            autoplay
-            loop
-            playsinline
-            webkit-playsinline
-            preload="metadata"
-            poster="/images/hero-poster.webp"
-            data-hero-video
-          >
-            <source data-src="/videos/room-spa-hero.mp4" type="video/mp4" />
-            <source data-src="/videos/room-spa-hero.webm" type="video/webm" />
-          </video>
+        <div
+          class="hero__media"
+          data-hero-slider
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="صور روم سبا"
+        >
+          <div class="hero__track" data-hero-track>
+            {heroImages.map((image, index) => (
+              <figure class:list={['hero__slide', index === 0 && 'is-active']}>
+                <img
+                  class="hero__image"
+                  src={image.src}
+                  alt={image.alt}
+                  width={heroImageSize.width}
+                  height={heroImageSize.height}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  fetchpriority={index === 0 ? 'high' : 'low'}
+                  decoding="async"
+                />
+              </figure>
+            ))}
+          </div>
         </div>
         <div class="hero__overlay" aria-hidden="true" />
       </>
@@ -74,7 +74,7 @@ const isGift = variant === 'gift';
             <span class="text-gradient-gold">الفخامة..</span> تزهى بك
           </h1>
           <p class="hero__lead">
-            الوجهة الرجالية الأولى في حفر الباطن، حيث تبدأ تجربة مختلفة تليق بذوقك.
+            الوجهة الرجالية الأولى للمساج والحمام المغربي في حفر الباطن، حيث تبدأ تجربة مختلفة تليق بذوقك.
           </p>
           <div class="hero__actions">
             <Button href={site.whatsappBookUrl} variant="whatsapp-dark" shape="xl" external>
@@ -93,135 +93,67 @@ const isGift = variant === 'gift';
 </section>
 
 <script>
-  type NetworkInformation = {
-    saveData?: boolean;
-  };
+  const SLIDE_MS = 5500;
+  let heroTimer: number | null = null;
+  let onHeroVisibility: (() => void) | null = null;
 
-  type PendingHeroLoad = {
-    id: number;
-    kind: 'idle' | 'timeout';
-  };
-
-  let pendingHeroLoad: PendingHeroLoad | null = null;
-  let resumeHeroPlayback: (() => void) | null = null;
-
-  const cancelPendingHeroLoad = () => {
-    if (!pendingHeroLoad) return;
-
-    if (pendingHeroLoad.kind === 'idle') {
-      window.cancelIdleCallback(pendingHeroLoad.id);
-    } else {
-      window.clearTimeout(pendingHeroLoad.id);
+  const stopHeroSlider = () => {
+    if (heroTimer !== null) {
+      window.clearInterval(heroTimer);
+      heroTimer = null;
     }
 
-    pendingHeroLoad = null;
-  };
-
-  const cleanupHeroVideo = () => {
-    cancelPendingHeroLoad();
-
-    if (resumeHeroPlayback) {
-      document.removeEventListener('visibilitychange', resumeHeroPlayback);
-      window.removeEventListener('pageshow', resumeHeroPlayback);
-      resumeHeroPlayback = null;
+    if (onHeroVisibility) {
+      document.removeEventListener('visibilitychange', onHeroVisibility);
+      onHeroVisibility = null;
     }
-
-    document.querySelectorAll('[data-hero-video]').forEach((element) => {
-      if (!(element instanceof HTMLVideoElement)) return;
-      element.pause();
-      element.classList.remove('is-ready');
-    });
   };
 
-  const isAppleTouchDevice = () => {
-    const platform = navigator.platform;
-    const userAgent = navigator.userAgent;
-    return /iPhone|iPad|iPod/.test(userAgent) || (platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  };
+  const initHeroSlider = () => {
+    const root = document.querySelector('[data-hero-slider]');
+    if (!(root instanceof HTMLElement) || root.dataset.initialized) return;
 
-  const initHeroVideo = () => {
-    const video = document.querySelector('[data-hero-video]');
-    if (!(video instanceof HTMLVideoElement) || video.dataset.initialized) return;
+    const track = root.querySelector('[data-hero-track]');
+    if (!(track instanceof HTMLElement)) return;
 
-    const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection;
+    const slides = Array.from(track.children);
+    if (slides.length < 2) return;
+
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion || connection?.saveData) return;
+    if (reduceMotion) return;
 
-    video.dataset.initialized = 'true';
-    video.muted = true;
-    video.defaultMuted = true;
-    video.playsInline = true;
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
-    video.loop = true;
+    root.dataset.initialized = 'true';
+    let index = 0;
 
-    const playHero = async () => {
-      if (!video.isConnected || !video.paused) return;
-      try {
-        video.muted = true;
-        await video.play();
-      } catch {
-        // Autoplay can fail before the file is ready. canplay retries below.
-      }
+    const goTo = (next: number) => {
+      index = (next + slides.length) % slides.length;
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle('is-active', slideIndex === index);
+      });
     };
 
-    const loadVideo = async () => {
-      pendingHeroLoad = null;
-      if (!video.isConnected) return;
+    const start = () => {
+      if (heroTimer !== null) window.clearInterval(heroTimer);
+      heroTimer = window.setInterval(() => goTo(index + 1), SLIDE_MS);
+    };
 
-      const skipWebm = isAppleTouchDevice();
-      video.querySelectorAll('source[data-src]').forEach((source) => {
-        if (!(source instanceof HTMLSourceElement) || !source.dataset.src) return;
-        if (skipWebm && source.type.includes('webm')) {
-          source.remove();
-          return;
+    onHeroVisibility = () => {
+      if (document.hidden) {
+        if (heroTimer !== null) {
+          window.clearInterval(heroTimer);
+          heroTimer = null;
         }
-        source.src = source.dataset.src;
-      });
-
-      video.addEventListener('playing', () => {
-        if (video.isConnected) video.classList.add('is-ready');
-      });
-      video.addEventListener('canplay', () => {
-        void playHero();
-      });
-      video.addEventListener('ended', () => {
-        video.currentTime = 0;
-        void playHero();
-      });
-
-      video.load();
-      await playHero();
-    };
-
-    const scheduleLoad = () => {
-      if (isAppleTouchDevice()) {
-        const id = window.setTimeout(() => void loadVideo(), 0);
-        pendingHeroLoad = { id, kind: 'timeout' };
         return;
       }
-
-      if ('requestIdleCallback' in window) {
-        const id = window.requestIdleCallback(() => void loadVideo(), { timeout: 1500 });
-        pendingHeroLoad = { id, kind: 'idle' };
-      } else {
-        const id = window.setTimeout(() => void loadVideo(), 500);
-        pendingHeroLoad = { id, kind: 'timeout' };
-      }
+      start();
     };
 
-    resumeHeroPlayback = () => {
-      if (document.hidden || video.paused === false) return;
-      void playHero();
-    };
-    document.addEventListener('visibilitychange', resumeHeroPlayback);
-    window.addEventListener('pageshow', resumeHeroPlayback);
-
-    scheduleLoad();
+    document.addEventListener('visibilitychange', onHeroVisibility);
+    start();
   };
 
-  document.addEventListener('astro:page-load', initHeroVideo);
-  document.addEventListener('astro:before-swap', cleanupHeroVideo);
+  document.addEventListener('astro:page-load', initHeroSlider);
+  document.addEventListener('astro:before-swap', stopHeroSlider);
 </script>
 
 <style>
@@ -242,15 +174,26 @@ const isGift = variant === 'gift';
       linear-gradient(180deg, rgba(24, 35, 24, 0.55), transparent 70%);
   }
 
-  .hero__media {
+  .hero__media,
+  .hero__track,
+  .hero__slide {
     position: absolute;
     inset: 0;
   }
 
-  .hero__image,
-  .hero__video {
-    position: absolute;
-    inset: 0;
+  .hero__slide {
+    margin: 0;
+    opacity: 0;
+    transition: opacity 1s var(--ease-out);
+    pointer-events: none;
+  }
+
+  .hero__slide.is-active {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .hero__image {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -259,18 +202,10 @@ const isGift = variant === 'gift';
     filter: brightness(0.55) saturate(0.85);
   }
 
-  .hero__video {
-    opacity: 0;
-    transition: opacity 0.5s var(--ease-out);
-  }
-
-  .hero__video.is-ready {
-    opacity: 1;
-  }
-
   .hero__overlay {
     position: absolute;
     inset: 0;
+    z-index: 1;
     background:
       linear-gradient(
         to bottom,
@@ -284,7 +219,7 @@ const isGift = variant === 'gift';
 
   .hero__content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     text-align: center;
     max-width: 52rem;
     animation: heroIn 0.9s var(--ease-out) both;
@@ -357,8 +292,10 @@ const isGift = variant === 'gift';
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero__video {
-      display: none;
+    .hero__slide,
+    .hero__content {
+      transition: none;
+      animation: none;
     }
   }
 </style>
