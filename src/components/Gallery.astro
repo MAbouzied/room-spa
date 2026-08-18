@@ -233,6 +233,12 @@ import SectionHeading from './SectionHeading.astro';
     background: var(--color-accent-soft);
   }
 
+  @media (max-width: 767px) {
+    .gallery__dots {
+      display: none;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .gallery__slide,
     .gallery__dot::after {
