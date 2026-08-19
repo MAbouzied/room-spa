@@ -85,4 +85,14 @@ const copy = formCopy[locale];
     order: -1;
     min-width: 0;
   }
+
+  @media (min-width: 900px) {
+    .form-landing__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    :global([dir='rtl']) .form-landing__form {
+      order: 0;
+    }
+  }
 </style>

@@ -53,6 +53,12 @@ test('form actions link to WhatsApp, call, maps, and WhatsApp offers', async () 
   assert.doesNotMatch(html, /\/#offers/);
 });
 
+test('form landing uses two columns with info first and WhatsApp contact second', async () => {
+  const html = await readFile(new URL('../components/FormLandingPage.astro', import.meta.url), 'utf8');
+  assert.ok(html.indexOf('form-landing__info') < html.indexOf('form-landing__form'));
+  assert.match(html, /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(0,\s*1fr\)/);
+});
+
 test('form landing keeps the logo static and drops home chrome', async () => {
   const html = await readFile(new URL('../components/FormLandingPage.astro', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /href=\{brandHref\}/);
