@@ -12,24 +12,7 @@ const { locale = 'ar' } = Astro.props;
 const copy = formCopy[locale];
 ---
 
-<div class="contact-form-card">
-  <Button href={site.whatsappBookUrl} variant="accent" shape="xl" external full>
-    <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
-    {copy.submit}
-  </Button>
-</div>
-
-<style>
-  .contact-form-card {
-    padding: 1.25rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border-card);
-    background: var(--color-bg-card);
-  }
-
-  @media (min-width: 640px) {
-    .contact-form-card {
-      padding: 1.5rem;
-    }
-  }
-</style>
+<Button href={site.whatsappBookUrl} variant="whatsapp" shape="xl" external>
+  <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
+  {copy.whatsappAction}
+</Button>
