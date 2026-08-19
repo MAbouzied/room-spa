@@ -12,7 +12,7 @@ const { locale = 'ar' } = Astro.props;
 const copy = formCopy[locale];
 ---
 
-<Button href={site.whatsappBookUrl} variant="whatsapp" shape="xl" external>
+<Button href={site.whatsappBookUrl} variant="whatsapp" shape="xl" external full>
   <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
   {copy.whatsappAction}
 </Button>

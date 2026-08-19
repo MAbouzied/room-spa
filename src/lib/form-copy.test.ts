@@ -30,8 +30,8 @@ test('places a language switch and quick actions on the form landing', async () 
   assert.match(html, /LanguageSwitcher/);
   assert.match(html, /ContactForm/);
   assert.match(html, /FormActions/);
-  assert.ok(html.indexOf('FormBranches') < html.indexOf('<FormActions'));
-  assert.ok(html.indexOf('<FormActions') < html.indexOf('<ContactForm'));
+  assert.ok(html.indexOf('FormBranches') < html.indexOf('<ContactForm'));
+  assert.ok(html.indexOf('<ContactForm') < html.indexOf('<FormActions'));
 });
 
 test('keeps the WhatsApp submit button and drops the contact form fields', async () => {
@@ -55,17 +55,18 @@ test('form actions link to call, maps, and WhatsApp offers', async () => {
   assert.doesNotMatch(html, /\/#offers/);
 });
 
-test('form landing uses two columns with info first and WhatsApp contact second', async () => {
+test('form landing stacks a single centered column with matching action widths', async () => {
   const html = await readFile(new URL('../components/FormLandingPage.astro', import.meta.url), 'utf8');
-  assert.ok(html.indexOf('form-landing__info') < html.indexOf('form-landing__form'));
-  assert.match(html, /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(0,\s*1fr\)/);
-  assert.match(html, /place-items:\s*center/);
+  assert.match(html, /form-landing__stack/);
+  assert.match(html, /margin-inline:\s*auto/);
+  assert.match(html, /max-width:\s*32rem/);
+  assert.doesNotMatch(html, /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(0,\s*1fr\)/);
 });
 
-test('WhatsApp contact is a single button without a form card', async () => {
+test('WhatsApp contact is a single full-width button without a form card', async () => {
   const html = await readFile(new URL('../components/ContactForm.astro', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /contact-form-card/);
-  assert.doesNotMatch(html, /\sfull/);
+  assert.match(html, /\sfull/);
 });
 
 test('form landing keeps the logo static and drops home chrome', async () => {
