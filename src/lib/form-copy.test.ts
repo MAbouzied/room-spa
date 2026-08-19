@@ -34,6 +34,16 @@ test('places a language switch and quick actions on the form landing', async () 
   assert.ok(html.indexOf('<FormActions') < html.indexOf('<ContactForm'));
 });
 
+test('keeps the WhatsApp submit button and drops the contact form fields', async () => {
+  const html = await readFile(new URL('../components/ContactForm.astro', import.meta.url), 'utf8');
+  assert.match(html, /whatsappBookUrl/);
+  assert.match(html, /copy\.submit/);
+  assert.doesNotMatch(html, /<form/);
+  assert.doesNotMatch(html, /name="phone"/);
+  assert.doesNotMatch(html, /name="service"/);
+  assert.doesNotMatch(html, /getContactBookingGroups/);
+});
+
 test('form actions link to WhatsApp, call, maps, and WhatsApp offers', async () => {
   const html = await readFile(new URL('../components/FormActions.astro', import.meta.url), 'utf8');
   assert.match(html, /whatsappBookUrl/);

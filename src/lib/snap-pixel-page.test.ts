@@ -23,10 +23,10 @@ test('embeds Snap Pixel in the public layout head', () => {
   assert.match(snapLib, new RegExp(`DEFAULT_SNAP_PIXEL_ID = '${PIXEL_ID}'`));
 });
 
-test('fires priced VIEW_CONTENT, ADD_CART, and PURCHASE from the contact form', () => {
-  assert.match(contactForm, /trackSnapViewContent/);
-  assert.match(contactForm, /trackSnapAddCart/);
-  assert.match(contactForm, /trackSnapPurchase/);
+test('does not fire form-field Snap events from the contact WhatsApp button', () => {
+  assert.doesNotMatch(contactForm, /trackSnapViewContent/);
+  assert.doesNotMatch(contactForm, /trackSnapAddCart/);
+  assert.doesNotMatch(contactForm, /trackSnapPurchase/);
 });
 
 test('keeps Snap Pixel off admin chrome pages', () => {

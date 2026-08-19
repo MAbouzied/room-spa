@@ -67,7 +67,7 @@ const copy = formCopy[locale];
   .form-landing__grid {
     display: grid;
     flex: 1;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
     align-items: start;
     width: 100%;
@@ -84,16 +84,5 @@ const copy = formCopy[locale];
   .form-landing__form {
     order: -1;
     min-width: 0;
-  }
-
-  @media (min-width: 1024px) {
-    .form-landing__grid {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-      gap: 4rem;
-    }
-
-    .form-landing__form {
-      order: 0;
-    }
   }
 </style>
