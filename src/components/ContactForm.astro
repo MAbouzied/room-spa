@@ -3,6 +3,7 @@ import { Icon } from 'astro-icon/components';
 import Button from './Button.astro';
 import { site } from '../data/site';
 import { formCopy, type FormLocale } from '../lib/form-copy';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 
 interface Props {
   locale?: FormLocale;
@@ -12,7 +13,7 @@ const { locale = 'ar' } = Astro.props;
 const copy = formCopy[locale];
 ---
 
-<Button href={site.whatsappBookUrl} variant="whatsapp" shape="xl" external full>
+<Button href={site.whatsappBookUrl} variant="whatsapp" shape="xl" external full {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'form_landing')}>
   <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
   {copy.whatsappAction}
 </Button>

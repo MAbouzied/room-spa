@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import { site } from '../data/site';
 import { formCopy, type FormLocale } from '../lib/form-copy';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 
 interface Props {
   locale?: FormLocale;
@@ -39,7 +40,7 @@ const copy = formCopy[locale];
               <dt class="visually-hidden">{copy.phone}</dt>
               <dd>
                 <Icon name="mdi:phone-outline" class="icon icon--sm" aria-hidden="true" />
-                <a class="phone" href={`tel:${site.phoneTel}`} dir="ltr">{site.phoneDisplay}</a>
+                <a class="phone" href={`tel:${site.phoneTel}`} dir="ltr" {...gtmContactAttrs(GTM_EVENTS.call, 'form_branches')}>{site.phoneDisplay}</a>
               </dd>
             </div>
           </dl>

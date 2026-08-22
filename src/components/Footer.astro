@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { site } from '../data/site';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 
 const year = new Date().getFullYear();
 ---
@@ -55,11 +56,11 @@ const year = new Date().getFullYear();
       <div class="site-footer__col">
         <h4>تواصل معنا</h4>
         <div class="site-footer__contact">
-          <a href={`tel:${site.phoneTel}`}>
+          <a href={`tel:${site.phoneTel}`} {...gtmContactAttrs(GTM_EVENTS.call, 'footer')}>
             <Icon name="mdi:phone-outline" class="icon icon--sm" aria-hidden="true" />
             <span class="phone" dir="ltr">{site.phoneDisplay}</span>
           </a>
-          <a href={site.whatsappBookUrl} target="_blank" rel="noopener noreferrer">
+          <a href={site.whatsappBookUrl} target="_blank" rel="noopener noreferrer" {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'footer')}>
             <Icon name="mdi:message-outline" class="icon icon--sm" aria-hidden="true" />
             واتساب
           </a>

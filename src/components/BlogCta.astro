@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import Button from './Button.astro';
 import { site } from '../data/site';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 
 interface Props {
   title?: string;
@@ -19,11 +20,11 @@ const {
     <h2 id="blog-page-cta-title">{title}</h2>
     <p>{description}</p>
     <div class="blog-page-cta__actions">
-      <Button href={site.whatsappBookUrl} variant="accent" shape="xl" external>
+      <Button href={site.whatsappBookUrl} variant="accent" shape="xl" external {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'blog_cta')}>
         <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
         احجز الآن
       </Button>
-      <Button href={`tel:${site.phoneTel}`} variant="outline" shape="xl">
+      <Button href={`tel:${site.phoneTel}`} variant="outline" shape="xl" {...gtmContactAttrs(GTM_EVENTS.call, 'blog_cta')}>
         <Icon name="mdi:phone" class="icon icon--md" aria-hidden="true" />
         اتصل الآن
       </Button>

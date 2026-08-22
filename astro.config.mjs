@@ -56,6 +56,12 @@ export default defineConfig({
         access: 'public',
         optional: true,
       }),
+      PUBLIC_GA_MEASUREMENT_ID: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+        default: 'G-D2NJJ1ZPF5',
+      }),
       BETTER_AUTH_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
       BETTER_AUTH_URL: envField.string({ context: 'server', access: 'secret', optional: true }),
       GOOGLE_CLIENT_ID: envField.string({ context: 'server', access: 'secret', optional: true }),

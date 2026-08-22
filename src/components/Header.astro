@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { site } from '../data/site';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 import Button from './Button.astro';
 import Logo from './Logo.astro';
 
@@ -61,7 +62,7 @@ const links = variant === 'gift' ? giftLinks : variant === 'blogs' ? blogLinks :
 
     <div class="site-header__actions">
       <div class="site-header__cta">
-        <Button href={site.whatsappBookUrl} variant="accent" external>
+        <Button href={site.whatsappBookUrl} variant="accent" external {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'header')}>
           <Icon name="mdi:message-text-outline" class="icon icon--md" aria-hidden="true" />
           تواصل معنا
         </Button>
@@ -89,7 +90,7 @@ const links = variant === 'gift' ? giftLinks : variant === 'blogs' ? blogLinks :
           </a>
         ))
       }
-      <Button href={site.whatsappBookUrl} variant="accent" external>
+      <Button href={site.whatsappBookUrl} variant="accent" external {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'header')}>
         <Icon name="mdi:message-text-outline" class="icon icon--md" aria-hidden="true" />
         تواصل معنا
       </Button>

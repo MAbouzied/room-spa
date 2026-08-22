@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import { packages, giftWhatsappUrl } from '../data/packages';
 import { site } from '../data/site';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 import SectionHeading from './SectionHeading.astro';
 import Button from './Button.astro';
 
@@ -88,13 +89,14 @@ const featuredId = isGift ? 'ihdaa' : packages.find((pkg) => pkg.featured)?.id;
                   shape="xl"
                   external
                   full
+                  {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'package_card')}
                 >
                   <Icon name="mdi:gift" class="icon icon--md" aria-hidden="true" />
                   أهدِ هذه الباقة
                 </Button>
               ) : (
                 <>
-                  <Button href={site.whatsappBookUrl} variant="accent" shape="xl" external full>
+                  <Button href={site.whatsappBookUrl} variant="accent" shape="xl" external full {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'package_card')}>
                     <Icon name="mdi:calendar-check" class="icon icon--md" aria-hidden="true" />
                     احجز هذه الباقة
                   </Button>

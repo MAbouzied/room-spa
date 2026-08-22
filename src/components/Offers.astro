@@ -3,6 +3,7 @@ import { Icon } from 'astro-icon/components';
 import { offers } from '../data/offers';
 import { giftWhatsappUrl } from '../data/packages';
 import { site } from '../data/site';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 import SectionHeading from './SectionHeading.astro';
 import Button from './Button.astro';
 ---
@@ -55,6 +56,7 @@ import Button from './Button.astro';
                   variant="accent"
                   shape="xl"
                   external
+                  {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'offer_card')}
                 >
                   <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
                   احجز هذا العرض

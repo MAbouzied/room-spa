@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { site } from '../data/site';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 import Button from './Button.astro';
 
 interface Props {
@@ -61,7 +62,7 @@ const isGift = variant === 'gift';
             أنتِ تختارين الباقة، ونحن نتولّى استقباله وضيافته وخدمته بأرقى صورة تليق به
           </p>
           <div class="hero__actions">
-            <Button href={site.whatsappGiftUrl} variant="accent" shape="xl" external>
+            <Button href={site.whatsappGiftUrl} variant="accent" shape="xl" external {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'gift_hero')}>
               <Icon name="mdi:gift-outline" class="icon icon--md" aria-hidden="true" />
               أهديه الآن
             </Button>
@@ -77,11 +78,11 @@ const isGift = variant === 'gift';
             الوجهة الرجالية الأولى للمساج والحمام المغربي في حفر الباطن، حيث تبدأ تجربة مختلفة تليق بذوقك.
           </p>
           <div class="hero__actions">
-            <Button href={site.whatsappBookUrl} variant="whatsapp-dark" shape="xl" external>
+            <Button href={site.whatsappBookUrl} variant="whatsapp-dark" shape="xl" external {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'home_hero')}>
               <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
               احجز عبر الواتساب
             </Button>
-            <Button href={`tel:${site.phoneTel}`} variant="accent" shape="xl">
+            <Button href={`tel:${site.phoneTel}`} variant="accent" shape="xl" {...gtmContactAttrs(GTM_EVENTS.call, 'home_hero')}>
               <Icon name="mdi:phone" class="icon icon--md" aria-hidden="true" />
               <span class="phone" dir="ltr">{site.phoneDisplay}</span>
             </Button>

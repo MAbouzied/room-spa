@@ -4,6 +4,9 @@ main = "@astrojs/cloudflare/entrypoints/server"
 compatibility_date = "2026-07-25"
 compatibility_flags = ["nodejs_compat"]
 
+[vars]
+PUBLIC_GA_MEASUREMENT_ID = "G-D2NJJ1ZPF5"
+
 [assets]
 directory = "./dist/client"
 binding = "ASSETS"

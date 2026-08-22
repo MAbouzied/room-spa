@@ -1,0 +1,153 @@
+---
+import { isGaMeasurementId } from '../lib/gtm';
+
+interface Props {
+  measurementId: string;
+}
+
+const { measurementId } = Astro.props;
+const gtmId = isGaMeasurementId(measurementId) ? measurementId.trim() : '';
+---
+
+{gtmId && <meta name="gtm-container-id" content={gtmId} />}
+
+<script
+  is:inline
+  define:vars={{
+    gtmId,
+  }}
+>
+  (function () {
+    if (!gtmId) {
+      return;
+    }
+
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      window.dataLayer.push(arguments);
+    }
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', gtmId);
+
+    var gaScript = document.createElement('script');
+    gaScript.async = true;
+    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gtmId);
+    document.head.appendChild(gaScript);
+  })();
+</script>
+
+<script>
+  import { isGtmEventName, pushGtmEvent, trackGtmPageView } from '../lib/gtm';
+
+  const SAME_TAB_PROTOCOLS = ['tel:', 'mailto:'];
+  const NAVIGATION_DELAY_MS = 150;
+
+  function readDataset(el: HTMLElement, key: 'gtmEvent' | 'gtmLocation') {
+    return el.dataset[key]?.trim() || undefined;
+  }
+
+  function isSameTabContactLink(el: HTMLAnchorElement) {
+    const href = el.getAttribute('href')?.toLowerCase() ?? '';
+    return SAME_TAB_PROTOCOLS.some((protocol) => href.startsWith(protocol));
+  }
+
+  function trackFromElement(el: HTMLElement, onReady?: () => void) {
+    const eventName = readDataset(el, 'gtmEvent');
+    if (!isGtmEventName(eventName)) {
+      onReady?.();
+      return;
+    }
+
+    const location = readDataset(el, 'gtmLocation');
+    const params: Record<string, string | number | (() => void) | undefined> = { location };
+
+    if (el instanceof HTMLAnchorElement) {
+      params.link_url = el.href;
+    }
+
+    if (el instanceof HTMLFormElement) {
+      params.form_id = el.id || undefined;
+      const serviceInput = el.querySelector('[name="service"]');
+      if (serviceInput instanceof HTMLInputElement || serviceInput instanceof HTMLTextAreaElement) {
+        params.service = serviceInput.value || undefined;
+      }
+    }
+
+    if (onReady) {
+      let settled = false;
+      const finish = () => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        onReady();
+      };
+
+      params.eventCallback = finish;
+      params.eventTimeout = NAVIGATION_DELAY_MS;
+      pushGtmEvent(eventName, params);
+      window.setTimeout(finish, NAVIGATION_DELAY_MS);
+      return;
+    }
+
+    pushGtmEvent(eventName, params);
+  }
+
+  function onClick(event: Event) {
+    const target = event.target;
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    const el = target.closest('[data-gtm-event]');
+    if (!(el instanceof HTMLElement) || el instanceof HTMLFormElement) {
+      return;
+    }
+
+    if (el.closest('form[data-gtm-event]')) {
+      return;
+    }
+
+    if (el instanceof HTMLAnchorElement && isSameTabContactLink(el)) {
+      event.preventDefault();
+      const href = el.getAttribute('href') ?? '';
+      trackFromElement(el, () => {
+        if (isSameTabContactLink(el) && SAME_TAB_PROTOCOLS.some((protocol) => href.toLowerCase().startsWith(protocol))) {
+          window.location.href = href;
+        }
+      });
+      return;
+    }
+
+    trackFromElement(el);
+  }
+
+  function onSubmit(event: Event) {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement)) {
+      return;
+    }
+
+    if (!form.dataset.gtmEvent) {
+      return;
+    }
+
+    trackFromElement(form);
+  }
+
+  if (!window.__roomGtmBound) {
+    let skipFirstPageLoad = true;
+    document.addEventListener('astro:page-load', () => {
+      if (skipFirstPageLoad) {
+        skipFirstPageLoad = false;
+        return;
+      }
+      trackGtmPageView();
+    });
+    document.addEventListener('click', onClick, true);
+    document.addEventListener('submit', onSubmit, true);
+    window.__roomGtmBound = true;
+  }
+</script>

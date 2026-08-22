@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { site } from '../data/site';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 import Button from './Button.astro';
 
 interface Props {
@@ -24,7 +25,7 @@ const isGift = variant === 'gift';
             يستحق.
           </p>
           <div class="cta__actions">
-            <Button href={site.whatsappGiftUrl} variant="accent" shape="xl" external>
+            <Button href={site.whatsappGiftUrl} variant="accent" shape="xl" external {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'gift_cta')}>
               <Icon name="mdi:message-text-outline" class="icon icon--md" aria-hidden="true" />
               أهديه الآن
             </Button>
@@ -39,11 +40,11 @@ const isGift = variant === 'gift';
             احجز موعدك الآن واستمتع بأفضل تجربة سبا رجالية في حفر الباطن. فريقنا ينتظرك على مدار الساعة.
           </p>
           <div class="cta__actions">
-            <Button href={site.whatsappBookUrl} variant="whatsapp" shape="xl" external>
+            <Button href={site.whatsappBookUrl} variant="whatsapp" shape="xl" external {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'cta')}>
               <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
               احجز عبر الواتساب
             </Button>
-            <Button href={`tel:${site.phoneTel}`} variant="outline" shape="xl">
+            <Button href={`tel:${site.phoneTel}`} variant="outline" shape="xl" {...gtmContactAttrs(GTM_EVENTS.call, 'cta')}>
               <Icon name="mdi:phone" class="icon icon--md" aria-hidden="true" />
               اتصل بنا الآن
             </Button>

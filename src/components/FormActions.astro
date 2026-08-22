@@ -4,6 +4,7 @@ import Button from './Button.astro';
 import { site } from '../data/site';
 import { buildOffersWhatsAppUrl } from '../lib/contact-form';
 import { formCopy, type FormLocale } from '../lib/form-copy';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 
 interface Props {
   locale?: FormLocale;
@@ -14,7 +15,7 @@ const copy = formCopy[locale];
 ---
 
 <nav class="form-actions" aria-label={copy.actionsAria} data-form-actions>
-  <Button href={`tel:${site.phoneTel}`} variant="outline" shape="xl" full>
+  <Button href={`tel:${site.phoneTel}`} variant="outline" shape="xl" full {...gtmContactAttrs(GTM_EVENTS.call, 'form_landing')}>
     <Icon name="mdi:phone" class="icon icon--md" aria-hidden="true" />
     {copy.callAction}
   </Button>
@@ -22,7 +23,7 @@ const copy = formCopy[locale];
     <Icon name="mdi:map-marker-outline" class="icon icon--md" aria-hidden="true" />
     {copy.locationAction}
   </Button>
-  <Button href={buildOffersWhatsAppUrl(locale)} variant="accent" shape="xl" external full>
+  <Button href={buildOffersWhatsAppUrl(locale)} variant="accent" shape="xl" external full {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'form_landing_offers')}>
     <Icon name="mdi:whatsapp" class="icon icon--md" aria-hidden="true" />
     {copy.offersAction}
   </Button>

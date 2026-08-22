@@ -6,6 +6,8 @@ interface Props {
   class?: string;
   external?: boolean;
   full?: boolean;
+  'data-gtm-event'?: string;
+  'data-gtm-location'?: string;
 }
 
 const {
@@ -15,6 +17,8 @@ const {
   class: className = '',
   external = false,
   full = false,
+  'data-gtm-event': gtmEvent,
+  'data-gtm-location': gtmLocation,
 } = Astro.props;
 
 const rel = external ? 'noopener noreferrer' : undefined;
@@ -26,6 +30,8 @@ const target = external ? '_blank' : undefined;
   href={href}
   rel={rel}
   target={target}
+  {...(gtmEvent ? { 'data-gtm-event': gtmEvent } : {})}
+  {...(gtmLocation ? { 'data-gtm-location': gtmLocation } : {})}
 >
   <slot />
 </a>

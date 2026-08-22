@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { site } from '../data/site';
+import { GTM_EVENTS, gtmContactAttrs } from '../lib/gtm';
 ---
 
 <a
@@ -9,6 +10,7 @@ import { site } from '../data/site';
   target="_blank"
   rel="noopener noreferrer"
   aria-label="واتساب"
+  {...gtmContactAttrs(GTM_EVENTS.whatsapp, 'floating')}
 >
   <Icon name="mdi:whatsapp" class="icon icon--xl" aria-hidden="true" />
 </a>
