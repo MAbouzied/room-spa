@@ -1,0 +1,58 @@
+---
+import { metaNoscriptSrc, resolveMetaPixelId } from '../lib/meta-pixel';
+
+interface Props {
+  pixelId: string;
+}
+
+const { pixelId } = Astro.props;
+const id = resolveMetaPixelId(pixelId);
+const noscriptSrc = metaNoscriptSrc(id);
+---
+
+{id && noscriptSrc && (
+  <>
+    <meta name="meta-pixel-id" content={id} />
+    <script
+      is:inline
+      define:vars={{ metaPixelId: id }}
+    >
+      (function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = true;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = true;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+      window.fbq('init', metaPixelId);
+      window.fbq('track', 'PageView');
+    </script>
+    <noscript>
+      <img height="1" width="1" style="display:none" src={noscriptSrc} alt="" />
+    </noscript>
+    <script>
+      import { trackMetaPageView } from '../lib/meta-pixel';
+
+      if (!window.__roomMetaBound) {
+        let skipFirstPageLoad = true;
+        document.addEventListener('astro:page-load', () => {
+          if (skipFirstPageLoad) {
+            skipFirstPageLoad = false;
+            return;
+          }
+          trackMetaPageView();
+        });
+        window.__roomMetaBound = true;
+      }
+    </script>
+  </>
+)}

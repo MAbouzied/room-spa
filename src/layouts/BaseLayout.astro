@@ -8,9 +8,11 @@ import Footer from '../components/Footer.astro';
 import Gtm from '../components/Gtm.astro';
 import WhatsAppFloat from '../components/WhatsAppFloat.astro';
 import SeoHead from '../components/SeoHead.astro';
+import MetaPixel from '../components/MetaPixel.astro';
 import SnapPixel from '../components/SnapPixel.astro';
 import { site } from '../data/site';
 import { isGaMeasurementId } from '../lib/gtm';
+import { DEFAULT_META_PIXEL_ID } from '../lib/meta-pixel';
 import { DEFAULT_SNAP_PIXEL_ID } from '../lib/snap-pixel';
 
 interface Props {
@@ -49,6 +51,7 @@ const analyticsEnabled =
 const gaMeasurementId = analyticsEnabled && PUBLIC_GA_MEASUREMENT_ID
   ? PUBLIC_GA_MEASUREMENT_ID.trim()
   : '';
+const metaPixelId = import.meta.env.PROD ? DEFAULT_META_PIXEL_ID : '';
 ---
 
 <!doctype html>
@@ -67,6 +70,7 @@ const gaMeasurementId = analyticsEnabled && PUBLIC_GA_MEASUREMENT_ID
     />
     <meta name="generator" content={Astro.generator} />
     {analyticsEnabled && <Gtm measurementId={gaMeasurementId} />}
+    {metaPixelId && <MetaPixel pixelId={metaPixelId} />}
     <SnapPixel pixelId={DEFAULT_SNAP_PIXEL_ID} />
     <ClientRouter />
   </head>
