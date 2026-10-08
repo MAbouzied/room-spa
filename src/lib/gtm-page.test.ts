@@ -46,6 +46,16 @@ test('embeds the Google Analytics gtag snippet', () => {
   assert.match(gtmComponent, /trackGtmPageView/);
 });
 
+test('adds the Google Ads tag and contact conversion to the existing tag', () => {
+  assert.match(gtmComponent, /GOOGLE_TAG_ID/);
+  assert.match(gtmComponent, /GOOGLE_ADS_ID/);
+  assert.match(gtmComponent, /gtag\('config', googleTagId\)/);
+  assert.match(gtmComponent, /gtag\('config', googleAdsId\)/);
+  assert.match(gtmComponent, /GOOGLE_ADS_CONTACT_SEND_TO/);
+  assert.match(gtmComponent, /trackGoogleAdsConversion\(GOOGLE_ADS_CONTACT_SEND_TO\)/);
+  assert.doesNotMatch(adminLayout, /GOOGLE_ADS_ID|AW-18495851809/);
+});
+
 test('keeps Google Analytics off admin chrome pages', () => {
   assert.doesNotMatch(adminLayout, /Gtm|gtm-container-id|googletagmanager|gtag/);
 });

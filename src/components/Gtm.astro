@@ -1,5 +1,10 @@
 ---
-import { isGaMeasurementId } from '../lib/gtm';
+import {
+  GOOGLE_ADS_ID,
+  GOOGLE_TAG_ID,
+  isGaMeasurementId,
+  isGoogleAdsId,
+} from '../lib/gtm';
 
 interface Props {
   measurementId: string;
@@ -7,6 +12,9 @@ interface Props {
 
 const { measurementId } = Astro.props;
 const gtmId = isGaMeasurementId(measurementId) ? measurementId.trim() : '';
+const googleTagId =
+  isGaMeasurementId(GOOGLE_TAG_ID) && GOOGLE_TAG_ID.trim() !== gtmId ? GOOGLE_TAG_ID.trim() : '';
+const googleAdsId = isGoogleAdsId(GOOGLE_ADS_ID) ? GOOGLE_ADS_ID.trim() : '';
 ---
 
 {gtmId && <meta name="gtm-container-id" content={gtmId} />}
@@ -15,6 +23,8 @@ const gtmId = isGaMeasurementId(measurementId) ? measurementId.trim() : '';
   is:inline
   define:vars={{
     gtmId,
+    googleTagId,
+    googleAdsId,
   }}
 >
   (function () {
@@ -30,6 +40,12 @@ const gtmId = isGaMeasurementId(measurementId) ? measurementId.trim() : '';
     window.gtag = gtag;
     gtag('js', new Date());
     gtag('config', gtmId);
+    if (googleTagId) {
+      gtag('config', googleTagId);
+    }
+    if (googleAdsId) {
+      gtag('config', googleAdsId);
+    }
 
     var gaScript = document.createElement('script');
     gaScript.async = true;
@@ -39,7 +55,13 @@ const gtmId = isGaMeasurementId(measurementId) ? measurementId.trim() : '';
 </script>
 
 <script>
-  import { isGtmEventName, pushGtmEvent, trackGtmPageView } from '../lib/gtm';
+  import {
+    GOOGLE_ADS_CONTACT_SEND_TO,
+    isGtmEventName,
+    pushGtmEvent,
+    trackGoogleAdsConversion,
+    trackGtmPageView,
+  } from '../lib/gtm';
 
   const SAME_TAB_PROTOCOLS = ['tel:', 'mailto:'];
   const NAVIGATION_DELAY_MS = 150;
@@ -76,8 +98,17 @@ const gtmId = isGaMeasurementId(measurementId) ? measurementId.trim() : '';
     }
 
     if (onReady) {
+      let gtmSent = false;
+      let adsSent = false;
       let settled = false;
       const finish = () => {
+        if (settled || !gtmSent || !adsSent) {
+          return;
+        }
+        settled = true;
+        onReady();
+      };
+      const force = () => {
         if (settled) {
           return;
         }
@@ -85,14 +116,25 @@ const gtmId = isGaMeasurementId(measurementId) ? measurementId.trim() : '';
         onReady();
       };
 
-      params.eventCallback = finish;
+      params.eventCallback = () => {
+        gtmSent = true;
+        finish();
+      };
       params.eventTimeout = NAVIGATION_DELAY_MS;
       pushGtmEvent(eventName, params);
-      window.setTimeout(finish, NAVIGATION_DELAY_MS);
+      trackGoogleAdsConversion(GOOGLE_ADS_CONTACT_SEND_TO, {
+        eventCallback: () => {
+          adsSent = true;
+          finish();
+        },
+        eventTimeout: NAVIGATION_DELAY_MS,
+      });
+      window.setTimeout(force, NAVIGATION_DELAY_MS);
       return;
     }
 
     pushGtmEvent(eventName, params);
+    trackGoogleAdsConversion(GOOGLE_ADS_CONTACT_SEND_TO);
   }
 
   function onClick(event: Event) {

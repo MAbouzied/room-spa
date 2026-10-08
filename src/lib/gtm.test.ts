@@ -1,24 +1,43 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  GOOGLE_ADS_CONTACT_SEND_TO,
+  GOOGLE_ADS_ID,
+  GOOGLE_TAG_ID,
   GTM_EVENTS,
   isGaMeasurementId,
+  isGoogleAdsId,
+  isGoogleAdsSendTo,
   isGtmContainerId,
   isGtmEventName,
   pushGtmEvent,
   resolveContactEvent,
   gtmContactAttrs,
+  trackGoogleAdsConversion,
   trackGtmPageView,
 } from './gtm.ts';
 
 test('validates GA4 measurement ids', () => {
   assert.equal(isGaMeasurementId('G-D2NJJ1ZPF5'), true);
   assert.equal(isGaMeasurementId('G-XXXX'), true);
+  assert.equal(isGaMeasurementId(GOOGLE_TAG_ID), true);
   assert.equal(isGaMeasurementId('GTM-ABC123'), false);
   assert.equal(isGaMeasurementId(''), false);
   assert.equal(isGaMeasurementId(undefined), false);
   assert.equal(isGtmContainerId('GTM-ABC123'), true);
   assert.equal(isGtmContainerId('G-D2NJJ1ZPF5'), false);
+});
+
+test('validates the Google Ads contact conversion ids', () => {
+  assert.equal(GOOGLE_TAG_ID, 'G-RTY2M3XLCT');
+  assert.equal(GOOGLE_ADS_ID, 'AW-18495851809');
+  assert.equal(GOOGLE_ADS_CONTACT_SEND_TO, 'AW-18495851809/xAcbCLzlx5QdEKGawfNE');
+  assert.equal(isGoogleAdsId(GOOGLE_ADS_ID), true);
+  assert.equal(isGoogleAdsId('G-RTY2M3XLCT'), false);
+  assert.equal(isGoogleAdsId('AW-'), false);
+  assert.equal(isGoogleAdsSendTo(GOOGLE_ADS_CONTACT_SEND_TO), true);
+  assert.equal(isGoogleAdsSendTo('AW-18495851809'), false);
+  assert.equal(isGoogleAdsSendTo(''), false);
 });
 
 test('exposes contact and form event names', () => {
@@ -126,4 +145,48 @@ test('trackGtmPageView sends a page_view event to gtag', () => {
 
 test('trackGtmPageView is a no-op without gtag', () => {
   assert.doesNotThrow(() => trackGtmPageView());
+});
+
+test('trackGoogleAdsConversion sends the contact conversion', () => {
+  const gtagCalls: unknown[][] = [];
+  globalThis.window = {
+    gtag(...args: unknown[]) {
+      gtagCalls.push(args);
+    },
+  } as Window & typeof globalThis;
+
+  const callback = () => {};
+  trackGoogleAdsConversion(GOOGLE_ADS_CONTACT_SEND_TO, {
+    eventCallback: callback,
+    eventTimeout: 150,
+  });
+
+  assert.equal(gtagCalls.length, 1);
+  assert.equal(gtagCalls[0][0], 'event');
+  assert.equal(gtagCalls[0][1], 'conversion');
+  assert.deepEqual(gtagCalls[0][2], {
+    send_to: 'AW-18495851809/xAcbCLzlx5QdEKGawfNE',
+    event_callback: callback,
+    event_timeout: 150,
+  });
+
+  // @ts-expect-error test cleanup
+  delete globalThis.window;
+});
+
+test('trackGoogleAdsConversion ignores a missing gtag or a bad send_to', () => {
+  assert.doesNotThrow(() => trackGoogleAdsConversion());
+
+  const gtagCalls: unknown[][] = [];
+  globalThis.window = {
+    gtag(...args: unknown[]) {
+      gtagCalls.push(args);
+    },
+  } as Window & typeof globalThis;
+
+  trackGoogleAdsConversion('not-an-ads-id');
+  assert.equal(gtagCalls.length, 0);
+
+  // @ts-expect-error test cleanup
+  delete globalThis.window;
 });
