@@ -37,8 +37,10 @@ test('loads GA4 gtag only in production when the measurement id is valid', () =>
 });
 
 test('embeds the Google Analytics gtag snippet', () => {
-  assert.match(gtmComponent, /googletagmanager\.com\/gtag\/js\?id=/);
-  assert.match(gtmComponent, /encodeURIComponent\(gtmId\)/);
+  assert.match(gtmComponent, /googletagmanager\.com\/gtag\/js\?id=\$\{scriptId\}/);
+  assert.match(gtmComponent, /resolveGoogleTagScriptId\(\[googleTagId, googleAdsId, gtmId\]\)/);
+  assert.match(gtmComponent, /<script is:inline async src=\{scriptSrc\}><\/script>/);
+  assert.doesNotMatch(gtmComponent, /encodeURIComponent\(gtmId\)/);
   assert.match(gtmComponent, /gtag\('config', gtmId\)/);
   assert.match(gtmComponent, /window\.dataLayer/);
   assert.match(gtmComponent, /isGaMeasurementId/);

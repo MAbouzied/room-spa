@@ -8,6 +8,7 @@ import {
   isGaMeasurementId,
   isGoogleAdsId,
   isGoogleAdsSendTo,
+  resolveGoogleTagScriptId,
   isGtmContainerId,
   isGtmEventName,
   pushGtmEvent,
@@ -26,6 +27,15 @@ test('validates GA4 measurement ids', () => {
   assert.equal(isGaMeasurementId(undefined), false);
   assert.equal(isGtmContainerId('GTM-ABC123'), true);
   assert.equal(isGtmContainerId('G-D2NJJ1ZPF5'), false);
+});
+
+test('loads gtag.js from a tag id Google actually serves', () => {
+  assert.equal(
+    resolveGoogleTagScriptId([GOOGLE_TAG_ID, GOOGLE_ADS_ID, 'G-D2NJJ1ZPF5']),
+    'G-RTY2M3XLCT',
+  );
+  assert.equal(resolveGoogleTagScriptId(['', 'AW-18495851809']), 'AW-18495851809');
+  assert.equal(resolveGoogleTagScriptId(['not-an-id', '']), '');
 });
 
 test('validates the Google Ads contact conversion ids', () => {

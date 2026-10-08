@@ -22,6 +22,22 @@ export function isGoogleAdsSendTo(value: unknown): value is string {
   return typeof value === 'string' && /^AW-\d+\/[A-Za-z0-9_-]+$/.test(value.trim());
 }
 
+/**
+ * Pick the id used in the gtag.js script URL.
+ * Google returns 404 for an unknown measurement id and the library never runs.
+ * Prefer the working Ads Google tag, then the Ads account id, then GA4.
+ */
+export function resolveGoogleTagScriptId(ids: readonly string[]): string {
+  for (const id of ids) {
+    const value = id.trim();
+    if (isGaMeasurementId(value) || isGoogleAdsId(value)) {
+      return value;
+    }
+  }
+
+  return '';
+}
+
 export function isGtmContainerId(value: unknown): value is string {
   return typeof value === 'string' && /^GTM-[A-Z0-9]+$/i.test(value.trim());
 }
