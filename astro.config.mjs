@@ -60,7 +60,7 @@ export default defineConfig({
         context: 'client',
         access: 'public',
         optional: true,
-        default: 'G-D2NJJ1ZPF5',
+        default: 'G-RTY2M3XLCT',
       }),
       BETTER_AUTH_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
       BETTER_AUTH_URL: envField.string({ context: 'server', access: 'secret', optional: true }),

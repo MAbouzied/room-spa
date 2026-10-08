@@ -33,7 +33,7 @@ test('loads GA4 gtag only in production when the measurement id is valid', () =>
   assert.match(baseLayout, /isGaMeasurementId/);
   assert.match(baseLayout, /<Gtm measurementId=\{gaMeasurementId\} \/>/);
   assert.match(astroConfig, /PUBLIC_GA_MEASUREMENT_ID/);
-  assert.match(wrangler, /PUBLIC_GA_MEASUREMENT_ID = "G-D2NJJ1ZPF5"/);
+  assert.match(wrangler, /PUBLIC_GA_MEASUREMENT_ID = "G-RTY2M3XLCT"/);
 });
 
 test('embeds the Google Analytics gtag snippet', () => {
